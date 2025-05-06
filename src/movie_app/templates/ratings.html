@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Movie Ratings - CineSelectorama</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #E5B94E;
+            --secondary: #8B1E3F;
+            --background: rgb(59, 99, 138);
+            --card-bg: rgb(59, 99, 138);
+            --text: #E8E9F3;
+            --text-light: #E5B94E;
+            --border-color: #b47a22;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: var(--background);
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.6;
+            background-image: 
+                linear-gradient(to bottom, rgba(26, 31, 43, 0.97), rgba(26, 31, 43, 0.97)),
+                repeating-linear-gradient(
+                    45deg,
+                    rgba(255, 255, 255, 0.03) 0px,
+                    rgba(255, 255, 255, 0.03) 1px,
+                    transparent 1px,
+                    transparent 3px
+                );
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 4px solid var(--border-color);
+            padding: 2.5rem;
+            box-shadow: 8px 8px 0 rgba(184, 134, 11, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            border-bottom: 2px dashed var(--border-color);
+            padding-bottom: 1.5rem;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 3px 3px var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .nav-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--primary);
+            color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .movie-card {
+            background: rgba(26, 38, 50, 0.8);
+            border: 2px solid var(--border-color);
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+            position: relative;
+            height: auto;
+            max-width: 100%;
+        }
+
+        .movie-poster {
+            width: 200px;
+            height: 300px;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+            margin-bottom: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .movie-title {
+            color: var(--primary);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            min-height: auto;
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .star {
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            color: #ccc;
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .star.active {
+            color: var(--primary);
+            animation: starPop 0.3s ease-out;
+        }
+
+        @keyframes starPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .star:hover {
+            transform: scale(1.2);
+        }
+
+        .rating-display {
+            color: var(--text);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .add-movie-btn {
+            background: var(--secondary);
+            color: var(--text);
+            border: 2px solid var(--border-color);
+            padding: 0.5rem;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+            width: auto;
+            display: inline-block;
+        }
+
+        .add-movie-btn:hover {
+            background: var(--primary);
+            color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border: 4px solid var(--border-color);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        #review-text {
+            width: 100%;
+            height: 100px;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            font-size: 0.8rem;
+            background: rgba(26, 38, 50, 0.8);
+            border: 2px solid var(--border-color);
+            color: var(--text);
+            resize: vertical;
+        }
+
+        .movie-review {
+            font-size: 0.7rem;
+            color: var(--text);
+            margin: 0.5rem 0;
+            max-height: 100px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        @media (max-width: 1024px) {
+            .movie-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .movie-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .movie-poster {
+                width: 150px;
+                height: 225px;
+            }
+        }
+
+        .no-movies {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 1.2em;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .message.success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .message.error {
+            background-color: #f44336;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .star-rating .fa-star {
+            cursor: pointer;
+            font-size: 24px;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+
+        .star-rating .fa-star.fas {
+            color: var(--primary);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .rating-text {
+            color: var(--text);
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+
+        .star-rating .fa-star {
+            font-size: 20px;
+            padding: 0 2px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text);
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .delete-btn:hover {
+            background: var(--secondary);
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .delete-btn i {
+            font-size: 1.2rem;
+        }
+
+        .curtain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .curtain {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            background: var(--secondary);
+            background-image: 
+                linear-gradient(90deg, 
+                    rgba(0,0,0,0.3) 0%, 
+                    rgba(0,0,0,0) 10%, 
+                    rgba(0,0,0,0.3) 20%),
+                linear-gradient(180deg, #8B1E3F, #5a142a);
+            transition: transform 1s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+
+        .curtain-left {
+            left: 0;
+            transform: translateX(-100%);
+            border-right: 4px solid var(--primary);
+        }
+
+        .curtain-right {
+            right: 0;
+            transform: translateX(100%);
+            border-left: 4px solid var(--primary);
+        }
+
+        .curtain::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0,0,0,0.1) 0px,
+                    rgba(0,0,0,0.1) 1px,
+                    transparent 1px,
+                    transparent 10px
+                );
+        }
+    </style>
+</head>
+<body>
+    <div class="curtain-container">
+        <div class="curtain curtain-left"></div>
+        <div class="curtain curtain-right"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>My Library</h1>
+            <a href="javascript:void(0)" onclick="transitionToPage('/')" class="nav-link">← Back to Movies</a>
+        </div>
+        <div id="watched-movies" class="movie-grid">
+            <!-- Movies will be displayed here -->
+        </div>
+    </div>
+
+    <!-- Add a modal for reviews -->
+    <div id="review-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Review</h2>
+            <textarea id="review-text" placeholder="Write your review here..."></textarea>
+            <div class="star-rating" id="modal-star-rating">
+                <i class="fa-star far" data-rating="1"></i>
+                <i class="fa-star far" data-rating="2"></i>
+                <i class="fa-star far" data-rating="3"></i>
+                <i class="fa-star far" data-rating="4"></i>
+                <i class="fa-star far" data-rating="5"></i>
+                <i class="fa-star far" data-rating="6"></i>
+                <i class="fa-star far" data-rating="7"></i>
+                <i class="fa-star far" data-rating="8"></i>
+                <i class="fa-star far" data-rating="9"></i>
+                <i class="fa-star far" data-rating="10"></i>
+            </div>
+            <p class="rating-text">Rating: <span id="rating-display">0</span>/10</p>
+            <button class="add-movie-btn" onclick="submitReview()">Submit Review</button>
+        </div>
+    </div>
+
+    <script>
+    let currentMovieId = null;
+
+    function loadWatchedMovies() {
+        console.log('Loading watched movies...'); // Debug log
+        fetch('/api/watched')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Received data:', data); // Debug log
+                const container = document.getElementById('watched-movies');
+                container.innerHTML = '';
+                
+                if (!data.watched_movies || data.watched_movies.length === 0) {
+                    container.innerHTML = '<p class="no-movies">No movies marked as watched yet. Go back and mark some movies as watched!</p>';
+                    return;
+                }
+                
+                data.watched_movies.forEach(movie => {
+                    const movieElement = document.createElement('div');
+                    movieElement.className = 'movie-card';
+                    
+                    // Create star display for existing rating
+                    let ratingDisplay = '';
+                    if (movie.rating) {
+                        ratingDisplay = `<div class="star-rating">
+                            ${Array(10).fill().map((_, i) => 
+                                `<i class="fa-star ${i < movie.rating ? 'fas' : 'far'}"></i>`
+                            ).join('')}
+                        </div>
+                        <p class="rating-text">Rating: ${movie.rating}/10</p>`;
+                    }
+
+                    movieElement.innerHTML = `
+                        <img class="movie-poster" src="${movie.poster_url}" alt="${movie.title}">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        ${ratingDisplay}
+                        ${movie.review ? `<p class="movie-review">Review: ${movie.review}</p>` : ''}
+                        <div class="button-container">
+                            <button class="add-movie-btn" onclick="openReviewModal(${movie.id})">
+                                ${movie.review ? 'Edit Review' : 'Add Review'}
+                            </button>
+                            <button class="delete-btn" onclick="deleteRating(${movie.id})">
+                                Remove
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(movieElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('watched-movies').innerHTML = 
+                    '<p class="error">Error loading watched movies. Please try again later.</p>';
+            });
+    }
+
+    function openReviewModal(movieId) {
+        currentMovieId = movieId;
+        const modal = document.getElementById('review-modal');
+        modal.style.display = 'flex';
+        
+        // Reset the form
+        document.getElementById('review-text').value = '';
+        const starRating = document.querySelector('#modal-star-rating');
+        starRating.setAttribute('data-current-rating', '0');
+        highlightStars(starRating, 0);
+        document.getElementById('rating-display').textContent = '0';
+    }
+
+    function submitReview() {
+        const review = document.getElementById('review-text').value;
+        const rating = document.querySelector('#modal-star-rating').getAttribute('data-current-rating');
+        
+        if (!rating) {
+            showMessage('Please select a rating', 'error');
+            return;
+        }
+
+        fetch('/api/ratings/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: currentMovieId,
+                review: review,
+                rating: parseInt(rating)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('review-modal').style.display = 'none';
+                document.getElementById('review-text').value = '';
+                const starRating = document.querySelector('#modal-star-rating');
+                starRating.setAttribute('data-current-rating', '0');
+                highlightStars(starRating, 0);
+                document.getElementById('rating-display').textContent = '0';
+                loadWatchedMovies();
+                showMessage('Review updated successfully!', 'success');
+            } else {
+                throw new Error(data.message || 'Failed to update rating');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Failed to update rating: ' + error.message, 'error');
+        });
+    }
+
+    // Close modal when clicking the X
+    document.querySelector('.close').onclick = function() {
+        document.getElementById('review-modal').style.display = 'none';
+    }
+
+    // Load movies when page loads
+    document.addEventListener('DOMContentLoaded', loadWatchedMovies);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const starContainers = document.querySelectorAll('.star-rating');
+
+        starContainers.forEach(container => {
+            const stars = container.querySelectorAll('.fa-star');
+
+            // Handle hover effects
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function() {
+                    const rating = this.dataset.rating;
+                    highlightStars(container, rating);
+                    if (container.id === 'modal-star-rating') {
+                        document.getElementById('rating-display').textContent = rating;
+                    }
+                });
+
+                star.addEventListener('click', function() {
+                    const rating = this.dataset.rating;
+                    container.setAttribute('data-current-rating', rating);
+                    highlightStars(container, rating);
+                    if (container.id === 'modal-star-rating') {
+                        document.getElementById('rating-display').textContent = rating;
+                    }
+                });
+            });
+
+            container.addEventListener('mouseleave', function() {
+                const currentRating = container.getAttribute('data-current-rating') || 0;
+                highlightStars(container, currentRating);
+                if (container.id === 'modal-star-rating') {
+                    document.getElementById('rating-display').textContent = currentRating;
+                }
+            });
+        });
+    });
+
+    function highlightStars(container, rating) {
+        const stars = container.querySelectorAll('.fa-star');
+        stars.forEach(star => {
+            const starRating = star.dataset.rating;
+            star.classList.remove('fas', 'far');
+            star.classList.add(starRating <= rating ? 'fas' : 'far');
+        });
+    }
+
+    function showMessage(message, type) {
+        const messageEl = document.createElement('div');
+        messageEl.className = `message ${type}`;
+        messageEl.textContent = message;
+        document.body.appendChild(messageEl);
+        
+        setTimeout(() => {
+            messageEl.remove();
+        }, 3000);
+    }
+
+    function transitionToPage(href) {
+        const curtainLeft = document.querySelector('.curtain-left');
+        const curtainRight = document.querySelector('.curtain-right');
+        
+        // Close curtains
+        curtainLeft.style.transform = 'translateX(0)';
+        curtainRight.style.transform = 'translateX(0)';
+        
+        // Wait for curtains to close before navigating
+        setTimeout(() => {
+            window.location.href = href;
+        }, 1000);
+    }
+
+    // Handle page load
+    document.addEventListener('DOMContentLoaded', () => {
+        // Start with curtains closed
+        const curtainLeft = document.querySelector('.curtain-left');
+        const curtainRight = document.querySelector('.curtain-right');
+        
+        curtainLeft.style.transform = 'translateX(0)';
+        curtainRight.style.transform = 'translateX(0)';
+        
+        // Open curtains after a brief delay
+        setTimeout(() => {
+            curtainLeft.style.transform = 'translateX(-100%)';
+            curtainRight.style.transform = 'translateX(100%)';
+        }, 100);
+        
+        // Update all navigation links to use the curtain transition
+        document.querySelectorAll('a[href]').forEach(link => {
+            if (!link.getAttribute('href').startsWith('http')) {  // Only for internal links
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    transitionToPage(link.href);
+                });
+            }
+        });
+    });
+
+    // Add the delete function
+    function deleteRating(movieId) {
+        if (confirm('Are you sure you want to remove this movie from your ratings?')) {
+            fetch('/api/ratings/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: movieId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadWatchedMovies();  // Reload the movies
+                    showMessage('Movie removed successfully!', 'success');
+                } else {
+                    throw new Error(data.message || 'Failed to remove movie');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Failed to remove movie: ' + error.message, 'error');
+            });
+        }
+    }
+    </script>
+</body>
+</html>

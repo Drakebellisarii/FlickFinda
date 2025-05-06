@@ -1,0 +1,2710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineSelectorama - Movie Discovery Platform</title>
+    <!-- Hidden input to store YouTube API key -->
+    <input type="hidden" id="youtube-api-key" value="AIzaSyC298FVCTIlyMv3D1Recj3p1QEjSUQoiJI">
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+          /* User Menu Styles */
+    .user-menu-container {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        border: 2px solid var(--border-color);
+        transition: all 0.3s;
+        box-shadow: 0 0 10px rgba(229, 185, 78, 0.3);
+    }
+
+    .user-avatar:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px var(--primary);
+    }
+
+    #user-initial {
+        color: var(--primary);
+        font-weight: bold;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+    }
+
+    .user-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 220px;
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius);
+        margin-top: 0.5rem;
+        box-shadow: 5px 5px 0 rgba(184, 134, 11, 0.3);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s;
+        z-index: 1001;
+        overflow: hidden;
+    }
+
+    .user-avatar:hover .user-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .user-dropdown-header {
+        padding: 1rem;
+        border-bottom: 2px solid var(--border-color);
+        background: var(--secondary);
+    }
+
+    #user-greeting {
+        color: var(--primary);
+        font-size: 0.8rem;
+        font-weight: bold;
+        font-family: 'Press Start 2P', cursive;
+    }
+
+    .user-dropdown-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .user-dropdown-menu li {
+        border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+    }
+
+    .user-dropdown-menu li:last-child {
+        border-bottom: none;
+    }
+
+    .menu-icon {
+        margin-right: 0.5rem;
+    }
+
+    .user-dropdown-menu a {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: var(--text);
+        text-decoration: none;
+        transition: all 0.3s;
+        font-size: 0.7rem;
+        font-family: 'Press Start 2P', cursive;
+    }
+
+    .user-dropdown-menu a:hover {
+        background: rgba(229, 185, 78, 0.1);
+        color: var(--primary);
+    }
+
+    /* Authentication Required Overlay */
+    .auth-required-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        z-index: 10002;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .auth-required-content {
+        background: var(--card-bg);
+        border: 4px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        animation: authRequiredPulse 0.5s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-required-header {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-required-header h3 {
+        color: var(--primary);
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1rem;
+        text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+        position: relative;
+        z-index: 1;
+    }
+
+    .spotlight-left, .spotlight-right {
+        position: absolute;
+        width: 50px;
+        height: 200px;
+        background: radial-gradient(
+            ellipse at center,
+            rgba(229, 185, 78, 0.3) 0%,
+            rgba(229, 185, 78, 0) 70%
+        );
+        animation: spotlightSweep 3s infinite alternate;
+        z-index: 0;
+    }
+
+    .spotlight-left {
+        left: 20px;
+        transform: rotate(-30deg);
+        animation-delay: -1.5s;
+    }
+
+    .spotlight-right {
+        right: 20px;
+        transform: rotate(30deg);
+    }
+
+    @keyframes spotlightSweep {
+        0% { opacity: 0.3; transform: rotate(-45deg); }
+        100% { opacity: 0.7; transform: rotate(-15deg); }
+    }
+
+    @keyframes authRequiredPulse {
+        0% { transform: scale(0.9); opacity: 0; }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .auth-required-content p {
+        color: var(--text);
+        margin-bottom: 1.5rem;
+        font-family: 'Courier Prime', monospace;
+    }
+
+    .auth-required-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .auth-required-buttons .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        background: var(--secondary);
+        border: 2px solid var(--border-color);
+        color: var(--text);
+        font-family: 'Press Start 2P', cursive;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 3px 3px 0 var(--border-color);
+    }
+
+    .auth-required-buttons .btn:hover {
+        background: var(--primary);
+        color: var(--secondary);
+        transform: translateY(-2px);
+        box-shadow: 3px 5px 0 var(--border-color);
+    }
+
+    /* Toast Notification */
+    .auth-toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: var(--card-bg);
+        color: var(--primary);
+        padding: 1rem 2rem;
+        border-radius: var(--border-radius);
+        border: 2px solid var(--border-color);
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.8rem;
+        z-index: 10003;
+        opacity: 0;
+        transition: transform 0.4s, opacity 0.4s;
+        box-shadow: 0 0 15px rgba(229, 185, 78, 0.3);
+    }
+
+    .auth-toast.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+
+               :root {
+            --primary: #E5B94E;        
+            --secondary: #8B1E3F;     
+            --background: rgb(59, 99, 138);     
+            --card-bg: rgb(59, 99, 138);        
+            --text: #E8E9F3;          
+            --text-light: #E5B94E;    
+            --border-color: #b47a22;  
+
+             --shadow-color: rgba(0, 0, 0, 0.2);
+            --transition-speed: 0.3s;
+                --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: var(--background);
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.6;
+            background-image: 
+            linear-gradient(to bottom, rgba(26, 31, 43, 0.97), rgba(26, 31, 43, 0.97)),
+            repeating-linear-gradient(
+                45deg,
+            rgba(255, 255, 255, 0.03) 0px,
+            rgba(255, 255, 255, 0.03) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+        }
+        .ai-input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .ai-input-row {
+            display: flex;
+            gap: 1rem;
+            align-items: stretch;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        #movieDescription {
+            flex: 1;
+            width: 80%;
+            height: 42px;
+            line-height: 42px;
+            padding: 0 0.75rem;
+            border: 2px solid var(--border-color);
+            background: var(--background);
+            color: var(--primary);
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin: 0;
+            display: block;
+        }
+
+        #movieDescription::placeholder {
+            color: rgba(229, 185, 78, 0.5);
+        }
+
+        #find-movie-btn {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: var(--secondary);
+            color: var(--text);
+            text-transform: uppercase;
+            font-family: 'Press Start 2P', cursive;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px #000;
+            box-shadow: 4px 4px 0 var(--border-color);
+            max-width: 800px;
+            margin-top: 15px;
+        }
+
+        #find-movie-btn:hover {
+            background: var(--primary);
+            color: var(--secondary);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--border-color);
+        }
+        .curtain-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.curtain {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    background: var(--secondary);
+    background-image: 
+        linear-gradient(90deg, 
+            rgba(0,0,0,0.3) 0%, 
+            rgba(0,0,0,0) 10%, 
+            rgba(0,0,0,0.3) 20%),
+        linear-gradient(180deg, #8B1E3F, #5a142a);
+    transition: transform 1s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.curtain-left {
+    left: 0;
+    transform: translateX(-100%);
+    border-right: 4px solid var(--primary);
+}
+
+.curtain-right {
+    right: 0;
+    transform: translateX(100%);
+    border-left: 4px solid var(--primary);
+}
+
+.curtain::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            rgba(0,0,0,0.1) 0px,
+            rgba(0,0,0,0.1) 1px,
+            transparent 1px,
+            transparent 10px
+        );
+        }
+                .select-container {
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            width: 100%;
+        }
+
+        .button-container .btn {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            margin: 0;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 0;
+            border: 4px solid var(--border-color);
+            padding: 2.5rem;
+            box-shadow: 8px 8px 0 rgba(184, 134, 11, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 1%;
+            right: 1%;
+            height: 3px;
+            background: var(--primary);
+            box-shadow: 
+                0 0 10px var(--primary),
+                0 6px 0 var(--primary);
+        }   
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            font-size: 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 3px 3px var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+    button {
+        background-color: #FFD700;
+        color: black;
+        padding: 12px 24px;  
+        font-size: 0.8rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        width: 100%;
+        max-width: 800px; 
+        margin-top: 15px;
+        white-space: nowrap; 
+        display: block; 
+    }
+
+    @media (max-width: 768px) {
+        button {
+            padding: 10px 20px;
+            font-size: 0.75rem;
+        }
+    }
+
+    button:hover {
+        background-color: rgba(255, 255, 255, 0.903); 
+        transform: scale(1.05); 
+    }
+
+    button:focus {
+        outline: none;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.3); 
+    }
+        .header p {
+            color: var(--text);
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+
+        .content-grid {
+            display: block;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .select-container {
+            background: rgba(26, 38, 50, 0.8);
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+        }
+
+        label {
+            display: block;
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            background-color: var(--background);
+            color: var(--text);
+            font-family: 'Courier Prime', monospace;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            appearance: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: var(--secondary);
+            color: var(--text);
+            text-transform: uppercase;
+            font-family: 'Courier Prime', monospace;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px #000;
+            box-shadow: 4px 4px 0 var(--border-color);
+        }
+
+        .btn:hover {
+            background: var(--primary);
+            color: var(--secondary);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--border-color);
+        }
+
+    .movie-card {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .movie-card img {
+        max-width: 100%;
+        height: auto;
+        cursor: pointer;
+    }
+
+    .movie-card button {
+        margin-top: 10px;
+        padding: 5px 10px;
+    }
+
+        .movie-info {
+            display: none;  /* Hidden by default */
+            width: 100%;
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(26, 38, 50, 0.8);
+            border: 4px solid var(--border-color);
+            box-shadow: 8px 8px 0 rgba(184, 134, 11, 0.3);
+            /* Add these flex properties */
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .movie-info.show {
+            display: block;  /* Show when class is added */
+        }
+
+        #movie-title {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px var(--secondary);
+        }
+
+        #movie-poster {
+            width: 300px;
+            height: 450px;
+            object-fit: cover;
+            border: 4px solid var(--border-color);
+            margin: 1rem auto;
+            display: block;
+        }
+
+        .movie-details {
+            width: 100%;
+            text-align: center;
+        }
+
+        .movie-ratings {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .movie-ratings li {
+            background: var(--background);
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            text-align: center;
+        }
+
+        .movie-ratings strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.7rem;
+        }
+
+        .movie-ratings span {
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+
+        .loading {
+            animation: flicker 1.5s infinite;
+        }
+
+        * Add different styles for the labels */
+    .plot-label, .awards-label {
+    font-family: 'Press Start 2P', cursive;
+    color: var(--primary);
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    }
+
+/* Add a subtle highlight effect on hover */
+#movie-plot:hover, #movie-awards:hover {
+  background: rgba(255, 215, 0, 0.05);
+  transition: background 0.3s ease;
+}
+
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .movie-poster {
+                max-width: 100%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .featured-banner {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 2x;
+            text-shadow: 2px 2px var(--secondary);
+            padding: 1rem;
+            border-top: 2px dashed var(--border-color);
+            border-bottom: 2px dashed var(--border-color);
+            background: rgba(26, 38, 50, 0.9);
+            position: relative;
+            transition: opacity 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+        }
+
+        .featured-banner::before,
+        .featured-banner::after {
+            content: "★";
+            color: var(--primary);
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+        }
+
+        .featured-banner::before {
+            left: 1rem;
+        }
+
+        .featured-banner::after {
+            right: 1rem;
+        }
+
+.skeleton {
+    background: linear-gradient(90deg, 
+        var(--card-bg) 25%, 
+        var(--background) 50%, 
+        var(--card-bg) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+.skeleton-text {
+    height: 20px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.skeleton-title {
+    height: 40px;
+    width: 70%;
+    margin-bottom: 16px;
+}
+
+.skeleton-poster {
+    height: 450px;
+    width: 300px;
+    margin-bottom: 16px;
+}
+
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Update movie-info transitions */
+.movie-info {
+    transition: opacity 0.3s ease;
+}
+
+.movie-info.loading {
+    opacity: 0.7;
+}
+
+.theater-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    perspective: 1000px;
+}
+
+.theater-content {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    margin: 5% auto;
+    transform-style: preserve-3d;
+}
+
+.theater-screen {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    background: #000;
+    border: 4px solid var(--primary);
+    box-shadow: 0 0 30px rgba(229, 185, 78, 0.3);
+    transform: rotateX(5deg);
+}
+
+.screen-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#youtube-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.screen-bottom {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background: var(--primary);
+    transform: rotateX(-45deg);
+    transform-origin: top;
+}
+
+/* Add these styles to your existing CSS */
+.theater-title {
+    color: var(--primary);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px var(--secondary);
+}
+
+/* Make the theater content area slightly larger for full movies */
+.theater-content {
+    width: 95%;
+    max-width: 1200px;
+}
+
+/* Add a subtle film frame style to indicate full movie mode */
+.theater-screen.full-movie {
+    border: 6px solid var(--primary);
+    box-shadow: 0 0 40px rgba(229, 185, 78, 0.4);
+}
+
+/* Add a notice for free YouTube movies */
+.youtube-notice {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 1000;
+}
+
+.close-theater {
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 40px;
+    height: 40px;
+    background: var(--secondary);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-theater:hover {
+    transform: scale(1.1);
+    background: var(--primary);
+    color: var(--secondary);
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    justify-content: flex-end;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    width: 100%;
+    position: relative;
+}
+
+.search-wrapper {
+    position: relative;
+    max-width: 200px;
+}
+
+.search-input {
+    width: 150px;
+    padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+    border: 2px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text);
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.8rem;
+    border-radius: 4px;
+}
+
+.search-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary);
+    font-size: 0.8rem;
+    pointer-events: none;
+}
+
+.search-text {
+    color: var(--text);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    text-shadow: 1px 1px var(--secondary);
+    opacity: 0.8;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+}
+
+.loading-overlay.active {
+    display: flex;
+}
+
+.loading-text {
+    color: var(--primary);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+}
+
+.ai-input-wrapper {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+}
+
+.movie-count-select {
+    width: auto;
+    height: 42px;
+    line-height: 42px;
+    padding: 0 0.75rem;
+    border: 2px solid var(--border-color);
+    background: var(--background);
+    color: var(--primary);
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 100px;
+    max-width: 120px;
+    box-sizing: border-box;
+    margin: 0;
+    display: block;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.movie-count-select::-ms-expand {
+    display: none;
+}
+
+.movie-count-select:hover {
+    border-color: var(--primary);
+    background: var(--card-bg);
+}
+
+#movieDescription:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--card-bg);
+}
+
+/* Add these styles to your existing CSS */
+
+.suggested-movies-heading {
+    color: var(--primary);
+    font-size: 2rem;
+    text-align: center;
+    margin: 2rem 0;
+    text-transform: uppercase;
+    text-shadow: 3px 3px var(--secondary);
+    font-family: 'Press Start 2P', cursive;
+}
+
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 2x2 grid */
+    gap: 2rem;
+    padding: 1rem;
+    margin: 2rem 0;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.movie-card {
+    background: rgba(26, 38, 50, 0.8);
+    border: 4px solid var(--border-color);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 8px 8px 0 rgba(184, 134, 11, 0.3);
+}
+
+.movie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 12px 12px 0 rgba(184, 134, 11, 0.3);
+}
+
+.movie-card-poster {
+    width: 100%;
+    max-width: 300px; /* Larger posters */
+    height: 450px;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.movie-card-title {
+    color: var(--primary);
+    font-size: 1rem;
+    margin: 1rem 0;
+    font-family: 'Press Start 2P', cursive;
+    min-height: 3em;
+}
+
+.movie-card-rating {
+    color: var(--text-light);
+    font-size: 0.8rem;
+    margin: 0.5rem 0;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.movie-card-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.movie-card-buttons .btn {
+    background: var(--secondary);
+    color: var(--text);
+    border: 2px solid var(--border-color);
+    padding: 0.6rem;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Press Start 2P', cursive;
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0 var(--border-color);
+}
+
+.movie-card-buttons .btn:hover {
+    background: var(--primary);
+    color: var(--secondary);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--border-color);
+}
+
+#back-to-results-btn {
+    margin-top: 2rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--secondary);
+    color: var(--text);
+    border: 2px solid var(--border-color);
+    font-family: 'Press Start 2P', cursive;
+    cursor: pointer;
+    font-size: 0.8rem;
+    box-shadow: 4px 4px 0 var(--border-color);
+    transition: all 0.3s ease;
+}
+
+#back-to-results-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--border-color);
+    background: var(--primary);
+    color: var(--secondary);
+}
+
+@media (max-width: 768px) {
+    .movie-grid {
+        grid-template-columns: 1fr; /* Single column on mobile */
+    }
+}
+
+.movie-details p {
+  margin-bottom: 15px;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  white-space: normal; /* Ensure text wraps properly */
+}
+
+#movie-plot, #movie-awards {
+  display: block;
+  color: #FFD700;
+  max-width: 100%;
+  margin-top: 5px;
+  background: transparent; /* Make sure no background interferes */
+  padding: 5px 0;
+  text-align: left;
+}
+
+.movie-details {
+  background: transparent;  
+  position: relative;
+  z-index: 1; /* Ensure content appears above any background elements */
+}
+
+        /* Add these animation styles */
+        .success-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            display: none;
+        }
+
+        .checkmark {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 2;
+            stroke: #4bb71b;
+            stroke-miterlimit: 10;
+            box-shadow: inset 0px 0px 0px #4bb71b;
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+        }
+
+        .checkmark__circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #4bb71b;
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes scale {
+            0%, 100% {
+                transform: none;
+            }
+            50% {
+                transform: scale3d(1.1, 1.1, 1);
+            }
+        }
+
+        @keyframes fill {
+            100% {
+                box-shadow: inset 0px 0px 0px 30px #4bb71b;
+            }
+        }
+    </style>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    </head>
+<body>
+    <!-- Add this animation HTML right after the opening body tag -->
+    <div class="success-animation" id="successAnimation">
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+    </div>
+
+    <div class="user-menu-container">
+        <div class="user-menu-trigger">
+            <div id="user-logged-in">
+                <div class="user-avatar">
+                    <span id="user-initial">?</span>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <span id="user-greeting">Welcome!</span>
+                        </div>
+                        <ul class="user-dropdown-menu">
+                            <li><a href="/watchlist"><span class="menu-icon">📽️</span> My Watchlist</a></li>
+                            <li><a href="/ratings"><span class="menu-icon">⭐</span> My Ratings</a></li>
+                            <li><a href="#" id="logout-btn"><span class="menu-icon">🚪</span> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="curtain-container">
+        <div class="curtain curtain-left"></div>
+        <div class="curtain curtain-right"></div>
+    </div>
+        <div class="container">
+        <div class="header">
+            <h1>FlickFinda</h1>
+            <p>Making movie selection effortless</p>
+        </div>
+
+        <div id="selectedMovie">
+            <h2 id="movieTitle"></h2>
+            <p id="movieDescriptionText"></p>
+            <p id="movieRatings"></p>
+            <p id="movieReviews"></p>
+        </div>
+
+        <!-- AI Movie Recommendation Section -->
+        <div class="ai-input-container">
+            <label for="movieDescription">What type of movie are you in the mood for?</label>
+            <div class="ai-input-row">
+                            <input type="text" id="movieDescription" placeholder="e.g., A moving film that is going to make me think about life">
+                <select id="movie-count" class="movie-count-select">
+                    <option value="1">1 Movie</option>
+                    <option value="2">2 Movies</option>
+                    <option value="3">3 Movies</option>
+                    <option value="4">4 Movies</option>
+                    <option value="5">5 Movies</option>
+                    <option value="6">6 Movies</option>
+                </select>
+            </div>
+            <button id="find-movie-btn">Find Movies with AI</button>
+        </div>
+
+        <div class="content-grid">
+            <div class="movie-info">
+                <div class="search-container">
+                    <div class="search-text">or search</div>
+                    <div class="search-wrapper">
+                        <input type="text" id="movie-search" placeholder="Search..." class="search-input">
+                        <i class="fas fa-search search-icon"></i>
+            </div>
+                    </div>
+                <div id="movie-poster-container">
+                    <img id="movie-poster" class="movie-poster" src="/api/placeholder/300/450" alt="Movie Poster">
+                </div>
+                <div class="movie-details">
+                    <h2 id="movie-title">Loading...</h2>
+                    <p><strong>Plot:</strong> <span id="movie-plot">Loading...</span></p>
+                    <p><strong>Awards:</strong> <span id="movie-awards">Loading...</span></p>
+                    
+                    <ul id="movie-ratings" class="movie-ratings">
+                        <li><strong>IMDb</strong> <span>Loading...</span></li>
+                        <li><strong>Rotten Tomatoes</strong> <span>Loading...</span></li>
+                        <li><strong>Metacritic</strong> <span>Loading...</span></li>
+                    </ul>
+
+                    <div class="button-container">
+                        <button class="btn" id="generate-review-btn">Add to Watchlist</button>
+                        <button class="btn" id="view-watchlist-btn" onclick="viewWatchlist()">View Watchlist</button>
+                        <button class="btn" id="get-ratings-btn" >View Trailer</button>
+                        <button class="btn" id="watch-full-movie-btn" >Watch Full Movie</button> 
+                        <button class="btn" id="view-ratings-btn" onclick="addToWatched()">Mark As Watched</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update the theater modal HTML -->
+    <div id="theater-modal" class="theater-modal">
+        <div class="theater-content">
+            <div class="theater-screen">
+                <div class="screen-frame">
+                    <div id="youtube-player"></div>
+                    <div class="loading-overlay">
+                        <span class="loading-text">Loading...</span>
+                    </div>
+                </div>
+                <div class="screen-bottom"></div>
+            </div>
+            <button class="close-theater">&times;</button>
+        </div>
+    </div>
+
+    <script>
+        // API Keys
+        const YOUTUBE_API_KEY = "{{ youtube_api_key }}";
+        const OMDB_API_KEY = "{{ omdb_api_key }}";
+
+// Global variables
+let player;
+
+// DOM Element References
+const elements = {
+    title: document.getElementById("movie-title"),
+    plot: document.getElementById("movie-plot"),
+    awards: document.getElementById("movie-awards"),
+    poster: document.getElementById("movie-poster"),
+    ratings: document.getElementById("movie-ratings"),
+    movieInfo: document.querySelector(".movie-info"),
+    movieSearch: document.getElementById("movie-search"),
+    movieDescription: document.getElementById("movieDescription"),
+    movieCount: document.getElementById("movie-count"),
+    findMovieBtn: document.getElementById("find-movie-btn"),
+    generateReviewBtn: document.getElementById("generate-review-btn"),
+    viewWatchlistBtn: document.getElementById("view-watchlist-btn"),
+    getTrailerBtn: document.getElementById("get-ratings-btn"),
+    watchFullMovieBtn: document.getElementById("watch-full-movie-btn"),
+    viewRatingsBtn: document.getElementById("view-ratings-btn"),
+    theaterModal: document.getElementById("theater-modal"),
+    youtubePlayer: document.getElementById("youtube-player"),
+    closeTheater: document.querySelector(".close-theater"),
+    successAnimation: document.getElementById("successAnimation")
+};
+
+/**
+ * Application Initialization
+ */
+function initializeApp() {
+    console.log("Initializing application...");
+    
+    // Hide movie info initially
+    if (elements.movieInfo) {
+        elements.movieInfo.style.display = 'none';
+    }
+
+    // Clear any existing movie grid
+    const existingGrid = document.getElementById('multiple-movies-grid');
+    if (existingGrid) {
+        existingGrid.remove();
+    }
+
+    // Remove any existing headings
+    const existingHeading = document.querySelector('.suggested-movies-heading');
+    if (existingHeading) {
+        existingHeading.remove();
+    }
+
+    // Set up Last Results button if we have saved results
+    setupLastResultsButton();
+    
+    // Load YouTube API
+    loadYouTubeAPI();
+    
+    // Setup all button listeners
+    setupButtonListeners();
+    
+    // Setup search input
+    if (elements.movieSearch) {
+        elements.movieSearch.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchMovie();
+            }
+        });
+    }
+    
+    // Handle keyboard events
+    setupKeyboardListeners();
+    
+    // Setup page transitions
+    setupPageTransitions();
+    
+    console.log("Application initialized");
+}
+
+/**
+ * Setup Button Listeners
+ */
+function setupButtonListeners() {
+    console.log("Setting up button listeners...");
+    
+    // Find Movie button
+    if (elements.findMovieBtn) {
+        elements.findMovieBtn.addEventListener("click", getMovieFromGPT);
+    }
+    
+    // Add to Watchlist button
+    if (elements.generateReviewBtn) {
+        elements.generateReviewBtn.addEventListener("click", function() {
+            const movieTitle = elements.title.textContent;
+            const posterUrl = elements.poster.src;
+            
+            addToWatchlist(movieTitle, posterUrl);
+        });
+    }
+    
+    // View Watchlist button
+    if (elements.viewWatchlistBtn) {
+        elements.viewWatchlistBtn.addEventListener("click", viewWatchlist);
+    }
+    
+    // View Trailer button
+    if (elements.getTrailerBtn) {
+        elements.getTrailerBtn.addEventListener("click", function() {
+            const movieTitle = elements.title.textContent;
+            if (!movieTitle || movieTitle === "Loading...") {
+                alert("Please wait for a movie to be selected.");
+                return;
+            }
+            watchTrailer(movieTitle);
+        });
+    }
+    
+    // Watch Full Movie button
+    if (elements.watchFullMovieBtn) {
+        elements.watchFullMovieBtn.addEventListener("click", function() {
+            const movieTitle = elements.title.textContent;
+            if (!movieTitle || movieTitle === "Loading...") {
+                alert("Please wait for a movie to be selected.");
+                return;
+            }
+            watchFullMovie(movieTitle);
+        });
+    }
+    
+    // Mark as Watched button
+    if (elements.viewRatingsBtn) {
+        elements.viewRatingsBtn.addEventListener("click", function() {
+            const movieTitle = elements.title.textContent;
+            const posterUrl = elements.poster.src;
+            
+            addToWatched(movieTitle, posterUrl);
+        });
+    }
+    
+    // Close Theater button
+    if (elements.closeTheater) {
+        elements.closeTheater.addEventListener("click", function() {
+            if (player && typeof player.stopVideo === 'function') {
+                player.stopVideo();
+            }
+            elements.theaterModal.style.display = 'none';
+            
+            const loadingOverlay = elements.theaterModal.querySelector('.loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.classList.remove('active');
+            }
+        });
+    }
+    
+    console.log("Button listeners setup complete");
+}
+
+/**
+ * Setup Last Results Button
+ */
+function setupLastResultsButton() {
+    const navMenu = document.querySelector('.nav-menu');
+    if (navMenu && loadMovieResults()) {
+        // Check if button already exists
+        let lastResultsBtn = document.getElementById('last-results-btn');
+        
+        if (!lastResultsBtn) {
+            lastResultsBtn = document.createElement('button');
+            lastResultsBtn.textContent = 'Last Results';
+            lastResultsBtn.className = 'nav-button';
+            lastResultsBtn.id = 'last-results-btn';
+            lastResultsBtn.addEventListener('click', showLastResults);
+            
+            if (elements.viewWatchlistBtn && elements.viewWatchlistBtn.parentNode) {
+                elements.viewWatchlistBtn.parentNode.insertBefore(lastResultsBtn, elements.viewWatchlistBtn.nextSibling);
+            } else {
+                navMenu.appendChild(lastResultsBtn);
+            }
+        }
+    }
+}
+
+/**
+ * Setup Keyboard Listeners
+ */
+function setupKeyboardListeners() {
+    document.addEventListener('keydown', function(e) {
+        const theater = elements.theaterModal;
+        
+        // Space bar to toggle play/pause when theater is open
+        if (e.code === 'Space' && theater && theater.style.display === 'block') {
+            e.preventDefault();
+            
+            if (player && player.getPlayerState) {
+                const state = player.getPlayerState();
+                if (state === YT.PlayerState.PLAYING) {
+                    player.pauseVideo();
+                } else if (state === YT.PlayerState.PAUSED) {
+                    player.playVideo();
+                }
+            }
+        }
+        
+        // Escape key to close theater
+        if (e.code === 'Escape' && theater && theater.style.display === 'block') {
+            if (player && typeof player.stopVideo === 'function') {
+                player.stopVideo();
+            }
+            theater.style.display = 'none';
+            
+            const loadingOverlay = theater.querySelector('.loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+    });
+}
+
+/**
+ * Setup Page Transitions
+ */
+function setupPageTransitions() {
+    // Handle page load transitions
+    const curtainContainer = document.querySelector('.curtain-container');
+    if (curtainContainer) {
+        curtainContainer.style.display = 'block';
+        curtainContainer.classList.add('closing');
+        
+        setTimeout(() => {
+            curtainContainer.classList.remove('closing');
+            curtainContainer.classList.add('opening');
+            
+            setTimeout(() => {
+                curtainContainer.style.display = 'none';
+            }, 1000);
+        }, 100);
+    }
+    
+    // Setup transition for navigation links
+    const links = document.querySelectorAll('a[href]:not([target="_blank"])');
+    links.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            transitionToPage(link.href);
+        });
+    });
+}
+
+/**
+ * Loading YouTube API
+ */
+function loadYouTubeAPI() {
+    if (window.YT || document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+        console.log('YouTube API already loaded or loading');
+        return;
+    }
+    
+    console.log('Loading YouTube API...');
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+}
+
+/**
+ * YouTube Player Initialization
+ */
+function onYouTubeIframeAPIReady() {
+    console.log('YouTube API Ready');
+    // We'll create the player when needed in openTheater()
+}
+
+/**
+ * YouTube Player Event Handlers
+ */
+function onPlayerReady(event) {
+    console.log('Player ready');
+    event.target.playVideo();
+}
+
+function onPlayerStateChange(event) {
+    console.log('Player state changed:', event.data);
+    const loadingOverlay = document.querySelector('.loading-overlay');
+    
+    if (event.data === YT.PlayerState.PLAYING) {
+        if (loadingOverlay) {
+            loadingOverlay.classList.remove('active');
+        }
+    }
+}
+
+/**
+ * UI State Management
+ */
+function setLoadingState(isLoading) {
+    const elements = document.querySelectorAll('.movie-info *');
+    if (isLoading) {
+        elements.forEach(el => el.classList.add('loading'));
+    } else {
+        elements.forEach(el => el.classList.remove('loading'));
+    }
+}
+
+function updateRatings(ratings) {
+    const ratingsContainer = elements.ratings;
+    if (!ratingsContainer) return;
+    
+    ratingsContainer.innerHTML = ""; // Clear existing ratings
+    
+    if (!ratings) return;
+    
+    Object.entries(ratings).forEach(([source, rating]) => {
+        const ratingElement = document.createElement("li");
+        ratingElement.innerHTML = `<strong>${source}:</strong> <span>${rating}</span>`;
+        ratingsContainer.appendChild(ratingElement);
+    });
+}
+
+function showSuccessAnimation() {
+    if (!elements.successAnimation) return;
+    
+    elements.successAnimation.style.display = 'block';
+    
+    // Hide the animation after 2 seconds
+    setTimeout(() => {
+        elements.successAnimation.style.display = 'none';
+    }, 2000);
+}
+
+/**
+ * Movie Data Operations
+ */
+function saveMovieResults(movieData) {
+    console.log("Saving movie results:", movieData);
+    
+    // Check if we have an array or a single movie object
+    if (Array.isArray(movieData)) {
+        // Multiple movies
+        localStorage.setItem('lastMovieResults', JSON.stringify({
+            type: 'multiple',
+            movies: movieData,
+            timestamp: new Date().getTime()
+        }));
+        console.log("Saved multiple movies to localStorage");
+    } else if (movieData.title) {
+        // Single movie with title property
+        localStorage.setItem('lastMovieResults', JSON.stringify({
+            type: 'single',
+            movie: movieData,
+            timestamp: new Date().getTime()
+        }));
+        console.log("Saved single movie to localStorage");
+    } else if (movieData.movies && Array.isArray(movieData.movies)) {
+        // Response that already has a movies array
+        localStorage.setItem('lastMovieResults', JSON.stringify({
+            type: 'multiple',
+            movies: movieData.movies,
+            timestamp: new Date().getTime()
+        }));
+        console.log("Saved multiple movies from movies property to localStorage");
+    } else {
+        console.error("Unrecognized movie data format:", movieData);
+    }
+}
+
+function loadMovieResults() {
+    const savedResults = localStorage.getItem('lastMovieResults');
+    if (!savedResults) return null;
+    
+    const data = JSON.parse(savedResults);
+    const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+    const now = new Date().getTime();
+    
+    // Check if results are older than 1 hour
+    if (now - data.timestamp > oneHour) {
+        localStorage.removeItem('lastMovieResults');
+        return null;
+    }
+    
+    return data;
+}
+
+function saveSearchResults(results) {
+    sessionStorage.setItem('lastSearchResults', JSON.stringify(results));
+}
+
+function loadSearchResults() {
+    const savedResults = sessionStorage.getItem('lastSearchResults');
+    if (savedResults) {
+        const results = JSON.parse(savedResults);
+        displayResults(results);
+    }
+}
+
+/**
+ * API Interaction Functions
+ */
+async function fetchMovies(genre) {
+    setLoadingState(true);
+    try {
+        const response = await fetch(`/select_movies?genre=${genre}`);
+        const data = await response.json();
+        
+        if (data.movies && data.movies.length > 0) {
+            // Select a random movie
+            const selectedMovie = data.movies[Math.floor(Math.random() * data.movies.length)];
+            
+            // Fetch additional details for the selected movie
+            const movieDetails = await fetch(`http://www.omdbapi.com/?t=${encodeURIComponent(selectedMovie.title)}&apikey=${OMDB_API_KEY}`);
+            const movieData = await movieDetails.json();
+            
+            // Create a complete movie object
+            const completeMovie = {
+                title: selectedMovie.title,
+                poster: selectedMovie.poster,
+                reviews: movieData.Plot || "No plot available",
+                awards: movieData.Awards || "No awards information",
+                ratings: {
+                    imdb: movieData.imdbRating || 'N/A',
+                    'rotten tomatoes': movieData.Ratings?.find(r => r.Source === "Rotten Tomatoes")?.Value || 'N/A',
+                    metacritic: movieData.Ratings?.find(r => r.Source === "Metacritic")?.Value || 'N/A'
+                }
+            };
+            
+            // Show the movie using the same function as the AI suggestions
+            showMovieDetails(completeMovie);
+            
+            // Save this movie to localStorage so it persists
+            saveMovieResults(completeMovie);
+            console.log("Saved random movie result:", completeMovie);
+            
+        } else {
+            throw new Error("No movies returned");
+        }
+    } catch (error) {
+        console.error("Error fetching movie:", error);
+        elements.title.textContent = "Error loading movie";
+    } finally {
+        setLoadingState(false);
+    }
+}
+
+async function fetchMovieDetails(movieTitle) {
+    setLoadingState(true);
+    try {
+        const response = await fetch(`/get_reviews_and_ratings?movie=${encodeURIComponent(movieTitle)}`);
+        const data = await response.json();
+        console.log("Movie details received:", data);
+        
+        // Update all UI elements
+        elements.title.textContent = movieTitle;
+        elements.plot.textContent = data.reviews || "No plot available";
+        elements.awards.textContent = data.awards || "No awards information";
+        
+        // Update poster
+        if (data.poster && data.poster !== "N/A") {
+            elements.poster.src = data.poster;
+        } else {
+            elements.poster.src = "/api/placeholder/300/450";
+        }
+        
+        // Update ratings
+        updateRatings(data.ratings || data.Ratings);
+        
+    } catch (error) {
+        console.error("Error fetching movie details:", error);
+        elements.plot.textContent = "Error loading movie details";
+    } finally {
+        setLoadingState(false);
+    }
+}
+
+async function getMovieFromGPT() {
+    const userDescription = elements.movieDescription.value.trim();
+    const numTitles = parseInt(elements.movieCount.value);
+    
+    console.log("Description entered:", userDescription);
+    console.log("Number of titles requested:", numTitles);
+    
+    if (!userDescription) {
+        alert("Please enter a movie description");
+        return;
+    }
+    
+    setLoadingState(true);
+    
+    try {
+        const response = await fetch("/get_movie_suggestion", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                description: userDescription,
+                num_titles: numTitles
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("Data received:", data);
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        // Save the results
+        if (data.movies && data.movies.length > 0) {
+            console.log("Saving multiple movies:", data.movies);
+            saveMovieResults(data.movies);
+            displayMultipleMovies(data.movies);
+        } else {
+            console.log("Saving single movie:", data);
+            saveMovieResults(data);
+            displaySingleMovie(data);
+        }
+    } catch (error) {
+        console.error("Error in getMovieFromGPT:", error);
+        alert("Error finding movie: " + error.message);
+    } finally {
+        setLoadingState(false);
+    }
+}
+
+/**
+ * Movie Display Functions
+ */
+function displayMultipleMovies(movies) {
+    // Hide the regular movie display
+    if (elements.movieInfo) {
+        elements.movieInfo.style.display = 'none';
+    }
+    
+    // Create a container for the movies if it doesn't exist
+    let movieGrid = document.getElementById('multiple-movies-grid');
+    if (!movieGrid) {
+        // Create grid container
+        movieGrid = document.createElement('div');
+        movieGrid.id = 'multiple-movies-grid';
+        movieGrid.className = 'movie-grid';
+        
+        // Add the elements to the page
+        const contentGrid = document.querySelector('.content-grid');
+        if (contentGrid) {
+            // Remove any existing heading first
+            const existingHeading = document.querySelector('.suggested-movies-heading');
+            if (existingHeading) {
+                existingHeading.remove();
+            }
+            
+            const heading = document.createElement('h2');
+            heading.textContent = 'Suggested Movies';
+            heading.className = 'suggested-movies-heading';
+            contentGrid.appendChild(heading);
+            contentGrid.appendChild(movieGrid);
+        }
+    } else {
+        // Clear existing movies
+        movieGrid.innerHTML = '';
+    }
+    
+    // Add each movie to the grid
+    movies.forEach(movie => {
+        const movieCard = createMovieCard(movie);
+        movieGrid.appendChild(movieCard);
+    });
+}
+
+function displaySingleMovie(movie) {
+    // Make sure movie info is visible
+    if (elements.movieInfo) {
+        elements.movieInfo.style.display = 'flex';
+    }
+    
+    // Remove multiple movies grid if it exists
+    const movieGrid = document.getElementById('multiple-movies-grid');
+    if (movieGrid) {
+        movieGrid.remove();
+        
+        // Remove the heading too
+        const heading = document.querySelector('.suggested-movies-heading');
+        if (heading) heading.remove();
+    }
+    
+    // Update movie details
+    if (elements.title) elements.title.textContent = movie.title || "No title available";
+    if (elements.plot) elements.plot.textContent = movie.reviews || "No plot available";
+    if (elements.awards) elements.awards.textContent = movie.awards || "No awards information";
+    
+    // Update poster
+    if (elements.poster) {
+        elements.poster.src = movie.poster && movie.poster !== "N/A" 
+            ? movie.poster 
+            : "/api/placeholder/300/450";
+    }
+    
+    // Update ratings
+    const ratings = {};
+    if (movie.ratings) {
+        Object.entries(movie.ratings).forEach(([source, value]) => {
+            if (value && value !== "N/A") {
+                ratings[source] = value;
+            }
+        });
+    }
+    updateRatings(ratings);
+}
+
+function createMovieCard(movie) {
+    // Create card container
+    const card = document.createElement('div');
+    card.className = 'movie-card';
+    
+    // Add poster
+    const img = document.createElement('img');
+    img.src = movie.poster && movie.poster !== "N/A" ? movie.poster : "/api/placeholder/300/450";
+    img.alt = movie.title;
+    img.className = 'movie-card-poster';
+    card.appendChild(img);
+    
+    // Add title
+    const title = document.createElement('h3');
+    title.textContent = movie.title;
+    title.className = 'movie-card-title';
+    card.appendChild(title);
+    
+    // Add brief info (optional)
+    if (movie.ratings && movie.ratings.imdb && movie.ratings.imdb !== 'N/A') {
+        const rating = document.createElement('div');
+        rating.className = 'movie-card-rating';
+        rating.textContent = `IMDb: ${movie.ratings.imdb}`;
+        card.appendChild(rating);
+    }
+    
+    // Add buttons
+    const btnContainer = document.createElement('div');
+    btnContainer.className = 'movie-card-buttons';
+    
+    // Add view details button
+    const viewBtn = document.createElement('button');
+    viewBtn.textContent = 'View Details';
+    viewBtn.className = 'btn view-details-btn';
+    viewBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showMovieDetails(movie);
+    });
+    btnContainer.appendChild(viewBtn);
+    
+    // Add watchlist button
+    const watchlistBtn = document.createElement('button');
+    watchlistBtn.textContent = 'Add to Watchlist';
+    watchlistBtn.className = 'btn add-watchlist-btn';
+    watchlistBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        addToWatchlist(movie.title, movie.poster);
+    });
+    btnContainer.appendChild(watchlistBtn);
+    
+    card.appendChild(btnContainer);
+    
+    return card;
+}
+
+function showMovieDetails(movie) {
+    // Get elements
+    const movieGrid = document.getElementById('multiple-movies-grid');
+    const heading = document.querySelector('.suggested-movies-heading');
+    const movieInfo = document.querySelector('.movie-info');
+    
+    // Hide grid and heading
+    if (movieGrid) movieGrid.style.display = 'none';
+    if (heading) heading.style.display = 'none';
+    
+    // Show and setup movie info section
+    if (movieInfo) {
+        movieInfo.style.display = 'flex';
+        movieInfo.style.flexDirection = 'column';
+        movieInfo.style.alignItems = 'center';
+    }
+    
+    // Update content
+    if (elements.title) elements.title.textContent = movie.title;
+    
+    // Update poster
+    if (elements.poster) {
+        elements.poster.src = movie.poster && movie.poster !== "N/A" 
+            ? movie.poster 
+            : "/api/placeholder/300/450";
+    }
+    
+    // Update movie details
+    if (elements.plot) {
+        elements.plot.innerHTML = `<strong>Plot:</strong> ${movie.reviews || "No plot available"}`;
+    }
+    
+    if (elements.awards) {
+        elements.awards.innerHTML = `<strong>Awards:</strong> ${movie.awards || "No awards information"}`;
+    }
+    
+    // Update ratings
+    if (movie.ratings && elements.ratings) {
+        elements.ratings.innerHTML = ''; // Clear existing ratings
+        
+        // Add each rating
+        Object.entries(movie.ratings).forEach(([source, value]) => {
+            if (value && value !== 'N/A') {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${source}</strong><span>${value}</span>`;
+                elements.ratings.appendChild(li);
+            }
+        });
+    }
+    
+    // Add back button
+    let backBtn = document.getElementById('back-to-results-btn');
+    if (!backBtn && movieInfo) {
+        backBtn = document.createElement('button');
+        backBtn.id = 'back-to-results-btn';
+        backBtn.textContent = '← Back to Results';
+        backBtn.onclick = () => {
+            movieInfo.style.display = 'none';
+            if (movieGrid) movieGrid.style.display = 'grid';
+            if (heading) heading.style.display = 'block';
+        };
+        movieInfo.appendChild(backBtn);
+    }
+}
+
+function displayMovies(movies) {
+    const movieContainer = document.getElementById('movie-container');
+    if (!movieContainer) return;
+    
+    movieContainer.innerHTML = '';  // Clear existing movies
+    
+    movies.forEach(movie => {
+        // Make sure we're getting the correct properties from the movie object
+        const title = movie.Title || movie.title;  // Handle both cases
+        const poster = movie.Poster || movie.poster_url;  // Handle both cases
+        
+        // Debug log to verify movie data
+        console.log('Processing movie:', { title, poster });
+        
+        const escapedTitle = title.replace(/'/g, "\\'");
+        const escapedPoster = poster.replace(/'/g, "\\'");
+        
+        const movieCard = document.createElement('div');
+        movieCard.className = 'movie-card';
+        movieCard.innerHTML = `
+            <img src="${poster}" alt="${title}">
+            <h3>${title}</h3>
+            <div class="button-container">
+                <button class="watchlist-btn" data-title="${escapedTitle}" data-poster="${escapedPoster}">
+                    Add to Watchlist
+                </button>
+                <button class="watched-btn" data-title="${escapedTitle}" data-poster="${escapedPoster}">
+                    Mark as Watched
+                </button>
+            </div>
+        `;
+        movieContainer.appendChild(movieCard);
+    });
+    
+    // Add event listeners for buttons
+    document.querySelectorAll('.watchlist-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const title = this.dataset.title;
+            const poster = this.dataset.poster;
+            addToWatchlist(title, poster);
+        });
+    });
+    
+    document.querySelectorAll('.watched-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const title = this.dataset.title;
+            const poster = this.dataset.poster;
+            addToWatched(title, poster);
+        });
+    });
+}
+
+function displayResults(results) {
+    const resultsContainer = document.getElementById('resultsContainer');
+    if (!resultsContainer) return;
+    
+    resultsContainer.innerHTML = '';
+    
+    results.forEach(movie => {
+        const movieCard = document.createElement('div');
+        movieCard.className = 'movie-card';
+        movieCard.innerHTML = `
+            <div class="poster-container">
+                <img src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : '/static/images/no-poster.jpg'}" 
+                     alt="${movie.title}" 
+                     class="movie-poster">
+            </div>
+            <h3 class="movie-title">${movie.title}</h3>
+            <p class="movie-year">${movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</p>
+            <div class="movie-actions">
+                <button class="action-button watchlist-btn" data-title="${movie.title}" data-poster="${movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : '/static/images/no-poster.jpg'}">
+                    Add to Watchlist
+                </button>
+                <button class="action-button watched-btn" data-title="${movie.title}" data-poster="${movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : '/static/images/no-poster.jpg'}">
+                    Mark as Watched
+                </button>
+            </div>
+        `;
+        resultsContainer.appendChild(movieCard);
+    });
+    
+    // Add event listeners for buttons
+    document.querySelectorAll('.watchlist-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const title = this.dataset.title;
+            const poster = this.dataset.poster;
+            addToWatchlist(title, poster);
+        });
+    });
+    
+    document.querySelectorAll('.watched-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const title = this.dataset.title;
+            const poster = this.dataset.poster;
+            addToWatched(title, poster);
+        });
+    });
+}
+
+function displaySavedResults() {
+    const savedData = loadMovieResults();
+    if (!savedData) return;
+    
+    if (savedData.type === 'multiple' && savedData.movies) {
+        displayMultipleMovies(savedData.movies);
+    } else if (savedData.type === 'single' && savedData.movie) {
+        displaySingleMovie(savedData.movie);
+    }
+}
+
+function showLastResults() {
+    const savedData = loadMovieResults();
+    if (!savedData) {
+        alert("No saved movie results found");
+        return;
+    }
+    
+    displaySavedResults();
+}
+
+/**
+ * YouTube Video Functions
+ */
+function watchTrailer(movieTitle) {
+    if (!movieTitle || movieTitle === "Loading...") {
+        alert("Please wait for a movie to be selected.");
+        return;
+    }
+    
+    console.log('Searching for trailer:', movieTitle);
+    
+    // Show loading overlay
+    const theater = elements.theaterModal;
+    const loadingOverlay = theater.querySelector('.loading-overlay');
+    
+    if (loadingOverlay) {
+        loadingOverlay.classList.add('active');
+    }
+    
+    theater.style.display = 'block';
+    
+    // Use the YouTube API to search for trailer
+    fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(movieTitle + ' official trailer')}&type=video&maxResults=1&key=${YOUTUBE_API_KEY}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`YouTube API error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('YouTube API response:', data);
+            
+            if (data.items && data.items.length > 0) {
+                const videoId = data.items[0].id.videoId;
+                console.log('Found trailer ID:', videoId);
+                open
+                openTheater(videoId);
+            } else {
+                throw new Error('No trailer found for this movie');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error loading trailer: ' + error.message);
+            theater.style.display = 'none';
+            if (loadingOverlay) {
+                loadingOverlay.classList.remove('active');
+            }
+        });
+}
+
+function watchFullMovie(movieTitle) {
+    if (!movieTitle || movieTitle === "Loading...") {
+        alert("Please wait for a movie to be selected.");
+        return;
+    }
+    
+    console.log('Searching for full movie:', movieTitle);
+    
+    // Show loading overlay
+    const theater = elements.theaterModal;
+    const loadingOverlay = theater.querySelector('.loading-overlay');
+    
+    if (loadingOverlay) {
+        loadingOverlay.classList.add('active');
+    }
+    
+    theater.style.display = 'block';
+    
+    // Use the YouTube API to search for full movie
+    fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(movieTitle + ' full movie')}&type=video&videoDuration=long&maxResults=1&key=${YOUTUBE_API_KEY}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`YouTube API error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('YouTube API response:', data);
+            
+            if (data.items && data.items.length > 0) {
+                const videoId = data.items[0].id.videoId;
+                console.log('Found movie ID:', videoId);
+                openTheater(videoId);
+                
+                // Add movie title indicator to the theater
+                addTheaterTitle(movieTitle, true);
+            } else {
+                throw new Error('Full movie not available');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error loading movie: ' + error.message);
+            theater.style.display = 'none';
+            if (loadingOverlay) {
+                loadingOverlay.classList.remove('active');
+            }
+        });
+}
+
+function openTheater(videoId) {
+    console.log('Opening theater with video:', videoId);
+    
+    if (!elements.theaterModal || !elements.youtubePlayer) {
+        console.error('Theater elements not found');
+        return;
+    }
+    
+    const loadingOverlay = elements.theaterModal.querySelector('.loading-overlay');
+    
+    // If player already exists, load new video
+    if (player && typeof player.loadVideoById === 'function') {
+        console.log('Loading video into existing player');
+        player.loadVideoById({
+            videoId: videoId,
+            startSeconds: 0,
+            suggestedQuality: 'hd720'
+        });
+        return;
+    }
+    
+    // Create new player
+    console.log('Creating new YouTube player');
+    try {
+        player = new YT.Player('youtube-player', {
+            height: '100%',
+            width: '100%',
+            videoId: videoId,
+            playerVars: {
+                'autoplay': 1,
+                'controls': 1,
+                'rel': 0,
+                'showinfo': 0,
+                'enablejsapi': 1
+            },
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange,
+                'onError': function(event) {
+                    console.error('Player error:', event.data);
+                    if (loadingOverlay) {
+                        loadingOverlay.classList.remove('active');
+                    }
+                    alert('Error playing video. Please try again.');
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error creating player:', error);
+        if (loadingOverlay) {
+            loadingOverlay.classList.remove('active');
+        }
+        alert('Error creating YouTube player: ' + error.message);
+    }
+}
+
+function addTheaterTitle(movieTitle, isFullMovie = false) {
+    const theaterContent = elements.theaterModal.querySelector('.theater-content');
+    if (!theaterContent) return;
+    
+    let modalTitle = theaterContent.querySelector('.theater-title');
+    
+    if (!modalTitle) {
+        modalTitle = document.createElement('div');
+        modalTitle.className = 'theater-title';
+        theaterContent.insertBefore(modalTitle, theaterContent.firstChild);
+    }
+    
+    modalTitle.textContent = isFullMovie 
+        ? `Now Playing: ${movieTitle} (Full Movie)` 
+        : `Now Playing: ${movieTitle} (Trailer)`;
+}
+
+/**
+ * User Actions
+ */
+function searchMovie() {
+    const searchInput = elements.movieSearch;
+    if (!searchInput) return;
+    
+    const movieTitle = searchInput.value.trim();
+    
+    if (!movieTitle) {
+        alert('Please enter a movie title');
+        return;
+    }
+    
+    setLoadingState(true);
+    
+    fetch(`/get_reviews_and_ratings?movie=${encodeURIComponent(movieTitle)}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Movie details received:", data);
+            
+            // Make sure movie info is visible
+            if (elements.movieInfo) {
+                elements.movieInfo.style.display = 'flex';
+            }
+            
+            // Update UI elements
+            if (elements.title) elements.title.textContent = movieTitle;
+            
+            // Properly check for plot in all possible locations in the response
+            let plotText = "No plot available";
+            if (data.plot && data.plot !== "N/A") {
+                plotText = data.plot;
+            } else if (data.Plot && data.Plot !== "N/A") {
+                plotText = data.Plot;
+            } else if (data.reviews && data.reviews !== "N/A") {
+                plotText = data.reviews;
+            }
+            
+            // Update plot
+            if (elements.plot) elements.plot.textContent = plotText;
+            
+            // Check for awards in all possible formats
+            let awardsText = "No awards information";
+            if (data.awards && data.awards !== "N/A") {
+                awardsText = data.awards;
+            } else if (data.Awards && data.Awards !== "N/A") {
+                awardsText = data.Awards;
+            }
+            if (elements.awards) elements.awards.textContent = awardsText;
+            
+            // Properly handle poster
+            if (elements.poster) {
+                if (data.poster && data.poster !== "N/A") {
+                    elements.poster.src = data.poster;
+                } else if (data.Poster && data.Poster !== "N/A") {
+                    elements.poster.src = data.Poster;
+                } else {
+                    elements.poster.src = "/api/placeholder/300/450";
+                }
+            }
+            
+            // Update ratings if they exist
+            if (data.ratings || data.Ratings) {
+                updateRatings(data.ratings || data.Ratings);
+            }
+            
+            // Clear search input
+            searchInput.value = '';
+        })
+        .catch(error => {
+            console.error("Error fetching movie details:", error);
+            
+            // In case of error, set error message
+            if (elements.plot) {
+                elements.plot.textContent = "Error loading movie details";
+            }
+            
+            const movieDescEl = document.getElementById('movieDescriptionText');
+            if (movieDescEl) {
+                movieDescEl.textContent = "Error loading movie details";
+            }
+        })
+        .finally(() => {
+            setLoadingState(false);
+        });
+}
+
+function viewWatchlist() {
+    window.location.href = "/watchlist";
+}
+
+function viewRatings() {
+    window.location.href = "/ratings";
+}
+
+function addToWatchlist(title, poster) {
+    if (!title) {
+        console.error('Missing title for watchlist:', title);
+        alert("Please wait for a movie to be selected.");
+        return;
+    }
+    
+    console.log('Adding to watchlist:', title);
+    
+    fetch('/api/watchlist/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: title,
+            poster: poster
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccessAnimation();
+        } else {
+            alert(data.message || 'Error adding to watchlist');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding to watchlist');
+    });
+}
+
+function addToWatched(title, poster) {
+    console.log('addToWatched called with:', { title, poster });
+    
+    // If title and poster weren't passed, try to get them from DOM
+    if (!title || title === "Loading...") {
+        const titleElement = document.getElementById("movie-title");
+        if (titleElement && titleElement.textContent && titleElement.textContent !== "Loading...") {
+            title = titleElement.textContent.trim();
+            console.log('Retrieved title from DOM:', title);
+        }
+    }
+    
+    if (!poster) {
+        const posterElement = document.getElementById("movie-poster");
+        if (posterElement && posterElement.src) {
+            poster = posterElement.src;
+            console.log('Retrieved poster from DOM:', poster);
+        }
+    }
+    
+    // Final check
+    if (!title || title === "Loading...") {
+        console.error('Missing title for watched list:', title);
+        alert("Please wait for a movie to be selected.");
+        return;
+    }
+    
+    console.log('Proceeding with addToWatched:', { title, poster });
+    
+    fetch('/api/ratings/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: title,
+            poster: poster
+        })
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json().catch(err => {
+            console.error('Error parsing JSON response:', err);
+            throw new Error('Invalid response from server');
+        });
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        
+        if (data.success) {
+            // Only show confirmation if it was actually successful
+            if (confirm('Successfully added to watched list! Would you like to view your ratings?')) {
+                window.location.href = '/ratings';
+            }
+        } else {
+            // Show the specific error message and don't redirect
+            throw new Error(data.message || 'Unknown error adding to watched list');
+        }
+    })
+    .catch(error => {
+        console.error('Error in addToWatched:', error);
+        alert('Error adding movie to watched list: ' + error.message);
+    });
+}
+
+
+function logout() {
+    fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/';
+        } else {
+            alert('Logout failed: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Logout error:', error);
+        alert('Error during logout');
+    });
+}
+
+function transitionToPage(href) {
+    const curtainContainer = document.querySelector('.curtain-container');
+    if (!curtainContainer) {
+        window.location.href = href;
+        return;
+    }
+    
+    curtainContainer.style.display = 'block';
+    curtainContainer.classList.add('closing');
+    curtainContainer.classList.remove('opening');
+    
+    // Wait for curtains to close
+    setTimeout(() => {
+        window.location.href = href;
+    }, 1000);
+}
+
+function deleteRating(movieId) {
+    console.log('Attempting to delete movie with ID:', movieId);
+    
+    if (confirm('Are you sure you want to remove this movie from your ratings?')) {
+        fetch('/api/ratings/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: movieId
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                loadWatchedMovies();  // Reload the movies
+                showMessage('Movie removed successfully!', 'success');
+            } else {
+                throw new Error(data.message || 'Failed to remove movie');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting movie:', error);
+            showMessage('Failed to remove movie: ' + error.message, 'error');
+        });
+    }
+}
+
+function showMessage(message, type = 'info') {
+    const toast = document.getElementById('auth-toast');
+    const toastMessage = document.getElementById('auth-toast-message');
+    
+    if (!toast || !toastMessage) return;
+    
+    toastMessage.textContent = message;
+    toast.className = 'auth-toast ' + type;
+    toast.style.display = 'block';
+    
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
+}
+
+/**
+ * Utility Functions
+ */
+function parsePTDuration(duration) {
+    const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    
+    if (!match) return 0;
+    
+    const hours = parseInt(match[1] || 0);
+    const minutes = parseInt(match[2] || 0);
+    const seconds = parseInt(match[3] || 0);
+    
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
+/**
+ * Authentication Functions
+ */
+function checkAuth() {
+    fetch('/api/auth/check')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Auth check response:", data);
+            if (data.authenticated) {
+                updateUIForLoggedInUser(data.user);
+            } else {
+                updateUIForGuestUser();
+            }
+        })
+        .catch(error => {
+            console.error('Auth check error:', error);
+            updateUIForGuestUser();
+        });
+}
+
+function updateUIForLoggedInUser(user) {
+    const userInitial = document.getElementById('user-initial');
+    const userGreeting = document.getElementById('user-greeting');
+    
+    if (userInitial) {
+        userInitial.textContent = user.username.charAt(0).toUpperCase();
+    }
+    
+    if (userGreeting) {
+        userGreeting.textContent = `Hello, ${user.username}!`;
+    }
+
+    // Setup logout button
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            logout();
+        });
+    }
+}
+
+function updateUIForGuestUser() {
+    const userInitial = document.getElementById('user-initial');
+    const userGreeting = document.getElementById('user-greeting');
+    
+    if (userInitial) {
+        userInitial.textContent = 'G';
+    }
+    
+    if (userGreeting) {
+        userGreeting.textContent = 'Hello, Guest!';
+    }
+}
+
+// Initialize application on page load
+document.addEventListener("DOMContentLoaded", function() {
+    // Check authentication status
+    checkAuth();
+    
+    // Initialize the application
+    initializeApp();
+    
+    // Load search results if available
+    loadSearchResults();
+});
+    </script>  
+
+
+<div id="auth-toast" class="auth-toast">
+    <span id="auth-toast-message">Message here</span>
+</div>
+</body>
+</html>

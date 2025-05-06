@@ -1,0 +1,1345 @@
+<style>
+:root {
+    --auth-gold: #E5B94E;
+    --auth-dark-gold: #b47a22;
+    --auth-red: #8B1E3F;
+    --auth-dark-red: #5a142a;
+    --auth-blue: rgb(26, 38, 50);
+    --auth-light-blue: rgb(59, 99, 138);
+    --auth-text: #E8E9F3;
+    --auth-border-radius: 8px;
+    --auth-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    --auth-ticket-color: #f9e9bf;
+}
+
+/* Auth Modal Base Styles */
+.auth-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 10001;
+    overflow: auto;
+    perspective: 1200px;
+    backdrop-filter: blur(5px);
+}
+
+.auth-content {
+    position: relative;
+    background: var(--auth-blue);
+    background-image: 
+        linear-gradient(to bottom, rgba(26, 31, 43, 0.97), rgba(26, 31, 43, 0.97)),
+        repeating-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.03) 0px,
+            rgba(255, 255, 255, 0.03) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+    margin: 8% auto 0;
+    width: 90%;
+    max-width: 500px;
+    border: 4px solid var(--auth-gold);
+    border-radius: var(--auth-border-radius);
+    box-shadow: var(--auth-shadow);
+    transform-origin: top;
+    animation: authModalOpen 0.7s cubic-bezier(0.17, 0.67, 0.21, 1.69);
+    overflow: hidden;
+}
+
+/* Marquee Header */
+.auth-modal-header {
+    position: relative;
+    padding-top: 1rem;
+    background: var(--auth-red);
+    text-align: center;
+}
+
+.marquee {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.marquee h2 {
+    color: var(--auth-gold);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    margin: 0.5rem 0;
+    text-shadow: 3px 3px 0 var(--auth-dark-red);
+    letter-spacing: 1px;
+}
+
+.bulbs {
+    width: 100%;
+    height: 10px;
+    background-image: radial-gradient(
+        circle,
+        var(--auth-gold) 30%, 
+        var(--auth-dark-gold) 70%
+    );
+    background-size: 20px 20px;
+    background-position: 0 center;
+    animation: bulbsFlash 2.5s infinite alternate;
+}
+
+@keyframes bulbsFlash {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+.close-auth {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: var(--auth-gold);
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--auth-gold);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.close-auth:hover {
+    color: var(--auth-text);
+    background: var(--auth-dark-red);
+    transform: rotate(90deg);
+}
+
+/* Ticket Stub Design */
+.auth-section {
+    padding: 0;
+}
+
+.ticket-stub {
+    position: relative;
+    background: var(--auth-light-blue);
+    border-radius: 0 0 var(--auth-border-radius) var(--auth-border-radius);
+    overflow: hidden;
+}
+
+.ticket-content {
+    padding: 2rem;
+    position: relative;
+    background: var(--auth-blue);
+    z-index: 1;
+}
+
+.ticket-tear {
+    height: 12px;
+    background-image: 
+        linear-gradient(90deg, transparent 0%, transparent 50%, var(--auth-gold) 50%, var(--auth-gold) 100%),
+        linear-gradient(90deg, var(--auth-gold) 0%, var(--auth-gold) 50%, transparent 50%, transparent 100%);
+    background-size: 16px 12px, 16px 12px;
+    background-position: 0 0, 8px 0;
+    position: relative;
+}
+
+.ticket-tear:before, .ticket-tear:after {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: var(--auth-blue);
+    z-index: -1;
+}
+
+.ticket-tear:before {
+    top: -6px;
+    left: 0;
+}
+
+.ticket-tear:after {
+    bottom: -6px;
+    left: 0;
+}
+
+/* Auth Form */
+.auth-subtitle {
+    color: var(--auth-gold);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+}
+
+.auth-form {
+    position: relative;
+}
+
+.auth-input-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.auth-input-group label {
+    display: block;
+    color: var(--auth-gold);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+}
+
+.auth-input {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--auth-dark-gold);
+    border-radius: 4px;
+    color: var(--auth-text);
+    font-family: 'Courier Prime', monospace;
+    transition: all 0.3s;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: var(--auth-gold);
+    box-shadow: 0 0 8px rgba(229, 185, 78, 0.4);
+}
+
+/* Show Password Checkbox */
+.show-password {
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.show-password input {
+    margin-right: 0.5rem;
+}
+
+.show-password label {
+    font-size: 0.6rem;
+    margin-bottom: 0;
+}
+
+/* Remember Me Checkbox */
+.auth-remember {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.auth-remember input {
+    margin-right: 0.5rem;
+}
+
+.auth-remember label {
+    color: var(--auth-text);
+    font-size: 0.7rem;
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Error Message */
+.auth-error {
+    color: #ff4136;
+    font-size: 0.7rem;
+    margin-bottom: 1rem;
+    min-height: 1.2em;
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Auth Buttons */
+.auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.auth-submit-btn {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: var(--auth-red);
+    border: 2px solid var(--auth-dark-gold);
+    color: var(--auth-text);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 4px 4px 0 var(--auth-dark-gold);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-submit-btn:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transition: left 0.7s ease-in-out;
+}
+
+.auth-submit-btn:hover {
+    background: var(--auth-gold);
+    color: var(--auth-dark-red);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--auth-dark-gold);
+}
+
+.auth-submit-btn:hover:before {
+    left: 100%;
+}
+
+.auth-secondary-btn {
+    background: transparent;
+    border: none;
+    color: var(--auth-gold);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    padding: 0.5rem;
+}
+
+.auth-secondary-btn:hover {
+    color: var(--auth-text);
+    text-shadow: 0 0 8px var(--auth-gold);
+}
+
+/* Guest Option */
+.guest-option {
+    margin-top: 2rem;
+    text-align: center;
+    border-top: 1px dashed var(--auth-dark-gold);
+    padding-top: 1.5rem;
+}
+
+.guest-btn {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--auth-gold);
+    color: var(--auth-gold);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 4px;
+}
+
+.guest-btn:hover {
+    background: rgba(229, 185, 78, 0.1);
+}
+
+.guest-note {
+    color: var(--auth-text);
+    font-size: 0.6rem;
+    opacity: 0.7;
+    margin-top: 0.5rem;
+}
+
+/* Password Strength Meter */
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-meter {
+    height: 4px;
+    background: #444;
+    position: relative;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    border-radius: 2px;
+}
+
+.strength-meter:before {
+    content: '';
+    height: 100%;
+    width: 0;
+    position: absolute;
+    background: #ff4136;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.strength-meter.weak:before {
+    width: 33%;
+    background: #ff4136;
+}
+
+.strength-meter.medium:before {
+    width: 66%;
+    background: #ffb700;
+}
+
+.strength-meter.strong:before {
+    width: 100%;
+    background: #2ecc40;
+}
+
+.strength-text {
+    font-size: 0.6rem;
+    color: var(--auth-text);
+    opacity: 0.8;
+    font-family: 'Courier Prime', monospace;
+}
+
+/* User Menu Styles */
+.user-menu-container {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+}
+
+.user-menu-login-btn {
+    background: var(--auth-red);
+    color: var(--auth-text);
+    border: 2px solid var(--auth-gold);
+    padding: 0.5rem 1rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 3px 3px 0 var(--auth-dark-gold);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    font-size: 1rem;
+}
+
+.user-menu-login-btn:hover {
+    background: var(--auth-gold);
+    color: var(--auth-red);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--auth-dark-gold);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--auth-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid var(--auth-gold);
+    transition: all 0.3s;
+    box-shadow: 0 0 10px rgba(229, 185, 78, 0.3);
+}
+
+.user-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px var(--auth-gold);
+}
+
+#user-initial {
+    color: var(--auth-gold);
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0 var(--auth-dark-red);
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 220px;
+    background: var(--auth-blue);
+    border: 2px solid var(--auth-gold);
+    border-radius: var(--auth-border-radius);
+    margin-top: 0.5rem;
+    box-shadow: 5px 5px 0 rgba(184, 134, 11, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    z-index: 1001;
+    overflow: hidden;
+}
+
+.user-avatar:hover .user-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-dropdown-header {
+    padding: 1rem;
+    border-bottom: 2px solid var(--auth-gold);
+    background: var(--auth-red);
+}
+
+#user-greeting {
+    color: var(--auth-gold);
+    font-size: 0.8rem;
+    font-weight: bold;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.user-dropdown-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.user-dropdown-menu li {
+    border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+}
+
+.user-dropdown-menu li:last-child {
+    border-bottom: none;
+}
+
+.menu-icon {
+    margin-right: 0.5rem;
+}
+
+.user-dropdown-menu a {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: var(--auth-text);
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 0.7rem;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.user-dropdown-menu a:hover {
+    background: rgba(229, 185, 78, 0.1);
+    color: var(--auth-gold);
+}
+
+/* Authentication Required Overlay */
+.auth-required-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 10002;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-required-content {
+    background: var(--auth-blue);
+    border: 4px solid var(--auth-gold);
+    border-radius: var(--auth-border-radius);
+    padding: 2rem;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    animation: authRequiredPulse 0.5s;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-required-header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.auth-required-header h3 {
+    color: var(--auth-gold);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    position: relative;
+    z-index: 1;
+}
+
+.spotlight-left, .spotlight-right {
+    position: absolute;
+    width: 50px;
+    height: 200px;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(229, 185, 78, 0.3) 0%,
+        rgba(229, 185, 78, 0) 70%
+    );
+    animation: spotlightSweep 3s infinite alternate;
+    z-index: 0;
+}
+
+.spotlight-left {
+    left: 20px;
+    transform: rotate(-30deg);
+    animation-delay: -1.5s;
+}
+
+.spotlight-right {
+    right: 20px;
+    transform: rotate(30deg);
+}
+
+@keyframes spotlightSweep {
+    0% { opacity: 0.3; transform: rotate(-45deg); }
+    100% { opacity: 0.7; transform: rotate(-15deg); }
+}
+
+.auth-required-content p {
+    color: var(--auth-text);
+    margin-bottom: 1.5rem;
+    font-family: 'Courier Prime', monospace;
+}
+
+.auth-required-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.auth-required-buttons .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    background: var(--auth-red);
+    border: 2px solid var(--auth-gold);
+    color: var(--auth-text);
+    font-family: 'Press Start 2P', cursive;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 3px 3px 0 var(--auth-dark-gold);
+}
+
+.auth-required-buttons .btn:hover {
+    background: var(--auth-gold);
+    color: var(--auth-red);
+    transform: translateY(-2px);
+    box-shadow: 3px 5px 0 var(--auth-dark-gold);
+}
+
+/* Toast Notification */
+.auth-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--auth-blue);
+    color: var(--auth-gold);
+    padding: 1rem 2rem;
+    border-radius: var(--auth-border-radius);
+    border: 2px solid var(--auth-gold);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    z-index: 10003;
+    opacity: 0;
+    transition: transform 0.4s, opacity 0.4s;
+    box-shadow: 0 0 15px rgba(229, 185, 78, 0.3);
+}
+
+.auth-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* Animations */
+@keyframes authModalOpen {
+    0% {
+        transform: translateY(-50px) scale(0.95);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes authRequiredPulse {
+    0% { transform: scale(0.9); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Added Animations */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .auth-content {
+        margin: 15% auto;
+        width: 95%;
+    }
+    
+    .marquee h2 {
+        font-size: 1.2rem;
+    }
+    
+    .auth-buttons {
+        flex-direction: column;
+    }
+}
+
+/* Additional Retro Theater Elements */
+.auth-content:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: 
+        linear-gradient(90deg, 
+            var(--auth-gold) 0%, 
+            var(--auth-gold) 5%, 
+            transparent 5%, 
+            transparent 10%,
+            var(--auth-gold) 10%, 
+            var(--auth-gold) 15%,
+            transparent 15%, 
+            transparent 20%,
+            var(--auth-gold) 20%, 
+            var(--auth-gold) 25%,
+            transparent 25%, 
+            transparent 30%,
+            var(--auth-gold) 30%, 
+            var(--auth-gold) 35%,
+            transparent 35%, 
+            transparent 40%,
+            var(--auth-gold) 40%, 
+            var(--auth-gold) 45%,
+            transparent 45%, 
+            transparent 50%,
+            var(--auth-gold) 50%, 
+            var(--auth-gold) 55%,
+            transparent 55%, 
+            transparent 60%,
+            var(--auth-gold) 60%, 
+            var(--auth-gold) 65%,
+            transparent 65%, 
+            transparent 70%,
+            var(--auth-gold) 70%, 
+            var(--auth-gold) 75%,
+            transparent 75%, 
+            transparent 80%,
+            var(--auth-gold) 80%, 
+            var(--auth-gold) 85%,
+            transparent 85%, 
+            transparent 90%,
+            var(--auth-gold) 90%, 
+            var(--auth-gold) 95%,
+            transparent 95%, 
+            transparent 100%
+        );  
+}
+</style>
+<!-- Always Visible Login Screen -->
+<div id="auth-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center;">
+    
+    <!-- Login Form - Initially Visible -->
+    <div id="login-container" style="background: #1a2632; width: 90%; max-width: 400px; 
+        border: 4px solid #E5B94E; border-radius: 8px; padding: 20px; position: relative;">
+        
+        <div style="text-align: center; background: #8B1E3F; margin: -20px -20px 20px -20px; padding: 15px 0;">
+            <h2 style="color: #E5B94E; margin: 0; font-family: 'Press Start 2P', cursive; text-shadow: 2px 2px #5a142a;">
+                Welcome to FlickFinda
+            </h2>
+        </div>
+        
+        <p style="text-align: center; color: #E5B94E; margin-bottom: 20px; font-size: 14px;">
+            Sign in to access your movie collection
+        </p>
+        
+        <form id="login-form">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #E5B94E; margin-bottom: 5px; font-size: 14px;">
+                    Username
+                </label>
+                <input type="text" id="login-username" style="width: 100%; padding: 8px; background: rgba(0,0,0,0.3);
+                    border: 2px solid #b47a22; color: #E8E9F3; border-radius: 4px;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #E5B94E; margin-bottom: 5px; font-size: 14px;">
+                    Password
+                </label>
+                <input type="password" id="login-password" style="width: 100%; padding: 8px; background: rgba(0,0,0,0.3);
+                    border: 2px solid #b47a22; color: #E8E9F3; border-radius: 4px;">
+                <div style="display: flex; align-items: center; margin-top: 5px;">
+                    <input type="checkbox" id="show-password" style="margin-right: 5px;">
+                    <label for="show-password" style="color: #E8E9F3; font-size: 12px;">Show password</label>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                <input type="checkbox" id="remember-me" style="margin-right: 5px;">
+                <label for="remember-me" style="color: #E8E9F3; font-size: 14px;">Remember me</label>
+            </div>
+            
+            <div id="login-error" style="color: #ff4136; font-size: 14px; margin-bottom: 15px; 
+                min-height: 20px; text-align: center;"></div>
+            
+            <button type="submit" style="width: 100%; padding: 10px; background: #8B1E3F;
+                border: 2px solid #b47a22; color: #E8E9F3; cursor: pointer; margin-bottom: 15px; 
+                box-shadow: 3px 3px 0 #b47a22; transition: all 0.3s; font-family: 'Press Start 2P', cursive; 
+                font-size: 14px; border-radius: 4px;">
+                Take Your Seat
+            </button>
+            
+            <div style="text-align: center;">
+                <button type="button" id="switch-to-register" style="background: transparent; border: none;
+                    color: #E5B94E; text-decoration: underline; cursor: pointer; font-size: 14px;
+                    padding: 5px; transition: all 0.3s; font-family: 'Press Start 2P', cursive;">
+                    New Here? Sign Up
+                </button>
+            </div>
+        </form>
+        
+        <div style="margin-top: 20px; text-align: center; border-top: 1px dashed #b47a22; padding-top: 15px;">
+            <button id="continue-as-guest" style="background: rgba(0,0,0,0.3); border: 1px solid #E5B94E;
+                color: #E5B94E; padding: 5px 10px; cursor: pointer; border-radius: 4px; 
+                font-family: 'Press Start 2P', cursive; font-size: 12px;">
+                Continue as Guest
+            </button>
+            <p style="color: #E8E9F3; font-size: 12px; margin-top: 5px; opacity: 0.7;">
+                Some features will be limited
+            </p>
+        </div>
+    </div>
+    
+    <!-- Registration Form - Initially Hidden -->
+    <div id="register-container" style="background: #1a2632; width: 90%; max-width: 400px; 
+        border: 4px solid #E5B94E; border-radius: 8px; padding: 20px; position: relative; display: none;">
+        
+        <div style="text-align: center; background: #8B1E3F; margin: -20px -20px 20px -20px; padding: 15px 0;">
+            <h2 style="color: #E5B94E; margin: 0; font-family: 'Press Start 2P', cursive; text-shadow: 2px 2px #5a142a;">
+                Join FlickFinda
+            </h2>
+        </div>
+        
+        <p style="text-align: center; color: #E5B94E; margin-bottom: 20px; font-size: 14px;">
+            Create your account to track your movies
+        </p>
+        
+        <form id="register-form">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #E5B94E; margin-bottom: 5px; font-size: 14px;">
+                    Username
+                </label>
+                <input type="text" id="register-username" style="width: 100%; padding: 8px; background: rgba(0,0,0,0.3);
+                    border: 2px solid #b47a22; color: #E8E9F3; border-radius: 4px;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #E5B94E; margin-bottom: 5px; font-size: 14px;">
+                    Password
+                </label>
+                <input type="password" id="register-password" style="width: 100%; padding: 8px; background: rgba(0,0,0,0.3);
+                    border: 2px solid #b47a22; color: #E8E9F3; border-radius: 4px;">
+                
+                <!-- Password strength meter -->
+                <div style="margin-top: 5px;">
+                    <div id="strength-meter" style="height: 4px; background: #444; position: relative; 
+                        margin-bottom: 5px; border-radius: 2px; overflow: hidden;">
+                        <div id="strength-fill" style="height: 100%; width: 0; background: #ff4136; 
+                            position: absolute; transition: width 0.3s, background-color 0.3s;"></div>
+                    </div>
+                    <span id="strength-text" style="font-size: 12px; color: #E8E9F3; opacity: 0.8;">
+                        Password strength
+                    </span>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #E5B94E; margin-bottom: 5px; font-size: 14px;">
+                    Confirm Password
+                </label>
+                <input type="password" id="register-confirm" style="width: 100%; padding: 8px; background: rgba(0,0,0,0.3);
+                    border: 2px solid #b47a22; color: #E8E9F3; border-radius: 4px;">
+            </div>
+            
+            <div id="register-error" style="color: #ff4136; font-size: 14px; margin-bottom: 15px; 
+                min-height: 20px; text-align: center;"></div>
+            
+            <button type="submit" style="width: 100%; padding: 10px; background: #8B1E3F;
+                border: 2px solid #b47a22; color: #E8E9F3; cursor: pointer; margin-bottom: 15px; 
+                box-shadow: 3px 3px 0 #b47a22; transition: all 0.3s; font-family: 'Press Start 2P', cursive; 
+                font-size: 14px; border-radius: 4px;">
+                Join FlickFinda
+            </button>
+            
+            <div style="text-align: center;">
+                <button type="button" id="back-to-login" style="background: transparent; border: none;
+                    color: #E5B94E; text-decoration: underline; cursor: pointer; font-size: 14px;
+                    padding: 5px; transition: all 0.3s; font-family: 'Press Start 2P', cursive;">
+                    Back to Login
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const loginContainer = document.getElementById('login-container');
+    const registerContainer = document.getElementById('register-container');
+    const authScreen = document.getElementById('auth-screen');
+    
+    // Switch between login and registration forms
+    document.getElementById('switch-to-register').addEventListener('click', function(e) {
+        e.preventDefault();
+        loginContainer.style.display = 'none';
+        registerContainer.style.display = 'block';
+    });
+    
+    document.getElementById('back-to-login').addEventListener('click', function(e) {
+        e.preventDefault();
+        registerContainer.style.display = 'none';
+        loginContainer.style.display = 'block';
+    });
+    
+    // Continue as guest button
+    document.getElementById('continue-as-guest').addEventListener('click', function() {
+        // Call the guest login API
+        fetch('/api/auth/guest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/';
+            }
+        })
+        .catch(error => {
+            console.error('Guest login error:', error);
+            // Try redirecting anyway
+            window.location.href = '/';
+        });
+    });
+    
+    // Show/hide password toggles
+    document.getElementById('show-password').addEventListener('change', function() {
+        const passwordInput = document.getElementById('login-password');
+        passwordInput.type = this.checked ? 'text' : 'password';
+    });
+    
+    document.getElementById('show-password').addEventListener('change', function() {
+        const passwordInput = document.getElementById('register-password');
+        passwordInput.type = this.checked ? 'text' : 'password';
+    });
+    
+    // Password strength meter
+    const passwordInput = document.getElementById('register-password');
+    const strengthMeter = document.getElementById('strength-fill');
+    const strengthText = document.getElementById('strength-text');
+    
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        
+        // Length check
+        if (password.length >= 8) strength += 1;
+        
+        // Character variety checks
+        if (/[A-Z]/.test(password)) strength += 1;
+        if (/[a-z]/.test(password)) strength += 1;
+        if (/[0-9]/.test(password)) strength += 1;
+        if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+        
+        // Update UI based on strength
+        if (password.length === 0) {
+            strengthMeter.style.width = '0';
+            strengthMeter.style.backgroundColor = '#ff4136';
+            strengthText.textContent = 'Password strength';
+        } else if (strength <= 2) {
+            strengthMeter.style.width = '33%';
+            strengthMeter.style.backgroundColor = '#ff4136';
+            strengthText.textContent = 'Weak password';
+        } else if (strength <= 4) {
+            strengthMeter.style.width = '66%';
+            strengthMeter.style.backgroundColor = '#ffb700';
+            strengthText.textContent = 'Medium password';
+        } else {
+            strengthMeter.style.width = '100%';
+            strengthMeter.style.backgroundColor = '#2ecc40';
+            strengthText.textContent = 'Strong password';
+        }
+    });
+    
+    // Show toast message function
+    function showToast(message, duration = 3000) {
+        const toast = document.getElementById('auth-toast');
+        const toastMessage = document.getElementById('auth-toast-message');
+        
+        if (toast && toastMessage) {
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        } else {
+            // Fallback to alert if toast elements not found
+            alert(message);
+        }
+    }
+    
+    // Login form submission
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const rememberMe = document.getElementById('remember-me')?.checked || false;
+            const loginError = document.getElementById('login-error');
+            
+            // Validate
+            if (!username || !password) {
+                if (loginError) loginError.textContent = 'Please fill in all fields';
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn ? submitBtn.textContent : '';
+            if (submitBtn) {
+                submitBtn.textContent = 'Logging in...';
+                submitBtn.disabled = true;
+            }
+            
+            console.log('Sending login request for user:', username);
+            
+            // Send login request to backend
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username: username, 
+                    password: password,
+                    remember_me: rememberMe
+                }),
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Login response:', data);
+                
+                if (data.success) {
+                    // Show success message
+                    showToast('Login successful! Redirecting...');
+                    
+                    // Redirect to home page
+                    window.location.href = '/';
+                } else {
+                    // Show error
+                    if (loginError) loginError.textContent = data.message || 'Login failed';
+                    
+                    // Reset button
+                    if (submitBtn) {
+                        submitBtn.textContent = originalText || 'Login';
+                        submitBtn.disabled = false;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+                if (loginError) loginError.textContent = 'Network error. Please try again.';
+                
+                // Reset button
+                if (submitBtn) {
+                    submitBtn.textContent = originalText || 'Login';
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+    }
+    
+    // Register form submission
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm').value;
+            const registerError = document.getElementById('register-error');
+            
+            // Validate
+            if (!username || !password || !confirmPassword) {
+                if (registerError) registerError.textContent = 'Please fill in all fields';
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                if (registerError) registerError.textContent = 'Passwords do not match';
+                return;
+            }
+            
+            if (password.length < 6) {
+                if (registerError) registerError.textContent = 'Password must be at least 6 characters';
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = registerForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn ? submitBtn.textContent : '';
+            if (submitBtn) {
+                submitBtn.textContent = 'Creating account...';
+                submitBtn.disabled = true;
+            }
+            
+            // Send registration request to backend
+            fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                }),
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showToast('Registration successful! Redirecting...');
+                    
+                    // Redirect to home page
+                    window.location.href = '/';
+                } else {
+                    // Show error
+                    if (registerError) registerError.textContent = data.message || 'Registration failed';
+                    
+                    // Reset button
+                    if (submitBtn) {
+                        submitBtn.textContent = originalText || 'Register';
+                        submitBtn.disabled = false;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Registration error:', error);
+                if (registerError) registerError.textContent = 'Network error. Please try again.';
+                
+                // Reset button
+                if (submitBtn) {
+                    submitBtn.textContent = originalText || 'Register';
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM loaded, checking for form elements...");
+    
+    // Log all relevant form elements
+    console.log("Login form:", document.getElementById('login-form'));
+    console.log("Login button:", document.querySelector('button[type="submit"]'));
+    console.log("Username field:", document.getElementById('login-username'));
+    console.log("Password field:", document.getElementById('login-password'));
+    
+    // Basic form submit handler
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        console.log("Found login form, attaching submit handler");
+        
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log("Form submitted!");
+            
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            console.log("Login data:", { username, password });
+            
+            // Very simple fetch request
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                console.log("Response received:", response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Response data:", data);
+                
+                if (data.success) {
+                    console.log("Login successful, redirecting...");
+                    window.location.href = '/';
+                } else {
+                    console.error("Login failed:", data.message);
+                    alert("Login failed: " + (data.message || "Unknown error"));
+                }
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+                alert("Login request failed. Check console for details.");
+            });
+        });
+    } else {
+        console.error("LOGIN FORM NOT FOUND!");
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Fix password strength meter
+    const passwordInput = document.getElementById('register-password');
+    const strengthFill = document.getElementById('strength-fill');
+    const strengthText = document.getElementById('strength-text');
+    
+    if (passwordInput && strengthFill && strengthText) {
+        console.log("Password strength elements found, adding event listener");
+        
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            console.log("Password changed:", password ? "[password entered]" : "[empty]");
+            
+            let strength = 0;
+            
+            // Length check
+            if (password.length >= 8) strength += 1;
+            
+            // Character variety checks
+            if (/[A-Z]/.test(password)) strength += 1;
+            if (/[a-z]/.test(password)) strength += 1;
+            if (/[0-9]/.test(password)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+            
+            console.log("Password strength score:", strength);
+            
+            // Update UI based on strength
+            if (password.length === 0) {
+                strengthFill.style.width = '0';
+                strengthFill.style.backgroundColor = '#ff4136';
+                strengthText.textContent = 'Password strength';
+            } else if (strength <= 2) {
+                strengthFill.style.width = '33%';
+                strengthFill.style.backgroundColor = '#ff4136';
+                strengthText.textContent = 'Weak password';
+            } else if (strength <= 4) {
+                strengthFill.style.width = '66%';
+                strengthFill.style.backgroundColor = '#ffb700';
+                strengthText.textContent = 'Medium password';
+            } else {
+                strengthFill.style.width = '100%';
+                strengthFill.style.backgroundColor = '#2ecc40';
+                strengthText.textContent = 'Strong password';
+            }
+        });
+    } else {
+        console.error("Password strength elements missing:", {
+            passwordInput: !!passwordInput,
+            strengthFill: !!strengthFill,
+            strengthText: !!strengthText
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Checking for registration form...");
+    
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        console.log("Registration form found, attaching submit handler");
+        
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log("Registration form submitted!");
+            
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm').value;
+            
+            console.log("Registration data:", { username, password: "***", confirmPass: "***" });
+            
+            // Basic validation
+            if (!username || !password || !confirmPassword) {
+                console.error("Missing required fields");
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                console.error("Passwords don't match");
+                return;
+            }
+            
+            // Send registration request
+            fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                }),
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                console.log("Registration response status:", response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Registration response data:", data);
+                
+                if (data.success) {
+                    console.log("Registration successful, redirecting...");
+                    alert("Registration successful!");
+                    window.location.href = '/';
+                } else {
+                    console.error("Registration failed:", data.message);
+                    const errorElem = document.getElementById('register-error');
+                    if (errorElem) {
+                        errorElem.textContent = data.message || 'Registration failed';
+                    } else {
+                        alert("Registration failed: " + (data.message || "Unknown error"));
+                    }
+                }
+            })
+            .catch(error => {
+                console.error("Registration fetch error:", error);
+                alert("Registration request failed. Check browser console for details.");
+            });
+        });
+    } else {
+        console.error("REGISTRATION FORM NOT FOUND!");
+    }
+});
+</script>
