@@ -1,0 +1,472 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import hashlib
+import json
+import os
+import random
+import requests
+
+
+Horror = ["The Babadook","Geralds Game", "Theres someone inside your house", "The platform", "Mr.Harrigans phone",
+    "Berlin syndrom", "Texas chainsaw massicure", "Army of the dead", "the babysitter: killer queen", "Fear street part one", "A classic horror story",
+    "1922", "the conjuring", "Death note", "In the tall grass", "Bird box", "The ritual", "Ouiji: Orgin of evil"] 
+
+Comedy = ["Superbad", "Anchorman", "The other guys", "Hustle", "We have a ghost", "Bad trip", "Between two ferns: the movie", "Set it up",
+    "Dolemite is my name", "The Ballad of Buster scruggs", "Its whats inside", "Unfrosted", "Leo", "Do revenege", "Glass onion: a knifes out mystery", "I care a lot",
+    "Red notice", "Spenser confidential", "The laundromat", "The Meyerowitz stories", "The breaker uppers", "Me time", "Old dads", "Dont look up",
+    "Dumb money", "Hustle", "The package"]
+
+romCom = ["Always be my maybe", "Somethings gotta give", "set it up", "No hard feelings", "Persuasion", "Look both ways", "Love and leashes", "The half of it",
+            "Someone great", "The love birds", "plus one", "He's all that", "Desperados", "Nappily Ever After", "Good on paper", "My best friends wedding", "The incredible jessica james",
+            "Sierra Burgess is a loser", "Anyone but you", "players", "The perfect find", "A tourests guide to love", "Set it up", "Alex Strangelove", "Love hard", "Love in the villa",
+            "To all the boys I've loved before"]
+
+Documentary = ["Our Planet", "13th", "The Social Dilemma", "Making a Murderer", "My Octopus Teacher", "Wild Wild Country","Tiger King","Inside Bill's Brain: Decoding Bill Gates",
+            "Crip Camp", "American Factory", "Seaspiracy", "Night on Earth", "Fyre: The Greatest Party That Never Happened", "David Attenborough: A Life on Our Planet", "The Tinder Swindler",
+            "Conversations with a Killer: The Ted Bundy Tapes", "The Great Hack", "Abducted in Plain Sight", "The Pharmacist", "Icarus", "Knock Down the House", "Homecoming: A Film by Beyoncé", "The Innocent Man",
+            "Don't F**k with Cats: Hunting an Internet Killer", "Cocaine Cowboys: The Kings of Miami", "Chef's Table", "Rotten", "Explained", "Break Point", "Untold: The Girlfriend Who Didn't Exist", "Down to Earth with Zac Efron",
+            "Fantastic Fungi", "Chasing Coral"]
+
+Christmas = ["Home Alone", "Home Alone 2: Lost in New York", "Elf", "A Christmas Story", "It's a Wonderful Life", "National Lampoon's Christmas Vacation","The Polar Express","How the Grinch Stole Christmas (2000)", "Dr. Seuss' The Grinch (2018)", 
+             "Miracle on 34th Street (1994)", "The Santa Clause","Love Actually","The Holiday","Arthur Christmas","Klaus","Scrooged","A Charlie Brown Christmas","Rudolph the Red-Nosed Reindeer","Frosty the Snowman","White Christmas",
+             "Jingle All the Way","The Nightmare Before Christmas","Bad Santa","Noelle"]
+
+genre = [Horror, Documentary, romCom, Comedy, Christmas]
+
+class LoginGUI:
+    def __init__(self, root):
+        # Initialize the main window
+        self.root = root
+        self.root.title("Login System")
+        self.root.geometry("400x300")
+        self.root.resizable(False, False)
+        
+        # Configure styles for a modern look
+        self.style = ttk.Style()
+        self.style.configure('TLabel', padding=5, font=('Arial', 10))
+        self.style.configure('TButton', padding=5, font=('Arial', 10))
+        self.style.configure('TEntry', padding=5)
+        
+        # Initialize the credentials system
+        # This JSON file acts as our simple database
+        self.credentials_file = "credentials.json"
+        self.load_credentials()
+        
+        # Create and show the login frame
+        self.create_login_frame()
+        
+        # Track login status
+        self.login_successful = False
+        
+    def load_credentials(self):
+        """Load existing credentials from file or create new ones if file doesn't exist."""
+        try:
+            # Try to read existing credentials
+            with open(self.credentials_file, 'r') as f:
+                self.credentials = json.load(f)
+                # If the file exists but doesn't have the users key, add it
+                if "users" not in self.credentials:
+                    self.credentials["users"] = {}
+                    self.save_credentials()
+        except (FileNotFoundError, json.JSONDecodeError):
+            # If file doesn't exist or is invalid, create new credentials structure
+            self.credentials = {"users": {}}
+            self.save_credentials()
+
+    def save_credentials(self):
+        with open(self.credentials_file, 'w', encoding='utf-8') as f:
+            json.dump(self.credentials, f, indent=4)
+    
+    def hash_password(self, password):
+        """Create a secure hash of the password using SHA-256."""
+        return hashlib.sha256(password.encode()).hexdigest()
+    
+    def create_login_frame(self):
+        """Create the main login frame."""
+        # Clear any existing widgets
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        
+        # Create main frame
+        main_frame = ttk.Frame(self.root, padding="20")
+        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        
+        # Title
+        title_label = ttk.Label(main_frame, text="Login System", font=('Arial', 16, 'bold'))
+        title_label.grid(row=0, column=0, columnspan=2, pady=20)
+        
+        # Username
+        ttk.Label(main_frame, text="Username:").grid(row=1, column=0, sticky=tk.W)
+        self.username_var = tk.StringVar()
+        username_entry = ttk.Entry(main_frame, textvariable=self.username_var)
+        username_entry.grid(row=1, column=1, padx=5, pady=5, sticky=(tk.W, tk.E))
+        
+        # Password
+        ttk.Label(main_frame, text="Password:").grid(row=2, column=0, sticky=tk.W)
+        self.password_var = tk.StringVar()
+        password_entry = ttk.Entry(main_frame, textvariable=self.password_var, show="*")
+        password_entry.grid(row=2, column=1, padx=5, pady=5, sticky=(tk.W, tk.E))
+        
+        # Login button
+        login_btn = ttk.Button(main_frame, text="Login", command=self.login)
+        login_btn.grid(row=3, column=0, columnspan=2, pady=20)
+        
+        # Register link
+        register_link = ttk.Button(main_frame, text="Register New Account", command=self.create_register_frame)
+        register_link.grid(row=4, column=0, columnspan=2)
+        
+        # Configure grid weights
+        main_frame.columnconfigure(1, weight=1)
+    
+    def create_register_frame(self):
+        """Create the registration frame."""
+        # Clear existing widgets
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        
+        # Create main frame
+        main_frame = ttk.Frame(self.root, padding="20")
+        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        
+        # Title
+        title_label = ttk.Label(main_frame, text="Register New Account", font=('Arial', 16, 'bold'))
+        title_label.grid(row=0, column=0, columnspan=2, pady=20)
+        
+        # Username
+        ttk.Label(main_frame, text="Username:").grid(row=1, column=0, sticky=tk.W)
+        self.reg_username_var = tk.StringVar()
+        username_entry = ttk.Entry(main_frame, textvariable=self.reg_username_var)
+        username_entry.grid(row=1, column=1, padx=5, pady=5, sticky=(tk.W, tk.E))
+        
+        # Password
+        ttk.Label(main_frame, text="Password:").grid(row=2, column=0, sticky=tk.W)
+        self.reg_password_var = tk.StringVar()
+        password_entry = ttk.Entry(main_frame, textvariable=self.reg_password_var, show="*")
+        password_entry.grid(row=2, column=1, padx=5, pady=5, sticky=(tk.W, tk.E))
+        
+        # Confirm Password
+        ttk.Label(main_frame, text="Confirm Password:").grid(row=3, column=0, sticky=tk.W)
+        self.reg_confirm_var = tk.StringVar()
+        confirm_entry = ttk.Entry(main_frame, textvariable=self.reg_confirm_var, show="*")
+        confirm_entry.grid(row=3, column=1, padx=5, pady=5, sticky=(tk.W, tk.E))
+        
+        # Register button
+        register_btn = ttk.Button(main_frame, text="Register", command=self.register)
+        register_btn.grid(row=4, column=0, columnspan=2, pady=20)
+        
+        # Back to login link
+        back_link = ttk.Button(main_frame, text="Back to Login", command=self.create_login_frame)
+        back_link.grid(row=5, column=0, columnspan=2)
+        
+        # Configure grid weights
+        main_frame.columnconfigure(1, weight=1)
+    
+    def login(self):
+        """Handle login process."""
+        username = self.username_var.get().strip()
+        password = self.password_var.get()
+    
+        # Ensure we have the users dictionary
+        if "users" not in self.credentials:
+            self.credentials["users"] = {}
+            self.save_credentials()
+    
+        if username in self.credentials["users"] and self.credentials["users"][username] == self.hash_password(password):
+            messagebox.showinfo("Success", "Login successful!")
+            self.login_successful = True
+            self.root.quit()  # Close the window after successful login
+        else:
+            messagebox.showerror("Error", "Invalid username or password")
+    
+    def register(self):
+        """Handle registration process."""
+        username = self.reg_username_var.get().strip()
+        password = self.reg_password_var.get()
+        confirm = self.reg_confirm_var.get()
+    
+        # Ensure we have the users dictionary
+        if "users" not in self.credentials:
+            self.credentials["users"] = {}
+    
+        if not username or not password:
+            messagebox.showerror("Error", "Please fill in all fields")
+            return
+    
+        if username in self.credentials["users"]:
+            messagebox.showerror("Error", "Username already exists")
+            return
+    
+        if password != confirm:
+            messagebox.showerror("Error", "Passwords don't match")
+            return
+    
+        # Store the new user
+        self.credentials["users"][username] = self.hash_password(password)
+        self.save_credentials()
+        messagebox.showinfo("Success", "Registration successful!")
+        self.create_login_frame()
+def authenticate():
+    """Run the login GUI and return whether authentication was successful."""
+    root = tk.Tk()
+    app = LoginGUI(root)
+    root.mainloop()
+    return app.login_successful
+
+
+def get_movie_ratings(movie_title):
+    """
+    Fetch movie ratings from various review sites using their APIs or web scraping.
+    Returns a dictionary of ratings from different sources.
+    """
+    ratings = {
+        "Rotten Tomatoes": "N/A",
+        "IMDb": "N/A",
+        "Metacritic": "N/A"
+    }
+    
+    try:
+        # Replace these with actual API calls - you'll need to sign up for API keys
+        # Example using OMDB API for IMDb ratings (requires API key)
+        omdb_api_key = "4b9e10c0"  
+        omdb_url = f"http://www.omdbapi.com/?t={movie_title}&apikey={omdb_api_key}"
+        
+        response = requests.get(omdb_url)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("Response") == "True":
+                ratings["IMDb"] = data.get("imdbRating", "N/A")
+                # OMDB also provides Rotten Tomatoes rating in its response
+                for rating in data.get("Ratings", []):
+                    if rating["Source"] == "Rotten Tomatoes":
+                        ratings["Rotten Tomatoes"] = rating["Value"]
+                    elif rating["Source"] == "Metacritic":
+                        ratings["Metacritic"] = rating["Value"]
+    
+    except Exception as e:
+        print(f"Error fetching ratings: {e}")
+    
+    return ratings
+
+class MovieApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Movie Selector")
+        self.geometry("800x800")  # Made bigger to accommodate reviews
+
+         # First, create instance attributes by copying the global lists
+        self.horror_movies = Horror      # Create an instance attribute from global Horror list
+        self.comedy_movies = Comedy      # Create an instance attribute from global Comedy list
+        self.romcom_movies = romCom      # Create an instance attribute from global romCom list
+        self.documentary_movies = Documentary  # Create an instance attribute from global Documentary list
+        self.christmas_movies = Christmas     # Create an instance attribute from global Christmas list
+
+         # Now use these instance attributes in the genre_lists dictionary
+        self.genre_lists = {
+            "Horror": self.horror_movies,
+            "Comedy": self.comedy_movies,
+            "Romance": self.romcom_movies,
+            "Documentary": self.documentary_movies,
+            "Christmas": self.christmas_movies
+        }
+
+        self.genre_var = tk.StringVar(self)
+        self.genre_var.set("Random")
+        self.selected_movie_var = tk.StringVar(self)
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        # Main Frame
+        main_frame = ttk.Frame(self, padding="10")
+        main_frame.pack(fill="both", expand=True)
+
+        # Genre Selection Section
+        genre_frame = ttk.LabelFrame(main_frame, text="Movie Selection", padding="10")
+        genre_frame.pack(fill="x", pady=5)
+
+        genre_label = ttk.Label(genre_frame, text="Choose Genre:")
+        genre_label.pack(side="left", padx=5)
+
+        genre_dropdown = ttk.OptionMenu(genre_frame, self.genre_var, "Random", 
+                                      "Horror", "romCom", "Documentary", "Comedy", "Christmas")
+        genre_dropdown.pack(side="left", padx=5)
+
+        select_button = ttk.Button(genre_frame, text="Select Movie", command=self.select_movie)
+        select_button.pack(side="left", padx=5)
+
+        # Selected Movie Display
+        movie_frame = ttk.LabelFrame(main_frame, text="Selected Movie", padding="10")
+        movie_frame.pack(fill="x", pady=5)
+        
+        movie_label = ttk.Label(movie_frame, textvariable=self.selected_movie_var, font=("Arial", 12, "bold"))
+        movie_label.pack()
+
+        # Ratings Frame
+        self.ratings_frame = ttk.LabelFrame(main_frame, text="Ratings", padding="10")
+        self.ratings_frame.pack(fill="x", pady=5)
+
+        # Create labels for each rating source
+        self.rating_labels = {}
+        for source in ["Rotten Tomatoes", "IMDb", "Metacritic"]:
+            frame = ttk.Frame(self.ratings_frame)
+            frame.pack(fill="x", pady=2)
+            ttk.Label(frame, text=f"{source}:", font=("Arial", 10, "bold")).pack(side="left")
+            self.rating_labels[source] = ttk.Label(frame, text="N/A")
+            self.rating_labels[source].pack(side="right")
+
+        # Reviews Section
+        reviews_frame = ttk.LabelFrame(main_frame, text="Reviews", padding="10")
+        reviews_frame.pack(fill="both", expand=True, pady=5)
+
+        # Button Frame
+        button_frame = ttk.Frame(reviews_frame)
+        button_frame.pack(fill="x", pady=5)
+
+        fetch_button = ttk.Button(button_frame, text="Fetch Reviews & Ratings", 
+                                command=self.get_reviews_and_ratings)
+        fetch_button.pack(side="left", padx=5)
+
+
+        # Review Text Areas
+        self.llm_review_frame = ttk.LabelFrame(reviews_frame, text="AI Summary", padding="5")
+        self.llm_review_frame.pack(fill="both", expand=True, pady=5)
+        
+        self.llm_review = tk.Text(self.llm_review_frame, height=4, wrap=tk.WORD)
+        self.llm_review.pack(fill="both", expand=True)
+
+        self.web_review_frame = ttk.LabelFrame(reviews_frame, text="Web Reviews", padding="5")
+        self.web_review_frame.pack(fill="both", expand=True, pady=5)
+        
+        self.web_review = tk.Text(self.web_review_frame, height=8, wrap=tk.WORD)
+        self.web_review.pack(fill="both", expand=True)
+
+    def get_reviews_and_ratings(self):
+        movie = self.selected_movie_var.get()
+        if not movie:
+            messagebox.showwarning("Warning", "Please select a movie first!")
+            return
+
+        # Clear previous reviews
+        self.clear_reviews()
+
+        # Get AI Summary
+        try:
+            prompt = f"Write a brief, engaging 3-sentence summary of the movie '{movie}'"
+            ai_review = send_to_llm(prompt)
+            self.llm_review.insert("1.0", ai_review)
+        except Exception as e:
+            self.llm_review.insert("1.0", f"Error getting AI summary: {str(e)}")
+
+        # Get Ratings and Web Reviews
+        try:
+            ratings = self.get_movie_ratings(movie)
+            web_reviews = self.get_web_reviews(movie)
+            
+            # Update ratings
+            for source, rating in ratings.items():
+                self.rating_labels[source].config(text=rating)
+            
+            # Update web reviews
+            self.web_review.insert("1.0", web_reviews)
+            
+        except Exception as e:
+            self.web_review.insert("1.0", f"Error fetching reviews: {str(e)}")
+
+    def get_movie_ratings(self, movie_title):
+        ratings = {
+            "Rotten Tomatoes": "N/A",
+            "IMDb": "N/A",
+            "Metacritic": "N/A"
+        }
+        
+        try:
+            # Replace with your actual OMDB API key
+            api_key = "4b9e10c0"
+            url = f"http://www.omdbapi.com/?t={movie_title}&apikey={api_key}"
+            
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("Response") == "True":
+                    ratings["IMDb"] = f"{data.get('imdbRating', 'N/A')}/10"
+                    
+                    # Extract Rotten Tomatoes and Metacritic ratings
+                    for rating in data.get("Ratings", []):
+                        if rating["Source"] == "Rotten Tomatoes":
+                            ratings["Rotten Tomatoes"] = rating["Value"]
+                        elif rating["Source"] == "Metacritic":
+                            ratings["Metacritic"] = rating["Value"]
+        
+        except Exception as e:
+            print(f"Error fetching ratings: {e}")
+        
+        return ratings
+
+    def get_web_reviews(self, movie_title):
+        """
+        Get critic reviews from OMDB API.
+        """
+        try:
+            # Replace with your actual OMDB API key
+            api_key = "4b9e10c0"
+            url = f"http://www.omdbapi.com/?t={movie_title}&plot=full&apikey={api_key}"
+            
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("Response") == "True":
+                    reviews = []
+                    if data.get("Plot"):
+                        reviews.append(f"Plot Summary:\n{data['Plot']}\n")
+                    if data.get("Awards"):
+                        reviews.append(f"\nAwards:\n{data['Awards']}\n")
+                    
+                    return "\n".join(reviews)
+                
+            return "No reviews available."
+            
+        except Exception as e:
+            return f"Error fetching web reviews: {str(e)}"
+
+    def clear_reviews(self):
+        """Clear all review and rating displays"""
+        self.llm_review.delete("1.0", tk.END)
+        self.web_review.delete("1.0", tk.END)
+        for label in self.rating_labels.values():
+            label.config(text="N/A")
+
+    # Keep your existing methods...
+    def select_genre(self):
+        return random.choice(list(self.genre_lists.values()))
+
+    def select_random_movie(self, movie_list):
+        return random.choice(movie_list)
+
+    def select_movie(self):
+        chosen_genre = self.genre_var.get()
+        if chosen_genre == "Random":
+            genre_list = self.select_genre()
+        else:
+            genre_list = self.genre_lists[chosen_genre]
+
+        selected_movie = self.select_random_movie(genre_list)
+        self.selected_movie_var.set(selected_movie)
+        self.clear_reviews()  # Clear reviews when new movie is selected
+def send_to_llm(prompt, url="http://localhost:11434/api/generate"):
+    headers = {"Content-Type": "application/json"}
+    data = {
+        "model": "llama2",
+        "prompt": prompt,
+        "stream": False
+    }
+    response = requests.post(url, headers=headers, json=data)
+    response_json = response.json()
+    return response_json['response']
+
+# Main execution
+if __name__ == "__main__":
+    if authenticate():  # Assuming authenticate() function is defined elsewhere
+        app = MovieApp()
+        app.mainloop()
+    else:
+        print("Login failed or window was closed.")

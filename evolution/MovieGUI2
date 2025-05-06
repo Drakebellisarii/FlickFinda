@@ -1,0 +1,116 @@
+import tkinter as tk
+import random
+import requests
+
+Horror = ["The Babadook","Geralds Game", "Theres someone inside your house", "The platform", "Mr.Harrigans phone",
+    "Berlin syndrom", "Texas chainsaw massicure", "Army of the dead", "the babysitter: killer queen", "Fear street part one", "A classic horror story",
+    "1922", "the conjuring", "Death note", "In the tall grass", "Bird box", "The ritual", "Ouiji: Orgin of evil"] 
+
+Comedy = ["Superbad", "Anchorman", "The other guys", "Hustle", "We have a ghost", "Bad trip", "Between two ferns: the movie", "Set it up",
+    "Dolemite is my name", "The Ballad of Buster scruggs", "Its whats inside", "Unfrosted", "Leo", "Do revenege", "Glass onion: a knifes out mystery", "I care a lot",
+    "Red notice", "Spenser confidential", "The laundromat", "The Meyerowitz stories", "The breaker uppers", "Me time", "Old dads", "Dont look up",
+    "Dumb money", "Hustle", "The package"]
+
+romCom = ["Always be my maybe", "Somethings gotta give", "set it up", "No hard feelings", "Persuasion", "Look both ways", "Love and leashes", "The half of it",
+            "Someone great", "The love birds", "plus one", "He's all that", "Desperados", "Nappily Ever After", "Good on paper", "My best friends wedding", "The incredible jessica james",
+            "Sierra Burgess is a loser", "Anyone but you", "players", "The perfect find", "A tourests guide to love", "Set it up", "Alex Strangelove", "Love hard", "Love in the villa",
+            "To all the boys I've loved before"]
+
+Documentary = ["Our Planet", "13th", "The Social Dilemma", "Making a Murderer", "My Octopus Teacher", "Wild Wild Country","Tiger King","Inside Bill's Brain: Decoding Bill Gates",
+            "Crip Camp", "American Factory", "Seaspiracy", "Night on Earth", "Fyre: The Greatest Party That Never Happened", "David Attenborough: A Life on Our Planet", "The Tinder Swindler",
+            "Conversations with a Killer: The Ted Bundy Tapes", "The Great Hack", "Abducted in Plain Sight", "The Pharmacist", "Icarus", "Knock Down the House", "Homecoming: A Film by Beyoncé", "The Innocent Man",
+            "Don't F**k with Cats: Hunting an Internet Killer", "Cocaine Cowboys: The Kings of Miami", "Chef's Table", "Rotten", "Explained", "Break Point", "Untold: The Girlfriend Who Didn't Exist", "Down to Earth with Zac Efron",
+            "Fantastic Fungi", "Chasing Coral"]
+
+
+
+
+
+
+
+
+
+
+genre = [Horror, Documentary, romCom, Comedy]
+
+def select_genre():
+    return random.choice(genre)
+
+def select_movie(movies):
+    return random.choice(movies)
+
+def send_to_llm(prompt, url="http://localhost:11434/api/generate"):  # Replace with your LLM API endpoint
+    headers = {"Content-Type": "application/json"}
+    data = {
+        "model": "llama2",
+        "prompt": prompt,
+        "stream": False
+    }
+    response = requests.post(url, headers=headers, json=data)
+    response_json = response.json()
+    return response_json['response']
+
+class MovieApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Movie Selector")
+        self.geometry("500x400")
+
+        self.genre_var = tk.StringVar(self)
+        self.genre_var.set("Random")  # Default selection
+
+        self.selected_movie_var = tk.StringVar(self)
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        genre_label = tk.Label(self, text="Choose Genre:")
+        genre_label.pack(pady=10)
+
+        genre_dropdown = tk.OptionMenu(self, self.genre_var, "Random", "Horror", "romCom", "Documentary", "Comedy")
+        genre_dropdown.pack()
+
+        select_button = tk.Button(self, text="Select Movie", command=self.select_movie)
+        select_button.pack(pady=10)
+
+        movie_label = tk.Label(self, text="Selected Movie:")
+        movie_label.pack()
+
+        movie_display = tk.Label(self, textvariable=self.selected_movie_var)
+        movie_display.pack()
+
+        review_button = tk.Button(self, text="Generate Review", command=self.get_review)
+        review_button.pack(pady=10)
+
+        review_text = tk.Text(self, width=50, height=10)
+        review_text.config(state=tk.DISABLED)
+        review_text.pack()
+        self.review_text = review_text
+
+    def select_movie(self):
+        chosen_genre = self.genre_var.get()
+        if chosen_genre == "Random":
+            genre_list = select_genre()
+        else:
+            genre_list = eval(chosen_genre + "[:]") 
+
+        selected_movie = select_movie(genre_list)
+        self.selected_movie_var.set(selected_movie)
+
+    def get_review(self):
+        selected_movie = self.selected_movie_var.get()
+        if not selected_movie:
+            return
+
+        prompt = f"very briefly explain(5 sentences) the movie '{selected_movie}'"
+        review = send_to_llm(prompt)
+
+        self.review_text.config(state=tk.NORMAL)
+        self.review_text.delete(1.0, tk.END)
+        self.review_text.insert(tk.END, review)
+        self.review_text.config(state=tk.DISABLED)
+
+
+if __name__ == "__main__":
+    app = MovieApp()
+    app.mainloop()
