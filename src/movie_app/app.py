@@ -703,15 +703,16 @@ def generate_movie_list(description, num_titles=5):
             max_tokens=150,
             temperature=0.2
         )
-        
+
         content = response.choices[0].message.content.strip()
-        
+
         movies = [movie.strip() for movie in content.split(',')]
-        
+
         return {
             "titles": movies[:num_titles],
             "success": True
         }
+
     except Exception as e:
         print(f"Error generating movie suggestion: {str(e)}")
         return {
