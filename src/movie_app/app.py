@@ -5,7 +5,6 @@ import os
 import random
 import requests 
 import openai
-from openai import OpenAI
 import traceback
 import re
 from flask_migrate import Migrate
@@ -161,85 +160,6 @@ def update_rating():
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': f'Error: {str(e)}', 'success': False}), 500
-
-##@app.route('/api/watched', methods=['GET'])
-## def get_watched_movies():
-    ##try:
-       ## movies = MovieRating.query.all()
-        ## print(f"Number of movies in ratings: {len(movies)}")  # Debug print
-        ## for movie in movies:
-           ##  print(f"Found movie: {movie.movie_title}")  # Debug print
-        
-        ## return jsonify({
-           ## 'success': True,
-            ## 'watched_movies': [{
-                ##'id': m.id,
-                ##'title': m.movie_title,
-                ## 'poster_url': m.poster_url,
-                ## 'review': m.review,
-                ## 'rating': m.rating
-            ## } for m in movies]
-       ## })
-    ## except Exception as e:
-       ## print(f"Error in get_watched_movies: {str(e)}")  # Debug print
-        ## #return jsonify({'message': f'Error: {str(e)}', 'success': False}), 500
-
-
-##@app.route('/api/watchlist/add', methods=['POST'])
-##def add_to_watchlist():
-  ##  try:
-        data = request.get_json()
-        movie_title = data.get('title')
-        poster_url = data.get('poster')
-        
-        
-        existing_item = WatchlistItem.query.filter_by(movie_title=movie_title).first()
-        if existing_item:
-            return jsonify({'message': 'Movie already in watchlist'}), 400
-            
-        new_item = WatchlistItem(
-            movie_title=movie_title,
-            poster_url=poster_url
-        )
-        db.session.add(new_item)
-        db.session.commit()
-        
-        return jsonify({'message': 'Added to watchlist', 'success': True}), 200
-   ## except Exception as e:
-       ## print(f"Error adding to watchlist: {str(e)}")
-       ## return jsonify({'message': 'Error adding to watchlist', 'success': False}), 500
-
-#@app.route('/api/watchlist/remove', methods=['POST'])
-#def remove_from_watchlist():
-    #try:
-        data = request.get_json()
-        movie_title = data.get('title')
-        
-        item = WatchlistItem.query.filter_by(movie_title=movie_title).first()
-        if item:
-            db.session.delete(item)
-            db.session.commit()
-            return jsonify({'message': 'Removed from watchlist', 'success': True}), 200
-        
-        return jsonify({'message': 'Movie not found in watchlist', 'success': False}), 404
-    #except Exception as e:
-        print(f"Error removing from watchlist: {str(e)}")
-        return jsonify({'message': 'Error removing from watchlist', 'success': False}), 500
-
-#@app.route('/api/watchlist', methods=['GET'])
-#def get_watchlist():
-    try:
-        items = WatchlistItem.query.order_by(WatchlistItem.added_date.desc()).all()
-        watchlist = [{
-            'title': item.movie_title,
-            'poster': item.poster_url,
-            'added_date': item.added_date.isoformat()
-        } for item in items]
-        return jsonify({'watchlist': watchlist, 'success': True})
-    except Exception as e:
-        print(f"Error fetching watchlist: {str(e)}")
-        return jsonify({'message': 'Error fetching watchlist', 'success': False}), 500
-
 
 class MovieDataService:
     def get_random_movie(self):
