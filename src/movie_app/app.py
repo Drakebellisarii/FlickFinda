@@ -613,8 +613,8 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 def generate_movie_list(description, num_titles=5):
     try:
-        response = client.chat.completions.create(  # ✅ use `client`, not `openai`
-            model="gpt-4o-mini",
+        response = client.chat.completions.create(
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a movie reviewing and recommending expert."},
                 {"role": "user", "content": f"Suggest any {num_titles} movie titles that match this description: {description}. Only include titles separated by commas, no numbers or additional details."}
