@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
+from openai import OpenAI
 import os
 import random
 import requests 
