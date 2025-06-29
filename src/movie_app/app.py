@@ -50,9 +50,6 @@ class User(db.Model):
     watchlist_items = db.relationship('WatchlistItem', backref='user', lazy=True)
     ratings = db.relationship('MovieRating', backref='user', lazy=True)
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
     
 class ReviewService:
     def __init__(self, OMDB_API_KEY):
@@ -142,6 +139,10 @@ class WatchlistItem(db.Model):
     __table_args__ = (
         db.UniqueConstraint('user_id', 'movie_title', name='uq_user_movie_watchlist'),
     )
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
 
 @app.route('/api/ratings/update', methods=['POST'])
 def update_rating():
