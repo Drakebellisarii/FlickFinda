@@ -5,7 +5,6 @@ from openai import OpenAI
 import os
 import random
 import requests 
-import openai
 import traceback
 import re
 from flask_migrate import Migrate
