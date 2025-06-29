@@ -1433,18 +1433,6 @@ function setupButtonListeners() {
         });
     }
     
-    // Watch Full Movie button
-    if (elements.watchFullMovieBtn) {
-        elements.watchFullMovieBtn.addEventListener("click", function() {
-            const movieTitle = elements.title.textContent;
-            if (!movieTitle || movieTitle === "Loading...") {
-                alert("Please wait for a movie to be selected.");
-                return;
-            }
-            watchFullMovie(movieTitle);
-        });
-    }
-    
     // Mark as Watched button
     if (elements.viewRatingsBtn) {
         elements.viewRatingsBtn.addEventListener("click", function() {
@@ -2216,56 +2204,6 @@ function watchTrailer(movieTitle) {
         });
 }
 
-function watchFullMovie(movieTitle) {
-    if (!movieTitle || movieTitle === "Loading...") {
-        alert("Please wait for a movie to be selected.");
-        return;
-    }
-    
-    console.log('Searching for full movie:', movieTitle);
-    
-    // Show loading overlay
-    const theater = elements.theaterModal;
-    const loadingOverlay = theater.querySelector('.loading-overlay');
-    
-    if (loadingOverlay) {
-        loadingOverlay.classList.add('active');
-    }
-    
-    theater.style.display = 'block';
-    
-    // Use the YouTube API to search for full movie
-    fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(movieTitle + ' full movie')}&type=video&videoDuration=long&maxResults=1&key=${YOUTUBE_API_KEY}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`YouTube API error: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('YouTube API response:', data);
-            
-            if (data.items && data.items.length > 0) {
-                const videoId = data.items[0].id.videoId;
-                console.log('Found movie ID:', videoId);
-                openTheater(videoId);
-                
-                // Add movie title indicator to the theater
-                addTheaterTitle(movieTitle, true);
-            } else {
-                throw new Error('Full movie not available');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error loading movie: ' + error.message);
-            theater.style.display = 'none';
-            if (loadingOverlay) {
-                loadingOverlay.classList.remove('active');
-            }
-        });
-}
-
 function openTheater(videoId) {
     console.log('Opening theater with video:', videoId);
     
@@ -2337,94 +2275,6 @@ function addTheaterTitle(movieTitle, isFullMovie = false) {
     modalTitle.textContent = isFullMovie 
         ? `Now Playing: ${movieTitle} (Full Movie)` 
         : `Now Playing: ${movieTitle} (Trailer)`;
-}
-
-/**
- * User Actions
- */
-function searchMovie() {
-    const searchInput = elements.movieSearch;
-    if (!searchInput) return;
-    
-    const movieTitle = searchInput.value.trim();
-    
-    if (!movieTitle) {
-        alert('Please enter a movie title');
-        return;
-    }
-    
-    setLoadingState(true);
-    
-    fetch(`/get_reviews_and_ratings?movie=${encodeURIComponent(movieTitle)}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log("Movie details received:", data);
-            
-            // Make sure movie info is visible
-            if (elements.movieInfo) {
-                elements.movieInfo.style.display = 'flex';
-            }
-            
-            // Update UI elements
-            if (elements.title) elements.title.textContent = movieTitle;
-            
-            // Properly check for plot in all possible locations in the response
-            let plotText = "No plot available";
-            if (data.plot && data.plot !== "N/A") {
-                plotText = data.plot;
-            } else if (data.Plot && data.Plot !== "N/A") {
-                plotText = data.Plot;
-            } else if (data.reviews && data.reviews !== "N/A") {
-                plotText = data.reviews;
-            }
-            
-            // Update plot
-            if (elements.plot) elements.plot.textContent = plotText;
-            
-            // Check for awards in all possible formats
-            let awardsText = "No awards information";
-            if (data.awards && data.awards !== "N/A") {
-                awardsText = data.awards;
-            } else if (data.Awards && data.Awards !== "N/A") {
-                awardsText = data.Awards;
-            }
-            if (elements.awards) elements.awards.textContent = awardsText;
-            
-            // Properly handle poster
-            if (elements.poster) {
-                if (data.poster && data.poster !== "N/A") {
-                    elements.poster.src = data.poster;
-                } else if (data.Poster && data.Poster !== "N/A") {
-                    elements.poster.src = data.Poster;
-                } else {
-                    elements.poster.src = "/api/placeholder/300/450";
-                }
-            }
-            
-            // Update ratings if they exist
-            if (data.ratings || data.Ratings) {
-                updateRatings(data.ratings || data.Ratings);
-            }
-            
-            // Clear search input
-            searchInput.value = '';
-        })
-        .catch(error => {
-            console.error("Error fetching movie details:", error);
-            
-            // In case of error, set error message
-            if (elements.plot) {
-                elements.plot.textContent = "Error loading movie details";
-            }
-            
-            const movieDescEl = document.getElementById('movieDescriptionText');
-            if (movieDescEl) {
-                movieDescEl.textContent = "Error loading movie details";
-            }
-        })
-        .finally(() => {
-            setLoadingState(false);
-        });
 }
 
 function viewWatchlist() {
