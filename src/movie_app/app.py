@@ -210,9 +210,6 @@ movie_data_service = MovieDataService()
 review_service = ReviewService(OMDB_API_KEY)
 rating_service = RatingService(OMDB_API_KEY)
 
-# Make sure OpenAI client is initialized with the API key
-openai.api_key = OPENAI_API_KEY
-
 @app.route('/api/auth/register', methods=['POST'])
 def register():
     try:
@@ -616,9 +613,11 @@ def get_trailer():
             'error': 'No movie specified'
         }), 400
 
+client = OpenAI(api_key=OPENAI_API_KEY)
+
 def generate_movie_list(description, num_titles=5):
     try:
-        response = openai.chat.completions.create(
+        response = client.chat.completions.create(  # ✅ use `client`, not `openai`
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a movie reviewing and recommending expert."},
@@ -629,7 +628,6 @@ def generate_movie_list(description, num_titles=5):
         )
 
         content = response.choices[0].message.content.strip()
-
         movies = [movie.strip() for movie in content.split(',')]
 
         return {
