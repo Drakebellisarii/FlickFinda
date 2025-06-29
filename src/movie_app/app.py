@@ -953,6 +953,4 @@ def get_saved_movies():
         }), 500
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  # Then create new tables with the updated schema
     app.run(debug=True)
