@@ -823,6 +823,62 @@ def delete_rating():
         db.session.rollback()  # Roll back in case of error
         return jsonify({'success': False, 'message': str(e)}), 500
 
+@app.route('/debug/full')
+def full_debug():
+    try:
+        # Environment checks
+        env_vars = {
+            'OMDB_API_KEY': os.getenv('OMDB_API_KEY'),
+            'OPENAI_API_KEY': os.getenv('OPENAI_API_KEY'),
+            'YOUTUBE_API_KEY': os.getenv('YOUTUBE_API_KEY'),
+        }
+
+        # Test OpenAI call
+        openai_test_result = "Not tested"
+        try:
+            test_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            test_response = test_client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": "Say hello"}],
+                max_tokens=5
+            )
+            openai_test_result = test_response.choices[0].message.content
+        except Exception as e:
+            openai_test_result = f"Failed: {str(e)}"
+
+        # Template existence
+        index_exists = os.path.exists(os.path.join(app.template_folder, 'index.html')) if app.template_folder else False
+        login_exists = os.path.exists(os.path.join(app.template_folder, 'login.html')) if app.template_folder else False
+
+        # Database presence
+        db_file_exists = os.path.exists(db_path)
+
+        debug_info = {
+            'Session': dict(session),
+            'Authenticated': 'user_id' in session,
+            'User ID': session.get('user_id'),
+            'Username': session.get('username'),
+            'Templates Folder': app.template_folder,
+            'index.html Exists': index_exists,
+            'login.html Exists': login_exists,
+            'DB File Exists': db_file_exists,
+            'Environment Variables': env_vars,
+            'OpenAI Test Result': openai_test_result,
+            'Current Directory': os.getcwd(),
+            'Files in Current Dir': os.listdir(os.getcwd())
+        }
+
+        # Format nicely
+        html = "<h1>Extended Flask Debug</h1><ul>"
+        for key, value in debug_info.items():
+            html += f"<li><strong>{key}:</strong> {value}</li>"
+        html += "</ul><a href='/'>Go to homepage</a>"
+
+        return html
+
+    except Exception as e:
+        return f"<h1>Error in full_debug</h1><p>{str(e)}</p>"
+
 
 @app.route('/debug/users')
 def debug_users():
