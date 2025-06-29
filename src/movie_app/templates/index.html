@@ -642,16 +642,16 @@
             animation: flicker 1.5s infinite;
         }
 
-        * Add different styles for the labels */
-    .plot-label, .awards-label {
-    font-family: 'Press Start 2P', cursive;
-    color: var(--primary);
-    font-size: 1rem;
-    display: block;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    }
+    .plot-label,
+        .awards-label,
+        .movie-details p > strong {
+            font-family: 'Press Start 2P', cursive;
+            color: #FFFFFF !important;
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
 
 /* Add a subtle highlight effect on hover */
 #movie-plot:hover, #movie-awards:hover {
