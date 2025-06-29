@@ -1266,13 +1266,6 @@
 
         <div class="content-grid">
             <div class="movie-info">
-                <div class="search-container">
-                    <div class="search-text">or search</div>
-                    <div class="search-wrapper">
-                        <input type="text" id="movie-search" placeholder="Search..." class="search-input">
-                        <i class="fas fa-search search-icon"></i>
-            </div>
-                    </div>
                 <div id="movie-poster-container">
                     <img id="movie-poster" class="movie-poster" src="/api/placeholder/300/450" alt="Movie Poster">
                 </div>
@@ -1291,7 +1284,6 @@
                         <button class="btn" id="generate-review-btn">Add to Watchlist</button>
                         <button class="btn" id="view-watchlist-btn" onclick="viewWatchlist()">View Watchlist</button>
                         <button class="btn" id="get-ratings-btn" >View Trailer</button>
-                        <button class="btn" id="watch-full-movie-btn" >Watch Full Movie</button> 
                         <button class="btn" id="view-ratings-btn" onclick="addToWatched()">Mark As Watched</button>
                     </div>
             </div>
@@ -1330,7 +1322,6 @@ const elements = {
     poster: document.getElementById("movie-poster"),
     ratings: document.getElementById("movie-ratings"),
     movieInfo: document.querySelector(".movie-info"),
-    movieSearch: document.getElementById("movie-search"),
     movieDescription: document.getElementById("movieDescription"),
     movieCount: document.getElementById("movie-count"),
     findMovieBtn: document.getElementById("find-movie-btn"),
