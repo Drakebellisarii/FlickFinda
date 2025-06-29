@@ -49,6 +49,10 @@ class User(db.Model):
     # Define relationships with other models
     watchlist_items = db.relationship('WatchlistItem', backref='user', lazy=True)
     ratings = db.relationship('MovieRating', backref='user', lazy=True)
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
     
 class ReviewService:
     def __init__(self, OMDB_API_KEY):
@@ -946,10 +950,6 @@ def get_saved_movies():
             'success': False,
             'message': f'Error fetching saved movies: {str(e)}'
         }), 500
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
 
 if __name__ == '__main__':
     with app.app_context():
