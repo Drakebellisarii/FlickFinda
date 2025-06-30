@@ -38,6 +38,7 @@ pexpect==4.9.0
 Pillow==10.1.0
 platformdirs  # removed version pin to avoid conflict
 psutil==6.1.1
+psycopg2-binary==2.9.9
 ptyprocess==0.7.0
 python-dateutil==2.8.2
 python-dotenv==1.0.1
