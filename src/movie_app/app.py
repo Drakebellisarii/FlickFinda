@@ -15,30 +15,17 @@ import secrets
 from flask import session
 import urllib.parse
 
-
 app = Flask(__name__)
 
 # Load environment variables from .env file
 load_dotenv()
 
-# Get API keys from environment variables
-OMDB_API_KEY = os.getenv('OMDB_API_KEY')
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+# Database setup
+basedir = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(basedir, 'instance', 'movies.db')
+os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
-app.secret_key = secrets.token_hex(16)
-
-# Load database from environment (PostgreSQL on Render) or fallback to SQLite locally
-DATABASE_URL = os.getenv('DATABASE_URL')
-
-if DATABASE_URL:
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-else:
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    db_path = os.path.join(basedir, 'instance', 'movies.db')
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
