@@ -20,6 +20,13 @@ app = Flask(__name__)
 # Load environment variables from .env file
 load_dotenv()
 
+# Get API keys from environment variables
+OMDB_API_KEY = os.getenv('OMDB_API_KEY')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+
+app.secret_key = secrets.token_hex(16)
+
 # Database setup
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(basedir, 'instance', 'movies.db')
