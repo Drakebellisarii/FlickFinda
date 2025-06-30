@@ -17,10 +17,10 @@ import urllib.parse
 
 app = Flask(__name__)
 
-# Load environment variables from .env file
+# Loading env vars
 load_dotenv()
 
-# Get API keys from environment variables
+# Get API keys
 OMDB_API_KEY = os.getenv('OMDB_API_KEY')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
@@ -38,18 +38,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Define all your classes (ReviewService, RatingService, MovieDataService, etc.)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
-    # Define relationships with other models
     watchlist_items = db.relationship('WatchlistItem', backref='user', lazy=True)
     ratings = db.relationship('MovieRating', backref='user', lazy=True)
 
-    
 class ReviewService:
     def __init__(self, OMDB_API_KEY):
         self.API_KEY = OMDB_API_KEY
@@ -120,12 +117,12 @@ class MovieRating(db.Model):
     # User relationship
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_rating_user_id'), nullable=False)
     
-    # Unique constraint - each user can only rate a movie once
+    #each user can only rate a movie once
     __table_args__ = (
         db.UniqueConstraint('user_id', 'movie_title', name='uq_user_movie_rating'),
     )
 
-# Modify your existing models to include user_id
+# include user_id
 class WatchlistItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movie_title = db.Column(db.String(200), nullable=False)
@@ -162,47 +159,6 @@ def update_rating():
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': f'Error: {str(e)}', 'success': False}), 500
-
-class MovieDataService:
-    def get_random_movie(self):
-        return random.choice(["The Babadook","Gerald's Game", "There's Someone Inside Your House", "The platform", "Mr. Harrigan's phone",
-                "Berlin syndrome", "Army of the dead", "the babysitter: killer queen", "Fear street part one", "A classic horror story",
-                "1922", "the conjuring", "Death note", "In the tall grass", "Bird box", "The ritual",  "Always be my maybe", "Somethings gotta give", "set it up", "No hard feelings", "Persuasion", "Look both ways", "Love and leashes", "The half of it",
-                "Someone great", "plus one", "He's all that", "Desperados", "Nappily Ever After", "Good on paper", "My Best Friend's Wedding", "The Incredible Jessica James",
-                "Sierra Burgess is a loser", "Anyone but you", "players", "The perfect find", "Set it up", "Alex Strangelove", "Love hard", "Love in the villa",
-                "To all the boys I've loved before", "Superbad","The other guys", "Hustle", "We have a ghost", "Bad trip", "Between two ferns: the movie", "Set it up",
-                "Dolemite is my name", "The Ballad of Buster scruggs", "Unfrosted", "Leo", "Do Revenge", "I care a lot",
-                "Red notice", "Spenser confidential", "The laundromat", "The Meyerowitz stories", "The Breaker Upperers", "Me time", "Old dads",
-                "Dumb money", "Hustle", "The package", "Our Planet", "13th", "The Social Dilemma", "Making a Murderer", "My Octopus Teacher", "Wild Wild Country","Tiger King","Inside Bill's Brain: Decoding Bill Gates",
-                "Crip Camp", "American Factory", "Seaspiracy", "Night on Earth", "David Attenborough: A Life on Our Planet", "The Tinder Swindler",
-                "Conversations with a Killer: The Ted Bundy Tapes", "The Great Hack", "Abducted in Plain Sight", "The Pharmacist", "Icarus", "Knock Down the House", "Homecoming: A Film by Beyoncé", "The Innocent Man",
-                "Don't F**k with Cats: Hunting an Internet Killer", "Cocaine Cowboys: The Kings of Miami", "Chef's Table", "Rotten", "Explained", "Break Point", "Untold: The Girlfriend Who Didn't Exist", "Down to Earth with Zac Efron",
-                "Fantastic Fungi", "Chasing Coral"])
-    
-
-    def get_random_movie_from_genre(self, genre):
-        genre_movies = {
-            "Horror": ["The Babadook","Gerald's Game", "There's Someone Inside Your House", "The platform", "Mr. Harrigan's phone",
-                "Berlin syndrome", "Texas Chainsaw Massacre", "Army of the dead", "the babysitter: killer queen", "Fear street part one", "A classic horror story",
-                "1922", "the conjuring", "Death note", "In the tall grass", "Bird box", "The ritual"],
-            "romCom": ["Always be my maybe", "Somethings gotta give", "set it up", "No hard feelings", "Persuasion", "Look both ways", "Love and leashes", "The half of it",
-                "Someone great", "plus one", "He's all that", "Desperados", "Nappily Ever After", "Good on paper", "My Best Friend's Wedding", "The incredible jessica james",
-                "Sierra Burgess is a loser", "Anyone but you", "players", "The perfect find", "Set it up", "Alex Strangelove", "Love hard", "Love in the villa",
-                "To all the boys I've loved before"],
-            "Comedy": ["Superbad", "Anchorman: The Legend of Ron Burgndy", "The other guys", "Hustle", "We have a ghost", "Bad trip", "Between two ferns: the movie", "Set it up",
-                "Dolemite is my name", "The Ballad of Buster scruggs", "Unfrosted", "Leo", "Do revenege", "Glass Onion: A Knives Out Mystery", "I care a lot",
-                "Red notice", "Spenser confidential", "The laundromat", "The Meyerowitz stories", "The breaker uppers", "Me time", "Old dads",
-                "Dumb money", "Hustle", "The package"],
-            "Documentary": ["Our Planet", "13th", "The Social Dilemma", "Making a Murderer", "My Octopus Teacher", "Wild Wild Country","Tiger King","Inside Bill's Brain: Decoding Bill Gates",
-                "Crip Camp", "American Factory", "Seaspiracy", "Night on Earth", "Fyre: The Greatest Party That Never Happened", "David Attenborough: A Life on Our Planet", "The Tinder Swindler",
-                "Conversations with a Killer: The Ted Bundy Tapes", "The Great Hack", "Abducted in Plain Sight", "The Pharmacist", "Icarus", "Knock Down the House", "Homecoming: A Film by Beyoncé", "The Innocent Man",
-                "Don't F**k with Cats: Hunting an Internet Killer", "Cocaine Cowboys: The Kings of Miami", "Chef's Table", "Rotten", "Explained", "Break Point", "Untold: The Girlfriend Who Didn't Exist", "Down to Earth with Zac Efron",
-                "Fantastic Fungi", "Chasing Coral"],
-            "Christmas": ["Home Alone", "Home Alone 2: Lost in New York", "Elf", "A Christmas Story", "It's a Wonderful Life", "National Lampoon's Christmas Vacation","The Polar Express","How the Grinch Stole Christmas (2000)", "Dr. Seuss' The Grinch (2018)", 
-             "Miracle on 34th Street (1994)", "The Santa Clause","Love Actually","The Holiday","Arthur Christmas","Klaus","Scrooged","A Charlie Brown Christmas","Rudolph the Red-Nosed Reindeer","Frosty the Snowman","White Christmas",
-             "Jingle All the Way","The Nightmare Before Christmas","Bad Santa","Noelle"]
-        }
-        return random.choice(genre_movies.get(genre, []))
 
 movie_data_service = MovieDataService()
 review_service = ReviewService(OMDB_API_KEY)
@@ -267,7 +223,7 @@ def login():
         if not user or not check_password_hash(user.password, password):
             return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
             
-        # Set up session - ADD THESE EXPLICIT PRINTS
+        # Set up session 
         print(f"Setting session for user_id: {user.id}")
         session['user_id'] = user.id
         session['username'] = user.username
@@ -284,8 +240,7 @@ def login():
     except Exception as e:
         print(f"Login error: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
-        
-    
+           
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
     # Clear session
@@ -616,13 +571,13 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 def generate_movie_list(description, num_titles=5):
     try:
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a movie reviewing and recommending expert."},
                 {"role": "user", "content": f"Suggest any {num_titles} movie titles that match this description: {description}. Only include titles separated by commas, no numbers or additional details."}
             ],
             max_tokens=150,
-            temperature=0.2
+            temperature=0.7
         )
 
         content = response.choices[0].message.content.strip()
@@ -734,63 +689,6 @@ def get_movie_suggestion():
             'details': traceback.format_exc()
         }), 500
 
-
-@app.route('/debug')
-def debug_route():
-    """Basic debug route to test templates and sessions"""
-    result = {
-        'session': dict(session),
-        'authenticated': 'user_id' in session,
-        'user_id': session.get('user_id'),
-        'username': session.get('username'),
-        'templates_folder': app.template_folder,
-        'index_exists': os.path.exists(os.path.join(app.template_folder, 'index.html')) if app.template_folder else False,
-        'login_exists': os.path.exists(os.path.join(app.template_folder, 'login.html')) if app.template_folder else False
-    }
-    
-    # Return as HTML for easy viewing
-    html = f"""
-    <html>
-    <head><title>Debug Info</title></head>
-    <body>
-        <h1>Flask App Debug Info</h1>
-        <ul>
-            <li>Session: {result['session']}</li>
-            <li>Authenticated: {result['authenticated']}</li>
-            <li>User ID: {result['user_id']}</li>
-            <li>Username: {result['username']}</li>
-            <li>Templates folder: {result['templates_folder']}</li>
-            <li>index.html exists: {result['index_exists']}</li>
-            <li>login.html exists: {result['login_exists']}</li>
-        </ul>
-        <form method="post" action="/api/auth/logout">
-            <button type="submit">Logout</button>
-        </form>
-        <br>
-        <a href="/">Go to homepage</a>
-    </body>
-    </html>
-    """
-    return html
-
-@app.route('/test-login')
-def test_login():
-    # Set a test user in session
-    session['user_id'] = 1
-    session['username'] = 'testuser'
-    
-    return """
-    <html>
-    <head><title>Test Login</title></head>
-    <body>
-        <h1>Test login successful</h1>
-        <p>Session has been set</p>
-        <p><a href="/">Go to homepage</a></p>
-        <p><a href="/debug">Check debug info</a></p>
-    </body>
-    </html>
-    """
-
 @app.route('/api/ratings/delete', methods=['POST'])
 def delete_rating():
     try:
@@ -825,63 +723,6 @@ def delete_rating():
         db.session.rollback()  # Roll back in case of error
         return jsonify({'success': False, 'message': str(e)}), 500
 
-@app.route('/debug/full')
-def full_debug():
-    try:
-        # Environment checks
-        env_vars = {
-            'OMDB_API_KEY': os.getenv('OMDB_API_KEY'),
-            'OPENAI_API_KEY': os.getenv('OPENAI_API_KEY'),
-            'YOUTUBE_API_KEY': os.getenv('YOUTUBE_API_KEY'),
-        }
-
-        # Test OpenAI call
-        openai_test_result = "Not tested"
-        try:
-            test_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-            test_response = test_client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": "Say hello"}],
-                max_tokens=5
-            )
-            openai_test_result = test_response.choices[0].message.content
-        except Exception as e:
-            openai_test_result = f"Failed: {str(e)}"
-
-        # Template existence
-        index_exists = os.path.exists(os.path.join(app.template_folder, 'index.html')) if app.template_folder else False
-        login_exists = os.path.exists(os.path.join(app.template_folder, 'login.html')) if app.template_folder else False
-
-        # Database presence
-        db_file_exists = os.path.exists(db_path)
-
-        debug_info = {
-            'Session': dict(session),
-            'Authenticated': 'user_id' in session,
-            'User ID': session.get('user_id'),
-            'Username': session.get('username'),
-            'Templates Folder': app.template_folder,
-            'index.html Exists': index_exists,
-            'login.html Exists': login_exists,
-            'DB File Exists': db_file_exists,
-            'Environment Variables': env_vars,
-            'OpenAI Test Result': openai_test_result,
-            'Current Directory': os.getcwd(),
-            'Files in Current Dir': os.listdir(os.getcwd())
-        }
-
-        # Format nicely
-        html = "<h1>Extended Flask Debug</h1><ul>"
-        for key, value in debug_info.items():
-            html += f"<li><strong>{key}:</strong> {value}</li>"
-        html += "</ul><a href='/'>Go to homepage</a>"
-
-        return html
-
-    except Exception as e:
-        return f"<h1>Error in full_debug</h1><p>{str(e)}</p>"
-
-
 @app.route('/debug/users')
 def debug_users():
     """List all users in the database (for debugging only)"""
@@ -899,49 +740,6 @@ def debug_users():
         })
     except Exception as e:
         return jsonify({'error': str(e)})
-
-@app.route('/debug/create-test-user')
-def create_test_user():
-    """Create a test user with a known password"""
-    try:
-        username = "driz"
-        password = "drake"
-        
-        # Check if user already exists
-        existing_user = User.query.filter_by(username=username).first()
-        if existing_user:
-            return f"User '{username}' already exists with ID {existing_user.id}"
-            
-        # Create new user
-        hashed_password = generate_password_hash(password)
-        new_user = User(username=username, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        
-        return f"Created test user: username='{username}', password='{password}', id={new_user.id}"
-    except Exception as e:
-        db.session.rollback()
-        return f"Error creating test user: {str(e)}"
-    
-@app.route('/debug/create-user/<username>/<password>')
-def debug_create_user(username, password):
-    """Create a user with specified username and password"""
-    try:
-        # Check if user exists
-        existing_user = User.query.filter_by(username=username).first()
-        if existing_user:
-            return f"User '{username}' already exists with ID {existing_user.id}"
-        
-        # Create user
-        hashed_password = generate_password_hash(password)
-        new_user = User(username=username, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        
-        return f"User '{username}' created with ID {new_user.id}"
-    except Exception as e:
-        db.session.rollback()
-        return f"Error creating user: {str(e)}"
     
 @app.route('/api/auth/guest', methods=['POST'])
 def guest_login():
