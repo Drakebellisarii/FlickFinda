@@ -136,8 +136,9 @@ class WatchlistItem(db.Model):
         db.UniqueConstraint('user_id', 'movie_title', name='uq_user_movie_watchlist'),
     )
 
-with app.app_context():
-    db.create_all()
+#Already up no need to wipe on all updates
+#with app.app_context():
+    #db.create_all()
 
 @app.route('/api/ratings/update', methods=['POST'])
 def update_rating():
@@ -160,7 +161,6 @@ def update_rating():
         db.session.rollback()
         return jsonify({'message': f'Error: {str(e)}', 'success': False}), 500
 
-movie_data_service = MovieDataService()
 review_service = ReviewService(OMDB_API_KEY)
 rating_service = RatingService(OMDB_API_KEY)
 
