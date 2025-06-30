@@ -136,9 +136,8 @@ class WatchlistItem(db.Model):
         db.UniqueConstraint('user_id', 'movie_title', name='uq_user_movie_watchlist'),
     )
 
-#Already up no need to wipe on all updates
-#with app.app_context():
-    #db.create_all()
+with app.app_context():
+    db.create_all()
 
 @app.route('/api/ratings/update', methods=['POST'])
 def update_rating():
