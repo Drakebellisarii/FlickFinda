@@ -28,16 +28,21 @@ YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 
 app.secret_key = secrets.token_hex(16)
 
-# Database setup
-basedir = os.path.abspath(os.path.dirname(__file__))
-db_path = os.path.join(basedir, 'instance', 'movies.db')
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
+# Load database from environment (PostgreSQL on Render) or fallback to SQLite locally
+DATABASE_URL = os.getenv('DATABASE_URL')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+if DATABASE_URL:
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+else:
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    db_path = os.path.join(basedir, 'instance', 'movies.db')
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-migrate = Migrate(app, db) 
+migrate = Migrate(app, db)
 
 # Define all your classes (ReviewService, RatingService, MovieDataService, etc.)
 class User(db.Model):
