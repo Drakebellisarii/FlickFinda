@@ -98,6 +98,71 @@
         margin-right: 0.5rem;
     }
 
+    /* Guest Login Button Styles */
+    #guest-login-section {
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .guest-login-btn {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 0.75rem 1.5rem;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.7rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 3px 3px 0 rgba(184, 134, 11, 0.3);
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 180px;
+        justify-content: center;
+    }
+
+    .guest-login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 5px 5px 0 rgba(184, 134, 11, 0.4);
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+    }
+
+    .guest-login-btn:active {
+        transform: translateY(0);
+        box-shadow: 2px 2px 0 rgba(184, 134, 11, 0.3);
+    }
+
+    .guest-login-btn i {
+        font-size: 0.8rem;
+    }
+
+    /* Mobile responsive for guest login button */
+    @media (max-width: 768px) {
+        #guest-login-section {
+            margin-top: 0.5rem;
+        }
+
+        .guest-login-btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.6rem;
+            min-width: 160px;
+        }
+
+        .guest-login-btn i {
+            font-size: 0.7rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .guest-login-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.55rem;
+            min-width: 140px;
+        }
+    }
+
     .user-dropdown-menu a {
         display: flex;
         align-items: center;
@@ -233,14 +298,184 @@
         background: var(--card-bg);
         color: var(--primary);
         padding: 1rem 2rem;
+    }
+
+    /* Guest Login Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background: var(--card-bg);
+        border: 3px solid var(--border-color);
         border-radius: var(--border-radius);
-        border: 2px solid var(--border-color);
+        box-shadow: 0 0 30px rgba(229, 185, 78, 0.5);
+        max-width: 500px;
+        width: 90%;
+        animation: modalSlideIn 0.3s ease-out;
+        overflow: hidden;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px) scale(0.9);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        background: var(--secondary);
+        padding: 1.5rem;
+        border-bottom: 2px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        color: var(--primary);
         font-family: 'Press Start 2P', cursive;
-        font-size: 0.8rem;
-        z-index: 10003;
-        opacity: 0;
-        transition: transform 0.4s, opacity 0.4s;
-        box-shadow: 0 0 15px rgba(229, 185, 78, 0.3);
+        font-size: 1rem;
+        margin: 0;
+        text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: var(--primary);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: all 0.3s;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-close:hover {
+        background: var(--primary);
+        color: var(--secondary);
+        transform: scale(1.1);
+    }
+
+    .modal-body {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .modal-icon {
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-icon i {
+        font-size: 3rem;
+        color: var(--primary);
+        text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    }
+
+    .modal-body p {
+        color: var(--text);
+        margin-bottom: 1rem;
+        font-family: 'Courier Prime', monospace;
+        line-height: 1.6;
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 2px solid var(--border-color);
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        background: var(--secondary);
+    }
+
+    .modal-footer .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        font-family: 'Press Start 2P', cursive;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid var(--border-color);
+        box-shadow: 3px 3px 0 var(--border-color);
+    }
+
+    .modal-footer .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 3px 5px 0 var(--border-color);
+    }
+
+    .modal-footer .btn-primary {
+        background: var(--primary);
+        color: var(--secondary);
+    }
+
+    .modal-footer .btn-primary:hover {
+        background: var(--secondary);
+        color: var(--primary);
+    }
+
+    .modal-footer .btn-secondary {
+        background: var(--secondary);
+        color: var(--text);
+    }
+
+    .modal-footer .btn-secondary:hover {
+        background: var(--text);
+        color: var(--secondary);
+    }
+
+    /* Mobile responsive styles for modal */
+    @media (max-width: 768px) {
+        .modal-content {
+            width: 95%;
+            max-width: none;
+            margin: 1rem;
+        }
+        
+        .modal-header {
+            padding: 1rem;
+        }
+        
+        .modal-header h3 {
+            font-size: 0.8rem;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-body p {
+            font-size: 0.9rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .modal-footer .btn {
+            width: 100%;
+            padding: 1rem;
+        }
     }
 
     .auth-toast.show {
@@ -1209,6 +1444,27 @@
         </svg>
     </div>
 
+    <!-- Guest Login Required Modal -->
+    <div id="guest-login-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Login Required</h3>
+                <button class="modal-close" onclick="closeGuestLoginModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <p>To add movies to your watchlist, you need to create an account or log in.</p>
+                <p>This feature is only available for registered users.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeGuestLoginModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="goToLogin()">Login / Sign Up</button>
+            </div>
+        </div>
+    </div>
+
     <div class="user-menu-container">
         <div class="user-menu-trigger">
             <div id="user-logged-in">
@@ -1226,6 +1482,14 @@
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <!-- Guest Login Button -->
+        <div id="guest-login-section" style="display: none;">
+            <button id="return-to-login-btn" class="guest-login-btn">
+                <i class="fas fa-sign-in-alt"></i>
+                Login / Sign Up
+            </button>
         </div>
     </div>
     <div class="curtain-container">
@@ -2281,6 +2545,13 @@ function addToWatchlist(title, poster) {
         return;
     }
     
+    // Check if user is authenticated
+    if (!isUserAuthenticated) {
+        console.log('Guest user trying to add to watchlist, showing login modal');
+        showGuestLoginModal();
+        return;
+    }
+    
     console.log('Adding to watchlist:', title);
     
     fetch('/api/watchlist/add', {
@@ -2309,6 +2580,13 @@ function addToWatchlist(title, poster) {
 
 function addToWatched(title, poster) {
     console.log('addToWatched called with:', { title, poster });
+    
+    // Check if user is authenticated
+    if (!isUserAuthenticated) {
+        console.log('Guest user trying to mark as watched, showing login modal');
+        showGuestLoginModal();
+        return;
+    }
     
     // If title and poster weren't passed, try to get them from DOM
     if (!title || title === "Loading...") {
@@ -2482,13 +2760,16 @@ function checkAuth() {
         .then(data => {
             console.log("Auth check response:", data);
             if (data.authenticated) {
+                isUserAuthenticated = true;
                 updateUIForLoggedInUser(data.user);
             } else {
+                isUserAuthenticated = false;
                 updateUIForGuestUser();
             }
         })
         .catch(error => {
             console.error('Auth check error:', error);
+            isUserAuthenticated = false;
             updateUIForGuestUser();
         });
 }
@@ -2496,6 +2777,7 @@ function checkAuth() {
 function updateUIForLoggedInUser(user) {
     const userInitial = document.getElementById('user-initial');
     const userGreeting = document.getElementById('user-greeting');
+    const guestLoginSection = document.getElementById('guest-login-section');
     
     if (userInitial) {
         userInitial.textContent = user.username.charAt(0).toUpperCase();
@@ -2503,6 +2785,11 @@ function updateUIForLoggedInUser(user) {
     
     if (userGreeting) {
         userGreeting.textContent = `Hello, ${user.username}!`;
+    }
+
+    // Hide guest login button for logged in users
+    if (guestLoginSection) {
+        guestLoginSection.style.display = 'none';
     }
 
     // Setup logout button
@@ -2518,6 +2805,7 @@ function updateUIForLoggedInUser(user) {
 function updateUIForGuestUser() {
     const userInitial = document.getElementById('user-initial');
     const userGreeting = document.getElementById('user-greeting');
+    const guestLoginSection = document.getElementById('guest-login-section');
     
     if (userInitial) {
         userInitial.textContent = 'G';
@@ -2526,7 +2814,62 @@ function updateUIForGuestUser() {
     if (userGreeting) {
         userGreeting.textContent = 'Hello, Guest!';
     }
+
+    // Show guest login button for guest users
+    if (guestLoginSection) {
+        guestLoginSection.style.display = 'block';
+    }
+
+    // Setup return to login button
+    const returnToLoginBtn = document.getElementById('return-to-login-btn');
+    if (returnToLoginBtn) {
+        returnToLoginBtn.addEventListener('click', function() {
+            // Redirect to login page
+            window.location.href = '/login';
+        });
+    }
 }
+
+/**
+ * Guest Login Modal Functions
+ */
+function showGuestLoginModal() {
+    const modal = document.getElementById('guest-login-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        // Add escape key listener
+        document.addEventListener('keydown', handleEscapeKey);
+        
+        // Add click outside to close functionality
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeGuestLoginModal();
+            }
+        });
+    }
+}
+
+function closeGuestLoginModal() {
+    const modal = document.getElementById('guest-login-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        // Remove escape key listener
+        document.removeEventListener('keydown', handleEscapeKey);
+    }
+}
+
+function handleEscapeKey(e) {
+    if (e.key === 'Escape') {
+        closeGuestLoginModal();
+    }
+}
+
+function goToLogin() {
+    window.location.href = '/login';
+}
+
+// Global variable to track authentication state
+let isUserAuthenticated = false;
 
 // Initialize application on page load
 document.addEventListener("DOMContentLoaded", function() {

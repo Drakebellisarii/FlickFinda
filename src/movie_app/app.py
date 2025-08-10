@@ -450,6 +450,11 @@ def index():
 def ratings_page():
     return render_template('ratings.html')
 
+@app.route('/login')
+def login_page():
+    """Route to show the login page"""
+    return render_template('login.html')
+
 # Helper function to get current user ID
 def get_current_user_id():
     return session.get('user_id')
