@@ -302,15 +302,16 @@ def get_watchlist():
         user_id = get_current_user_id()
         if not user_id:
             return jsonify({'success': False, 'message': 'Authentication required'}), 401
-            
+
         items = WatchlistItem.query.filter_by(user_id=user_id).order_by(WatchlistItem.added_date.desc()).all()
+        # Filter out movies without posters
         watchlist = [{
             'id': item.id,
             'title': item.movie_title,
             'poster': item.poster_url,
             'added_date': item.added_date.isoformat()
-        } for item in items]
-        
+        } for item in items if item.poster_url and item.poster_url.strip() and item.poster_url != 'N/A']
+
         return jsonify({'success': True, 'watchlist': watchlist})
     except Exception as e:
         print(f"Error fetching watchlist: {str(e)}")
@@ -405,9 +406,10 @@ def get_watched_movies():
         user_id = get_current_user_id()
         if not user_id:
             return jsonify({'success': False, 'message': 'Authentication required'}), 401
-            
+
         movies = MovieRating.query.filter_by(user_id=user_id).all()
-        
+
+        # Filter out movies without posters
         return jsonify({
             'success': True,
             'watched_movies': [{
@@ -416,7 +418,7 @@ def get_watched_movies():
                 'poster_url': m.poster_url,
                 'review': m.review,
                 'rating': m.rating
-            } for m in movies]
+            } for m in movies if m.poster_url and m.poster_url.strip() and m.poster_url != 'N/A']
         })
     except Exception as e:
         print(f"Error in get_watched_movies: {str(e)}")
