@@ -595,7 +595,10 @@
                     }
 
                     movieElement.innerHTML = `
-                        <img class="movie-poster" src="${movie.poster_url}" alt="${movie.title}">
+                        <img class="movie-poster"
+                             src="${movie.poster_url}"
+                             alt="${movie.title}"
+                             onerror="this.style.display='none'; this.parentElement.querySelector('.movie-title').style.marginTop='2rem';">
                         <h3 class="movie-title">${movie.title}</h3>
                         ${ratingDisplay}
                         ${movie.review ? `<p class="movie-review">Review: ${movie.review}</p>` : ''}
