@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlickFinda - Movie Discovery Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* User Menu Styles */
@@ -31,7 +31,6 @@
     }
 
     .user-avatar:hover {
-        transform: scale(1.1);
         box-shadow: 0 0 15px var(--primary);
     }
 
@@ -124,14 +123,11 @@
     }
 
     .guest-login-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 5px 5px 0 rgba(184, 134, 11, 0.4);
         background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
     }
 
     .guest-login-btn:active {
-        transform: translateY(0);
-        box-shadow: 2px 2px 0 rgba(184, 134, 11, 0.3);
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
     }
 
     .guest-login-btn i {
@@ -298,6 +294,8 @@
         background: var(--card-bg);
         color: var(--primary);
         padding: 1rem 2rem;
+        display: none;
+        opacity: 0;
     }
 
     /* Guest Login Modal Styles */
@@ -481,6 +479,7 @@
     .auth-toast.show {
         transform: translateX(-50%) translateY(0);
         opacity: 1;
+        display: block;
     }
 
         :root {
@@ -528,6 +527,13 @@
 
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Retro Movie Poster Theme Variables */
+            --primary: #E5B94E;
+            --secondary: #1a1a1a;
+            --text: #FFFFFF;
+            --background: #2a2a2a;
+            --border-color: #E5B94E;
         }
 
         * {
@@ -537,41 +543,15 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background:
-                linear-gradient(135deg,
-                    #FFFFFF 0%,
-                    #F8FAFC 15%,
-                    #E2E8F0 30%,
-                    #CBD5E1 45%,
-                    #94A3B8 60%,
-                    #64748B 75%,
-                    var(--navy-bg) 90%,
-                    var(--dark-navy) 100%);
+            font-family: 'Oswald', sans-serif;
+            background: #FFFFFF;
             min-height: 100vh;
             padding: 2rem;
             line-height: 1.6;
             color: var(--primary-text);
             overflow-x: hidden;
             position: relative;
-        }
-
-        /* Dynamic animated background elements */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 60% 60%, rgba(30, 58, 138, 0.06) 0%, transparent 50%);
-            animation: backgroundFloat 25s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
+            font-weight: 400;
         }
 
         @keyframes backgroundFloat {
@@ -654,9 +634,7 @@
             color: var(--text);
             text-transform: uppercase;
             font-family: 'Press Start 2P', cursive;
-            transition: all 0.3s ease;
             text-shadow: 1px 1px #000;
-            box-shadow: 4px 4px 0 var(--border-color);
             max-width: 800px;
             margin-top: 15px;
         }
@@ -664,8 +642,6 @@
         #find-movie-btn:hover {
             background: var(--primary);
             color: var(--secondary);
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0 var(--border-color);
         }
         .curtain-container {
     position: fixed;
@@ -743,16 +719,11 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: #FFFFFF;
             border-radius: var(--radius-xl);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e5e5e5;
             padding: 3rem;
-            box-shadow:
-                0 25px 50px rgba(0, 0, 0, 0.15),
-                0 0 0 1px rgba(245, 158, 11, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             position: relative;
             z-index: 1;
         }
@@ -762,45 +733,32 @@
             margin-bottom: 3rem;
             padding-bottom: 2rem;
             position: relative;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            background: #1a1a1a;
             border-radius: var(--radius-xl) var(--radius-xl) 0 0;
             margin: -3rem -3rem 3rem -3rem;
             padding: 3rem;
         }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg,
-                rgba(245, 158, 11, 0.1) 0%,
-                rgba(255, 255, 255, 0.05) 50%,
-                rgba(245, 158, 11, 0.1) 100%);
-            pointer-events: none;
-        }
-
         h1 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Bebas Neue', sans-serif;
             color: #FFFFFF;
-            font-size: 3rem;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            font-size: 4.5rem;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.8), 2px 2px 20px rgba(229, 185, 78, 0.6);
             margin-bottom: 0.75rem;
             position: relative;
             z-index: 2;
+            text-transform: uppercase;
         }
 
     button {
-        background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+        background: #1a1a1a;
         color: #FFFFFF;
         padding: 16px 32px;
         font-size: 1rem;
         font-weight: 600;
-        border: none;
+        border: 2px solid #1a1a1a;
         border-radius: var(--radius-md);
         cursor: pointer;
         transition: var(--transition);
@@ -811,27 +769,9 @@
         display: block;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         font-family: 'Inter', sans-serif;
         letter-spacing: 0.3px;
-    }
-
-    button:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(245, 158, 11, 0.2) 50%,
-            transparent 100%);
-        transition: left 0.6s ease-in-out;
-    }
-
-    button:hover:before {
-        left: 100%;
     }
 
     @media (max-width: 768px) {
@@ -842,12 +782,11 @@
     }
 
     button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
+        background: #2a2a2a;
     }
 
     button:active {
-        transform: translateY(0);
+        background: #2a2a2a;
     }
 
     button:focus {
@@ -856,11 +795,13 @@
     }
         .header p {
             color: rgba(245, 158, 11, 0.9);
-            font-size: 1rem;
-            font-weight: 400;
+            font-size: 1.1rem;
+            font-weight: 500;
             position: relative;
             z-index: 2;
-            letter-spacing: 0.2px;
+            letter-spacing: 2px;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
         }
 
         .content-grid {
@@ -878,12 +819,13 @@
 
         label {
             display: block;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             color: var(--primary-text);
             margin-bottom: 1rem;
             font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 0.3px;
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         select {
@@ -909,16 +851,12 @@
             color: var(--text);
             text-transform: uppercase;
             font-family: 'Courier Prime', monospace;
-            transition: all 0.3s ease;
             text-shadow: 1px 1px #000;
-            box-shadow: 4px 4px 0 var(--border-color);
         }
 
         .btn:hover {
             background: var(--primary);
             color: var(--secondary);
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0 var(--border-color);
         }
 
     .movie-card {
@@ -943,15 +881,10 @@
             max-width: 1000px;
             margin: 2rem auto;
             padding: 2.5rem;
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(245, 158, 11, 0.1);
+            background: #FFFFFF;
+            border: 1px solid #e5e5e5;
             border-radius: var(--radius-xl);
-            box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.12),
-                0 0 0 1px rgba(255, 255, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             flex-direction: column;
             align-items: center;
         }
@@ -962,11 +895,14 @@
 
         #movie-title {
             color: var(--primary-text);
-            font-size: 2rem;
-            font-weight: 600;
-            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 400;
+            font-family: 'Bebas Neue', sans-serif;
             margin-bottom: 1.5rem;
             text-align: center;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
         }
 
         #movie-poster {
@@ -1056,14 +992,14 @@
         }
 
         .featured-banner {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Bebas Neue', sans-serif;
             color: var(--primary);
-            font-size: 1.5rem;
+            font-size: 2rem;
             text-align: center;
             margin-bottom: 1.4rem;
             text-transform: uppercase;
-            letter-spacing: 2x;
-            text-shadow: 2px 2px var(--secondary);
+            letter-spacing: 4px;
+            text-shadow: 3px 3px 0px var(--secondary), 0px 0px 15px rgba(229, 185, 78, 0.5);
             padding: 1rem;
             border-top: 2px dashed var(--border-color);
             border-bottom: 2px dashed var(--border-color);
@@ -1378,12 +1314,13 @@
 
 .suggested-movies-heading {
     color: var(--primary);
-    font-size: 2rem;
+    font-size: 3rem;
     text-align: center;
     margin: 2rem 0;
     text-transform: uppercase;
-    text-shadow: 3px 3px var(--secondary);
-    font-family: 'Press Start 2P', cursive;
+    text-shadow: 4px 4px 0px var(--secondary), 0px 0px 20px rgba(229, 185, 78, 0.6);
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 4px;
 }
 
 .movie-grid {
@@ -1397,27 +1334,18 @@
 }
 
 .movie-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(245, 158, 11, 0.1);
+    background: #FFFFFF;
+    border: 1px solid #e5e5e5;
     border-radius: var(--radius-lg);
     padding: 2rem;
     text-align: center;
     transition: var(--transition);
     position: relative;
-    box-shadow:
-        0 10px 25px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(255, 255, 255, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .movie-card:hover {
-    transform: translateY(-8px);
-    box-shadow:
-        0 20px 40px rgba(0, 0, 0, 0.15),
-        0 0 0 1px var(--primary-gold),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .movie-card-poster {
@@ -1433,26 +1361,28 @@
 }
 
 .movie-card:hover .movie-card-poster {
-    transform: scale(1.02);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .movie-card-title {
     color: var(--primary-text);
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.5rem;
+    font-weight: 400;
     margin: 1rem 0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Bebas Neue', sans-serif;
     min-height: 3em;
     line-height: 1.4;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .movie-card-rating {
     color: var(--primary-gold);
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 1rem;
+    font-weight: 600;
     margin: 0.5rem 0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 1px;
 }
 
 .movie-card-buttons {
