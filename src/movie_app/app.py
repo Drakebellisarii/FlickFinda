@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect
+from flask import Flask, render_template, jsonify, request, redirect, Response
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 from openai import OpenAI
@@ -472,13 +472,19 @@ def get_movie_data(movie_title):
                 data.get("Plot", "No plot available."),
                 data.get("Awards", "No awards available."),
                 data.get("Ratings", {}),
-                data.get("Poster", "No poster available.")
+                data.get("Poster", "N/A"),
+                data.get("Released", "N/A"),
+                data.get("Actors", "N/A"),
+                data.get("Director", "N/A"),
+                data.get("Genre", "N/A"),
+                data.get("Runtime", "N/A"),
+                data.get("Year", "N/A")
             )
         else:
-            return None, None, None, None
+            return None, None, None, None, None, None, None, None, None, None
     except requests.RequestException as e:
         print(f"Error fetching movie data: {e}")
-        return None, None, None, None
+        return None, None, None, None, None, None, None, None, None, None
 
 @app.route('/select_movie', methods=['GET'])
 def select_movie():
@@ -528,7 +534,13 @@ def get_reviews_and_ratings():
                     'reviews': data.get("Plot", "No plot available."),
                     'ratings': ratings_dict,
                     'awards': data.get("Awards", "No awards information available."),
-                    'poster': data.get("Poster", "N/A")
+                    'poster': data.get("Poster", "N/A"),
+                    'released': data.get("Released", "N/A"),
+                    'actors': data.get("Actors", "N/A"),
+                    'director': data.get("Director", "N/A"),
+                    'genre': data.get("Genre", "N/A"),
+                    'runtime': data.get("Runtime", "N/A"),
+                    'year': data.get("Year", "N/A")
                 })
             return jsonify({'error': 'Movie not found'})
         except Exception as e:
@@ -574,13 +586,17 @@ def get_trailer():
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-def generate_movie_list(description, num_titles=5):
+def generate_movie_list(description, num_titles=5, streaming_service=None):
     try:
+        streaming_prompt = ""
+        if streaming_service and streaming_service != "all":
+            streaming_prompt = f" that are currently available to stream on {streaming_service}"
+        
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a movie reviewing and recommending expert."},
-                {"role": "user", "content": f"Suggest any {num_titles} movie titles that match this description: {description}. Only include titles separated by commas, no numbers or additional details."}
+                {"role": "system", "content": "You are a movie reviewing and recommending expert. You have up-to-date knowledge of which movies are available on major streaming platforms."},
+                {"role": "user", "content": f"Suggest any {num_titles} movie titles{streaming_prompt} that match this description: {description}. Only include titles separated by commas, no numbers or additional details."}
             ],
             max_tokens=150,
             temperature=0.7
@@ -601,10 +617,17 @@ def generate_movie_list(description, num_titles=5):
             "error": str(e)
         }
 
-# Add this route for the placeholder image
-#@app.route('/api/placeholder/<width>/<height>')
+@app.route('/api/placeholder/<width>/<height>')
 def placeholder(width, height):
-    return redirect(f"https://via.placeholder.com/{width}x{height}")
+    """Generate a simple SVG placeholder image for missing movie posters."""
+    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">
+      <rect width="100%" height="100%" fill="#1E293B"/>
+      <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle"
+            font-family="sans-serif" font-size="40" fill="#64748B">🎬</text>
+      <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle"
+            font-family="sans-serif" font-size="14" fill="#94A3B8">No Poster</text>
+    </svg>'''
+    return Response(svg, mimetype='image/svg+xml')
 
 @app.route('/get_movie_suggestion', methods=['POST'])
 def get_movie_suggestion():
@@ -612,6 +635,7 @@ def get_movie_suggestion():
         data = request.get_json()
         user_description = data.get("description", "")
         num_titles = int(data.get("num_titles", 1))  # Default to 1 if not specified
+        streaming_service = data.get("streaming_service", "all")
         
         # Validate input
         if not user_description:
@@ -623,9 +647,9 @@ def get_movie_suggestion():
         elif num_titles > 6:  # Match your dropdown max
             num_titles = 6
             
-        print(f"Generating {num_titles} movie suggestions for: {user_description}")
+        print(f"Generating {num_titles} movie suggestions for: {user_description} (streaming: {streaming_service})")
             
-        result = generate_movie_list(user_description, num_titles)
+        result = generate_movie_list(user_description, num_titles, streaming_service)
         
         if not result["success"]:
             return jsonify({'error': 'Failed to generate movie suggestions'}), 500
@@ -638,23 +662,33 @@ def get_movie_suggestion():
         if num_titles > 1:
             movie_results = []
             for movie_title in suggested_movies:
-                reviews, awards, ratings, poster = get_movie_data(movie_title)
+                reviews, awards, ratings, poster, released, actors, director, genre, runtime, year = get_movie_data(movie_title)
                 
                 # Create a ratings dictionary for this movie
                 ratings_dict = {}
                 if isinstance(ratings, list):
                     ratings_dict = {r.get("Source", "Unknown"): r.get("Value", "N/A") for r in ratings if isinstance(r, dict)}
                 
+                # Use placeholder for missing posters
+                if not poster or poster == "N/A":
+                    poster = "/api/placeholder/300/450"
+                
                 movie_results.append({
                     'title': movie_title,
                     'reviews': reviews or "No reviews available",
                     'awards': awards or "No awards information available",
-                    'poster': poster or "/api/placeholder/300/450",
+                    'poster': poster,
                     'ratings': {
                         'imdb': ratings_dict.get('IMDb', 'N/A') if ratings else 'N/A',
                         'rotten tomatoes': ratings_dict.get('Rotten Tomatoes', 'N/A') if ratings else 'N/A',
                         'metacritic': ratings_dict.get('Metacritic', 'N/A') if ratings else 'N/A'
                     },
+                    'released': released or "N/A",
+                    'actors': actors or "N/A",
+                    'director': director or "N/A",
+                    'genre': genre or "N/A",
+                    'runtime': runtime or "N/A",
+                    'year': year or "N/A",
                     'trailer_url': f"https://www.youtube.com/results?search_query={movie_title} trailer"
                 })
             
@@ -665,12 +699,16 @@ def get_movie_suggestion():
         else:
             # Single movie case - keep original behavior but ensure consistent data structure
             selected_movie = suggested_movies[0]
-            reviews, awards, ratings, poster = get_movie_data(selected_movie)
+            reviews, awards, ratings, poster, released, actors, director, genre, runtime, year = get_movie_data(selected_movie)
             
             # Ensure ratings is a dictionary
             ratings_dict = {}
             if isinstance(ratings, list):
                 ratings_dict = {r.get("Source", "Unknown"): r.get("Value", "N/A") for r in ratings if isinstance(r, dict)}
+            
+            # Use placeholder for missing posters
+            if not poster or poster == "N/A":
+                poster = "/api/placeholder/300/450"
             
             response_data = {
                 'title': selected_movie,
@@ -681,7 +719,13 @@ def get_movie_suggestion():
                     'metacritic': ratings_dict.get('Metacritic', 'N/A') if ratings else 'N/A'
                 },
                 'awards': awards or "Could not find any award information",
-                'poster': poster or "https://example.com/popcorn-movie.jpg/300x450",
+                'poster': poster,
+                'released': released or "N/A",
+                'actors': actors or "N/A",
+                'director': director or "N/A",
+                'genre': genre or "N/A",
+                'runtime': runtime or "N/A",
+                'year': year or "N/A",
                 'trailer_url': f"https://www.youtube.com/results?search_query={selected_movie} trailer"
             }
             
