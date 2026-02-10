@@ -4,29 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Movie Ratings - FlickFinda</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            /* Modern Color Palette */
-            --primary-blue: #1E3A8A;
-            --secondary-blue: #3730A3;
-            --accent-blue: #6366F1;
+            /* Luxury Cinema Dark Palette */
+            --primary: #E5B94E;
             --primary-gold: #F59E0B;
             --secondary-gold: #FBBF24;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --primary-text: #1E293B;
-            --secondary-text: #475569;
-            --muted-text: #64748B;
-            --navy-bg: #0F172A;
-            --dark-navy: #0B1426;
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --accent-gold: #FCD34D;
+            --secondary: #1a1a1a;
+            --primary-bg: #0D0D0D;
+            --secondary-bg: #141414;
+            --background: #0D0D0D;
+            --card-bg: #1a1a1a;
+            --text: #E8E8E8;
+            --text-muted: #999999;
+            --primary-text: #E8E8E8;
+            --secondary-text: #CCCCCC;
+            --muted-text: #999999;
+            --border-color: rgba(229, 185, 78, 0.3);
+            --border-light: rgba(229, 185, 78, 0.15);
+            --border-medium: rgba(229, 185, 78, 0.25);
+            --border-dark: rgba(229, 185, 78, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6);
+            --shadow-gold: 0 8px 25px rgba(245, 158, 11, 0.2);
             --radius-md: 12px;
             --radius-lg: 16px;
             --radius-xl: 24px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -37,21 +46,14 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg,
-                #FFFFFF 0%,
-                #F8FAFC 15%,
-                #E2E8F0 30%,
-                #CBD5E1 45%,
-                #94A3B8 60%,
-                #64748B 75%,
-                var(--navy-bg) 90%,
-                var(--dark-navy) 100%);
+            background: #0D0D0D;
             min-height: 100vh;
             padding: 2rem;
             line-height: 1.6;
             color: var(--primary-text);
             overflow-x: hidden;
             position: relative;
+            font-weight: 400;
         }
 
         body::before {
@@ -62,8 +64,8 @@
             right: 0;
             bottom: 0;
             background:
-                radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+                radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(229, 185, 78, 0.05) 0%, transparent 50%);
             animation: backgroundFloat 25s ease-in-out infinite;
             pointer-events: none;
             z-index: 0;
@@ -78,15 +80,12 @@
             max-width: 1400px;
             margin: 0 auto;
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(229, 185, 78, 0.2);
             border-radius: var(--radius-xl);
             padding: 3rem;
             box-shadow:
-                0 25px 50px rgba(0, 0, 0, 0.15),
-                0 0 0 1px rgba(245, 158, 11, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                0 25px 50px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(245, 158, 11, 0.1);
             position: relative;
             z-index: 1;
         }
@@ -95,11 +94,12 @@
             text-align: center;
             margin-bottom: 3rem;
             padding-bottom: 2rem;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            background: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
             border-radius: var(--radius-xl) var(--radius-xl) 0 0;
             margin: -3rem -3rem 3rem -3rem;
             padding: 3rem;
             position: relative;
+            border-bottom: 1px solid rgba(229, 185, 78, 0.2);
         }
 
         .header::before {
@@ -110,9 +110,9 @@
             right: 0;
             bottom: 0;
             background: linear-gradient(45deg,
-                rgba(245, 158, 11, 0.1) 0%,
-                rgba(255, 255, 255, 0.05) 50%,
-                rgba(245, 158, 11, 0.1) 100%);
+                rgba(245, 158, 11, 0.08) 0%,
+                rgba(229, 185, 78, 0.04) 50%,
+                rgba(245, 158, 11, 0.08) 100%);
             pointer-events: none;
         }
 
@@ -120,9 +120,9 @@
             color: #FFFFFF;
             font-size: 2.5rem;
             font-weight: 600;
-            font-family: 'Playfair Display', serif;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
             margin-bottom: 1rem;
             position: relative;
             z-index: 2;
@@ -130,23 +130,23 @@
 
         .nav-link {
             display: inline-block;
-            color: rgba(245, 158, 11, 0.9);
+            color: var(--primary-gold);
             text-decoration: none;
             margin-top: 1rem;
             padding: 0.75rem 1.5rem;
-            border: 2px solid rgba(245, 158, 11, 0.3);
+            border: 2px solid rgba(229, 185, 78, 0.3);
             border-radius: var(--radius-md);
             transition: var(--transition);
             font-weight: 500;
             font-family: 'Inter', sans-serif;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(229, 185, 78, 0.1);
             position: relative;
             z-index: 2;
         }
 
         .nav-link:hover {
             background: var(--primary-gold);
-            color: var(--primary-blue);
+            color: #0D0D0D;
             border-color: var(--primary-gold);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
@@ -161,24 +161,21 @@
 
         .movie-card {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--border-light);
             border-radius: var(--radius-lg);
             padding: 2rem;
             text-align: center;
             transition: var(--transition);
             position: relative;
             height: auto;
-            box-shadow:
-                0 10px 25px rgba(0, 0, 0, 0.1),
-                0 0 0 1px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .movie-card:hover {
             transform: translateY(-8px);
+            border-color: var(--primary-gold);
             box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.15),
+                0 20px 40px rgba(0, 0, 0, 0.4),
                 0 0 0 1px var(--primary-gold);
         }
 
@@ -186,9 +183,10 @@
             width: 200px;
             height: 300px;
             object-fit: cover;
-            border: 2px solid var(--border-color);
+            border: 2px solid rgba(229, 185, 78, 0.3);
+            border-radius: 8px;
             margin-bottom: 1rem;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
         .movie-title {
@@ -213,7 +211,7 @@
             height: 28px;
             cursor: pointer;
             transition: transform 0.2s;
-            color: #cbd5e1;
+            color: #555;
             font-size: 1.5rem;
             user-select: none;
         }
@@ -241,20 +239,20 @@
         }
 
         .add-movie-btn {
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            color: #FFFFFF;
+            background: var(--primary-gold);
+            color: #0D0D0D;
             border: none;
             border-radius: var(--radius-md);
             padding: 0.75rem 1.5rem;
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Oswald', sans-serif;
             font-size: 0.9rem;
             font-weight: 600;
             margin-top: 1rem;
             transition: var(--transition);
             width: auto;
             display: inline-block;
-            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+            box-shadow: 0 4px 15px rgba(229, 185, 78, 0.3);
             position: relative;
             overflow: hidden;
         }
@@ -268,7 +266,7 @@
             height: 100%;
             background: linear-gradient(90deg,
                 transparent 0%,
-                rgba(245, 158, 11, 0.2) 50%,
+                rgba(255, 255, 255, 0.2) 50%,
                 transparent 100%);
             transition: left 0.6s ease-in-out;
         }
@@ -279,7 +277,7 @@
 
         .add-movie-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
+            box-shadow: 0 8px 25px rgba(229, 185, 78, 0.4);
         }
 
         .modal {
@@ -298,7 +296,8 @@
         .modal-content {
             background: var(--card-bg);
             padding: 1.5rem;
-            border: 4px solid var(--border-color);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
             max-width: 400px;
             width: 90%;
         }
@@ -309,20 +308,27 @@
             padding: 0.5rem;
             margin: 0.5rem 0;
             font-size: 0.8rem;
-            background: rgba(26, 38, 50, 0.8);
-            border: 2px solid var(--border-color);
+            font-family: 'Inter', sans-serif;
+            background: #222;
+            border: 2px solid rgba(229, 185, 78, 0.2);
             color: var(--text);
             resize: vertical;
+            border-radius: 6px;
+        }
+
+        #review-text:focus {
+            outline: none;
+            border-color: var(--primary-gold);
         }
 
         .movie-review {
             font-size: 0.7rem;
-            color: var(--text);
+            color: var(--secondary-text);
             margin: 0.5rem 0;
             max-height: 100px;
             overflow-y: auto;
             padding: 0.5rem;
-            background: rgba(0, 0, 0, 0.2);
+            background: #222;
             border-radius: 4px;
         }
 
@@ -346,11 +352,11 @@
         .no-movies {
             text-align: center;
             padding: 20px;
-            color: #666;
+            color: var(--muted-text);
             font-size: 1.2em;
         }
         .error {
-            color: red;
+            color: #f87171;
             text-align: center;
             padding: 20px;
         }
@@ -396,12 +402,12 @@
         .star-rating .fa-star {
             cursor: pointer;
             font-size: 24px;
-            color: #ddd;
+            color: #555;
             transition: color 0.2s;
         }
 
         .star-rating .fa-star.fas {
-            color: var(--primary);
+            color: var(--primary-gold);
         }
 
         .modal-content {
@@ -409,6 +415,7 @@
             padding: 2rem;
             border-radius: 8px;
             position: relative;
+            border: 2px solid var(--border-color);
         }
 
         .close {
@@ -420,8 +427,12 @@
             color: var(--text);
         }
 
+        .close:hover {
+            color: var(--primary-gold);
+        }
+
         .rating-text {
-            color: var(--text);
+            color: var(--primary-gold);
             text-align: center;
             margin-top: 10px;
             font-size: 0.8rem;
@@ -443,7 +454,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             color: var(--text);
             border: none;
             padding: 8px;
@@ -460,7 +471,7 @@
 
         .delete-btn:hover {
             background: var(--secondary);
-            color: var(--primary);
+            color: var(--primary-gold);
             transform: scale(1.1);
         }
 
