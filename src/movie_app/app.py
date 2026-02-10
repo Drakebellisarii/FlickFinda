@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect
+from flask import Flask, render_template, jsonify, request, redirect, Response
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 from openai import OpenAI
@@ -627,7 +627,6 @@ def placeholder(width, height):
       <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle"
             font-family="sans-serif" font-size="14" fill="#94A3B8">No Poster</text>
     </svg>'''
-    from flask import Response
     return Response(svg, mimetype='image/svg+xml')
 
 @app.route('/get_movie_suggestion', methods=['POST'])
