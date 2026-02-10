@@ -602,11 +602,28 @@
                 `;
             }
 
+            // Format cast/director/date
+            let castHtml = '';
+            if (data.actors && data.actors !== 'N/A') {
+                castHtml = `<p><strong>Cast:</strong> ${data.actors}</p>`;
+            }
+            let directorHtml = '';
+            if (data.director && data.director !== 'N/A') {
+                directorHtml = `<p><strong>Director:</strong> ${data.director}</p>`;
+            }
+            let releasedHtml = '';
+            if (data.released && data.released !== 'N/A') {
+                releasedHtml = `<p><strong>Released:</strong> ${data.released}</p>`;
+            }
+
             cardBack.innerHTML = `
                 <h3 class="movie-title">${card.querySelector('.card-front .movie-title').textContent}</h3>
                 <div class="movie-details">
                     <h4>Plot:</h4>
                     <p>${data.reviews || 'No plot available'}</p>
+                    ${castHtml}
+                    ${directorHtml}
+                    ${releasedHtml}
                     ${ratingsHtml}
                     ${awardsHtml}
                 </div>
