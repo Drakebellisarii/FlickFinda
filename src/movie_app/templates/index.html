@@ -959,6 +959,22 @@
                 );
         }
 
+        .curtain-container.closing .curtain-left {
+            transform: translateX(0);
+        }
+
+        .curtain-container.closing .curtain-right {
+            transform: translateX(0);
+        }
+
+        .curtain-container.opening .curtain-left {
+            transform: translateX(-100%);
+        }
+
+        .curtain-container.opening .curtain-right {
+            transform: translateX(100%);
+        }
+
         /* Movie Info Section */
         .movie-info {
             display: none;
@@ -1990,15 +2006,31 @@ function setupPageTransitions() {
     // Handle page load transitions
     const curtainContainer = document.querySelector('.curtain-container');
     if (curtainContainer) {
-        curtainContainer.style.display = 'block';
-        curtainContainer.classList.add('closing');
-        
+        // Start with curtains closed (no transition)
+        const curtainLeft = curtainContainer.querySelector('.curtain-left');
+        const curtainRight = curtainContainer.querySelector('.curtain-right');
+        if (curtainLeft && curtainRight) {
+            // Temporarily disable transition for instant close
+            curtainLeft.style.transition = 'none';
+            curtainRight.style.transition = 'none';
+            curtainContainer.style.display = 'block';
+            curtainContainer.classList.add('closing');
+            curtainContainer.classList.remove('opening');
+            // Force reflow
+            void curtainContainer.offsetHeight;
+            // Re-enable transition
+            curtainLeft.style.transition = '';
+            curtainRight.style.transition = '';
+        }
+
+        // Open curtains after a brief delay
         setTimeout(() => {
             curtainContainer.classList.remove('closing');
             curtainContainer.classList.add('opening');
             
             setTimeout(() => {
                 curtainContainer.style.display = 'none';
+                curtainContainer.classList.remove('opening');
             }, 1000);
         }, 100);
     }
