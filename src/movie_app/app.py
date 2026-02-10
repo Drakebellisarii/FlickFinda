@@ -42,7 +42,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     watchlist_items = db.relationship('WatchlistItem', backref='user', lazy=True)
     ratings = db.relationship('MovieRating', backref='user', lazy=True)
@@ -114,7 +114,7 @@ class MovieRating(db.Model):
     poster_url = db.Column(db.String(500))
     review = db.Column(db.Text)
     rating = db.Column(db.Integer)
-    added_date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    added_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     # User relationship
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_rating_user_id'), nullable=False)
     
@@ -128,7 +128,7 @@ class WatchlistItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movie_title = db.Column(db.String(200), nullable=False)
     poster_url = db.Column(db.String(500))
-    added_date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    added_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     # User relationship
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_watchlist_user_id'), nullable=False)
     
