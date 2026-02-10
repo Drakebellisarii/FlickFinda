@@ -76,7 +76,7 @@
         color: var(--primary);
         font-size: 0.8rem;
         font-weight: bold;
-        font-family: 'Press Start 2P', cursive;
+        font-family: 'Inter', sans-serif;
     }
 
     .user-dropdown-menu {
@@ -109,8 +109,8 @@
         border: 2px solid var(--border-color);
         border-radius: var(--border-radius);
         padding: 0.75rem 1.5rem;
-        font-family: 'Press Start 2P', cursive;
-        font-size: 0.7rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.8rem;
         cursor: pointer;
         transition: all 0.3s;
         box-shadow: 3px 3px 0 rgba(184, 134, 11, 0.3);
@@ -166,8 +166,8 @@
         color: var(--text);
         text-decoration: none;
         transition: all 0.3s;
-        font-size: 0.7rem;
-        font-family: 'Press Start 2P', cursive;
+        font-size: 0.85rem;
+        font-family: 'Inter', sans-serif;
     }
 
     .user-dropdown-menu a:hover {
@@ -212,8 +212,8 @@
 
     .auth-required-header h3 {
         color: var(--primary);
-        font-family: 'Press Start 2P', cursive;
-        font-size: 1rem;
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.2rem;
         text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
         position: relative;
         z-index: 1;
@@ -257,7 +257,7 @@
     .auth-required-content p {
         color: var(--text);
         margin-bottom: 1.5rem;
-        font-family: 'Courier Prime', monospace;
+        font-family: 'Inter', sans-serif;
     }
 
     .auth-required-buttons {
@@ -268,11 +268,11 @@
 
     .auth-required-buttons .btn {
         padding: 0.5rem 1rem;
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         background: var(--secondary);
         border: 2px solid var(--border-color);
         color: var(--text);
-        font-family: 'Press Start 2P', cursive;
+        font-family: 'Inter', sans-serif;
         cursor: pointer;
         transition: all 0.3s;
         box-shadow: 3px 3px 0 var(--border-color);
@@ -346,8 +346,8 @@
 
     .modal-header h3 {
         color: var(--primary);
-        font-family: 'Press Start 2P', cursive;
-        font-size: 1rem;
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.2rem;
         margin: 0;
         text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
     }
@@ -392,7 +392,7 @@
     .modal-body p {
         color: var(--text);
         margin-bottom: 1rem;
-        font-family: 'Courier Prime', monospace;
+        font-family: 'Inter', sans-serif;
         line-height: 1.6;
     }
 
@@ -408,7 +408,7 @@
     .modal-footer .btn {
         padding: 0.75rem 1.5rem;
         font-size: 0.9rem;
-        font-family: 'Press Start 2P', cursive;
+        font-family: 'Inter', sans-serif;
         cursor: pointer;
         transition: all 0.3s;
         border: 2px solid var(--border-color);
@@ -483,7 +483,7 @@
     }
 
         :root {
-            /* Modern Color Palette */
+            /* Modern Color Palette - kept for button gradients */
             --primary-blue: #1E3A8A;
             --secondary-blue: #3730A3;
             --accent-blue: #6366F1;
@@ -496,28 +496,28 @@
             --secondary-gold: #FBBF24;
             --accent-gold: #FCD34D;
 
-            --primary-bg: #FFFFFF;
-            --secondary-bg: #F8FAFC;
-            --tertiary-bg: #F1F5F9;
-            --card-bg: rgba(255, 255, 255, 0.95);
+            --primary-bg: #0D0D0D;
+            --secondary-bg: #141414;
+            --tertiary-bg: #1a1a1a;
+            --card-bg: #1a1a1a;
 
-            --primary-text: #1E293B;
-            --secondary-text: #475569;
-            --muted-text: #64748B;
-            --light-text: #94A3B8;
+            --primary-text: #E8E8E8;
+            --secondary-text: #CCCCCC;
+            --muted-text: #999999;
+            --light-text: #777777;
 
             --success-green: #10B981;
             --warning-orange: #F59E0B;
             --error-red: #EF4444;
 
-            --border-light: rgba(255, 255, 255, 0.1);
-            --border-medium: rgba(255, 255, 255, 0.2);
-            --border-dark: rgba(255, 255, 255, 0.05);
+            --border-light: rgba(229, 185, 78, 0.15);
+            --border-medium: rgba(229, 185, 78, 0.25);
+            --border-dark: rgba(229, 185, 78, 0.1);
 
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6);
             --shadow-gold: 0 8px 25px rgba(245, 158, 11, 0.2);
 
             --radius-sm: 8px;
@@ -528,12 +528,15 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
-            /* Retro Movie Poster Theme Variables */
+            /* Cinema Theme Variables */
             --primary: #E5B94E;
             --secondary: #1a1a1a;
-            --text: #FFFFFF;
-            --background: #2a2a2a;
-            --border-color: #E5B94E;
+            --text: #E8E8E8;
+            --text-muted: #999999;
+            --background: #0D0D0D;
+            --card-bg-hover: #222222;
+            --border-color: rgba(229, 185, 78, 0.3);
+            --border-radius: 12px;
         }
 
         * {
@@ -543,8 +546,8 @@
         }
 
         body {
-            font-family: 'Oswald', sans-serif;
-            background: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            background: #0D0D0D;
             min-height: 100vh;
             padding: 2rem;
             line-height: 1.6;
@@ -594,8 +597,8 @@
             height: 52px;
             line-height: 52px;
             padding: 0 1.25rem;
-            border: 2px solid rgba(245, 158, 11, 0.1);
-            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(229, 185, 78, 0.2);
+            background: #1a1a1a;
             color: var(--primary-text);
             font-family: 'Inter', sans-serif;
             font-size: 1rem;
@@ -605,16 +608,16 @@
             margin: 0;
             display: block;
             transition: var(--transition);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         #movieDescription:focus {
             outline: none;
             border-color: var(--primary-gold);
-            background: rgba(255, 255, 255, 0.95);
+            background: #222222;
             box-shadow:
-                0 0 0 3px rgba(245, 158, 11, 0.1),
-                0 4px 12px rgba(0, 0, 0, 0.1);
+                0 0 0 3px rgba(229, 185, 78, 0.15),
+                0 4px 12px rgba(0, 0, 0, 0.4);
             transform: translateY(-1px);
         }
 
@@ -630,18 +633,19 @@
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            background: var(--secondary);
-            color: var(--text);
+            background: var(--primary);
+            color: var(--secondary);
             text-transform: uppercase;
-            font-family: 'Press Start 2P', cursive;
-            text-shadow: 1px 1px #000;
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 2px;
             max-width: 800px;
             margin-top: 15px;
         }
 
         #find-movie-btn:hover {
-            background: var(--primary);
-            color: var(--secondary);
+            background: #F59E0B;
+            color: #0D0D0D;
+            box-shadow: 0 0 20px rgba(229, 185, 78, 0.4);
         }
         .curtain-container {
     position: fixed;
@@ -719,11 +723,11 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: #FFFFFF;
+            background: #1a1a1a;
             border-radius: var(--radius-xl);
-            border: 1px solid #e5e5e5;
+            border: 1px solid rgba(229, 185, 78, 0.15);
             padding: 3rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 40px rgba(229, 185, 78, 0.05);
             position: relative;
             z-index: 1;
         }
@@ -733,7 +737,7 @@
             margin-bottom: 3rem;
             padding-bottom: 2rem;
             position: relative;
-            background: #1a1a1a;
+            background: linear-gradient(180deg, #111111 0%, #1a1a1a 100%);
             border-radius: var(--radius-xl) var(--radius-xl) 0 0;
             margin: -3rem -3rem 3rem -3rem;
             padding: 3rem;
@@ -753,12 +757,12 @@
         }
 
     button {
-        background: #1a1a1a;
-        color: #FFFFFF;
+        background: var(--primary);
+        color: #0D0D0D;
         padding: 16px 32px;
         font-size: 1rem;
         font-weight: 600;
-        border: 2px solid #1a1a1a;
+        border: 2px solid rgba(229, 185, 78, 0.3);
         border-radius: var(--radius-md);
         cursor: pointer;
         transition: var(--transition);
@@ -769,7 +773,7 @@
         display: block;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         font-family: 'Inter', sans-serif;
         letter-spacing: 0.3px;
     }
@@ -782,15 +786,16 @@
     }
 
     button:hover {
-        background: #2a2a2a;
+        background: #F59E0B;
+        box-shadow: 0 4px 15px rgba(229, 185, 78, 0.3);
     }
 
     button:active {
-        background: #2a2a2a;
+        background: #D4A843;
     }
 
     button:focus {
-        outline: 2px solid var(--primary-blue);
+        outline: 2px solid var(--primary);
         outline-offset: 2px;
     }
         .header p {
@@ -812,7 +817,7 @@
         }
 
         .select-container {
-            background: rgba(26, 38, 50, 0.8);
+            background: rgba(13, 13, 13, 0.8);
             padding: 1.5rem;
             border: 2px solid var(--border-color);
         }
@@ -820,7 +825,7 @@
         label {
             display: block;
             font-size: 1.1rem;
-            color: var(--primary-text);
+            color: var(--text);
             margin-bottom: 1rem;
             font-weight: 600;
             font-family: 'Oswald', sans-serif;
@@ -832,9 +837,9 @@
             width: 100%;
             padding: 0.75rem 1rem;
             border: 2px solid var(--border-color);
-            background-color: var(--background);
-            color: var(--text);
-            font-family: 'Courier Prime', monospace;
+            background-color: var(--secondary);
+            color: var(--primary);
+            font-family: 'Inter', sans-serif;
             font-size: 1rem;
             margin-bottom: 1rem;
             appearance: none;
@@ -850,8 +855,8 @@
             background: var(--secondary);
             color: var(--text);
             text-transform: uppercase;
-            font-family: 'Courier Prime', monospace;
-            text-shadow: 1px 1px #000;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
         }
 
         .btn:hover {
@@ -881,10 +886,10 @@
             max-width: 1000px;
             margin: 2rem auto;
             padding: 2.5rem;
-            background: #FFFFFF;
-            border: 1px solid #e5e5e5;
+            background: #1a1a1a;
+            border: 1px solid rgba(229, 185, 78, 0.15);
             border-radius: var(--radius-xl);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             flex-direction: column;
             align-items: center;
         }
@@ -928,10 +933,11 @@
         }
 
         .movie-ratings li {
-            background: var(--background);
+            background: #0D0D0D;
             padding: 1rem;
             border: 2px solid var(--border-color);
             text-align: center;
+            border-radius: var(--radius-sm);
         }
 
         .movie-ratings strong {
@@ -953,17 +959,18 @@
     .plot-label,
         .awards-label,
         .movie-details p > strong {
-            font-family: 'Press Start 2P', cursive;
-            color: #FFFFFF !important;
+            font-family: 'Oswald', sans-serif;
+            color: var(--primary) !important;
             font-size: 1rem;
             display: block;
             margin-bottom: 8px;
             letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
 /* Add a subtle highlight effect on hover */
 #movie-plot:hover, #movie-awards:hover {
-  background: rgba(255, 215, 0, 0.05);
+  background: rgba(229, 185, 78, 0.05);
   transition: background 0.3s ease;
 }
 
@@ -1003,7 +1010,7 @@
             padding: 1rem;
             border-top: 2px dashed var(--border-color);
             border-bottom: 2px dashed var(--border-color);
-            background: rgba(26, 38, 50, 0.9);
+            background: rgba(13, 13, 13, 0.9);
             position: relative;
             transition: opacity 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
         }
@@ -1139,8 +1146,8 @@
 /* Add these styles to your existing CSS */
 .theater-title {
     color: var(--primary);
-    font-family: 'Press Start 2P', cursive;
-    font-size: 1rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2rem;
     text-align: center;
     margin-bottom: 15px;
     text-shadow: 1px 1px var(--secondary);
@@ -1216,9 +1223,9 @@
     width: 150px;
     padding: 0.5rem 2.5rem 0.5rem 0.75rem;
     border: 2px solid var(--border-color);
-    background-color: var(--card-bg);
+    background-color: var(--secondary);
     color: var(--text);
-    font-family: 'Courier Prime', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.8rem;
     border-radius: 4px;
 }
@@ -1235,10 +1242,10 @@
 
 .search-text {
     color: var(--text);
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.6rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    text-shadow: 1px 1px var(--secondary);
+    letter-spacing: 1px;
     opacity: 0.8;
 }
 
@@ -1261,8 +1268,8 @@
 
 .loading-text {
     color: var(--primary);
-    font-family: 'Press Start 2P', cursive;
-    font-size: 1rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2rem;
 }
 
 .ai-input-wrapper {
@@ -1278,9 +1285,9 @@
     line-height: 42px;
     padding: 0 0.75rem;
     border: 2px solid var(--border-color);
-    background: var(--background);
+    background: var(--secondary);
     color: var(--primary);
-    font-family: 'Courier Prime', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.9rem;
     border-radius: 4px;
     cursor: pointer;
@@ -1301,13 +1308,13 @@
 
 .movie-count-select:hover {
     border-color: var(--primary);
-    background: var(--card-bg);
+    background: var(--card-bg-hover);
 }
 
 #movieDescription:focus {
     outline: none;
     border-color: var(--primary);
-    background: var(--card-bg);
+    background: var(--card-bg-hover);
 }
 
 /* Add these styles to your existing CSS */
@@ -1334,18 +1341,19 @@
 }
 
 .movie-card {
-    background: #FFFFFF;
-    border: 1px solid #e5e5e5;
+    background: #1a1a1a;
+    border: 1px solid rgba(229, 185, 78, 0.15);
     border-radius: var(--radius-lg);
     padding: 2rem;
     text-align: center;
     transition: var(--transition);
     position: relative;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .movie-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 20px rgba(229, 185, 78, 0.1);
+    border-color: rgba(229, 185, 78, 0.3);
 }
 
 .movie-card-poster {
@@ -1361,7 +1369,7 @@
 }
 
 .movie-card:hover .movie-card-poster {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
 .movie-card-title {
@@ -1393,8 +1401,8 @@
 }
 
 .movie-card-buttons .btn {
-    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-    color: #FFFFFF;
+    background: linear-gradient(135deg, var(--primary), #F59E0B);
+    color: #0D0D0D;
     border: none;
     border-radius: var(--radius-md);
     padding: 0.8rem;
@@ -1404,7 +1412,7 @@
     transition: var(--transition);
     font-family: 'Inter', sans-serif;
     letter-spacing: 0.3px;
-    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+    box-shadow: 0 4px 15px rgba(229, 185, 78, 0.3);
     position: relative;
     overflow: hidden;
 }
@@ -1429,7 +1437,7 @@
 
 .movie-card-buttons .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
+    box-shadow: 0 8px 25px rgba(229, 185, 78, 0.4);
 }
 
 #back-to-results-btn {
@@ -1438,16 +1446,16 @@
     background: var(--secondary);
     color: var(--text);
     border: 2px solid var(--border-color);
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Inter', sans-serif;
     cursor: pointer;
-    font-size: 0.8rem;
-    box-shadow: 4px 4px 0 var(--border-color);
+    font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
 }
 
 #back-to-results-btn:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--border-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
     background: var(--primary);
     color: var(--secondary);
 }
@@ -1468,10 +1476,10 @@
 
 #movie-plot, #movie-awards {
   display: block;
-  color: #FFD700;
+  color: #E8E8E8;
   max-width: 100%;
   margin-top: 5px;
-  background: transparent; /* Make sure no background interferes */
+  background: transparent;
   padding: 5px 0;
   text-align: left;
 }
