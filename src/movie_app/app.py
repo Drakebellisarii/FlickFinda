@@ -14,8 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 from flask import session
 import urllib.parse
-from concurrent.futures import ThreadPoolExecutor
-from functools import lru_cache
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 app = Flask(__name__, static_folder='../../static', static_url_path='/static')
 
@@ -466,15 +465,29 @@ def serve_react_app():
     dist_path = os.path.join(app.static_folder, 'dist')
     return send_from_directory(dist_path, 'index.html')
 
-@lru_cache(maxsize=128)
+# Simple cache for OMDB API responses with TTL
+from time import time
+_movie_cache = {}
+_cache_ttl = 3600  # 1 hour
+
 def get_movie_data(movie_title):
+    """Fetch movie data from OMDB API with simple caching"""
+    # Check cache first
+    cache_key = movie_title.lower()
+    if cache_key in _movie_cache:
+        cached_data, timestamp = _movie_cache[cache_key]
+        if time() - timestamp < _cache_ttl:
+            return cached_data
+    
     try:
         url = f"http://www.omdbapi.com/?t={movie_title}&plot=full&apikey={OMDB_API_KEY}"
         response = requests.get(url, timeout=5)  # Reduced from 10s to 5s
         response.raise_for_status() 
         data = response.json()
+        result = None
+        
         if data.get("Response") == "True":
-            return (
+            result = (
                 data.get("Plot", "No plot available."),
                 data.get("Awards", "No awards available."),
                 data.get("Ratings", {}),
@@ -487,7 +500,11 @@ def get_movie_data(movie_title):
                 data.get("Year", "N/A")
             )
         else:
-            return None, None, None, None, None, None, None, None, None, None
+            result = (None, None, None, None, None, None, None, None, None, None)
+        
+        # Cache the result
+        _movie_cache[cache_key] = (result, time())
+        return result
     except requests.RequestException as e:
         print(f"Error fetching movie data: {e}")
         return None, None, None, None, None, None, None, None, None, None
@@ -614,7 +631,7 @@ def generate_movie_list(description, num_titles=5, streaming_service=None):
         # Filter out empty strings, whitespace-only strings, and invalid entries
         valid_movies = [
             movie for movie in movies 
-            if movie and movie.strip() and len(movie.strip()) > 0 and not movie.strip().isdigit()
+            if movie and movie.strip() and not movie.strip().isdigit()
         ]
         
         # Check if we have any valid titles after filtering
@@ -692,12 +709,13 @@ def get_movie_suggestion():
             valid_titles = [title for title in suggested_movies if title and title.strip()]
             
             # Use ThreadPoolExecutor for parallel API calls
-            with ThreadPoolExecutor(max_workers=min(6, len(valid_titles))) as executor:
+            max_workers = int(os.environ.get('OMDB_MAX_WORKERS', 6))
+            with ThreadPoolExecutor(max_workers=min(max_workers, len(valid_titles))) as executor:
                 # Submit all movie data fetches in parallel
                 future_to_title = {executor.submit(get_movie_data, title): title for title in valid_titles}
                 
-                # Collect results as they complete
-                for future in future_to_title:
+                # Collect results as they complete for better perceived performance
+                for future in as_completed(future_to_title):
                     movie_title = future_to_title[future]
                     try:
                         reviews, awards, ratings, poster, released, actors, director, genre, runtime, year = future.result()
