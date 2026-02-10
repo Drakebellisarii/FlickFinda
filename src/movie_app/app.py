@@ -14,6 +14,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 from flask import session
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 
 app = Flask(__name__, static_folder='../../static', static_url_path='/static')
 
@@ -461,10 +463,11 @@ def login_page():
     """Route to show the login page"""
     return render_template('login.html')
 
+@lru_cache(maxsize=128)
 def get_movie_data(movie_title):
     try:
         url = f"http://www.omdbapi.com/?t={movie_title}&plot=full&apikey={OMDB_API_KEY}"
-        response = requests.get(url, timeout=10) 
+        response = requests.get(url, timeout=5)  # Reduced from 10s to 5s
         response.raise_for_status() 
         data = response.json()
         if data.get("Response") == "True":
@@ -604,9 +607,23 @@ def generate_movie_list(description, num_titles=5, streaming_service=None):
 
         content = response.choices[0].message.content.strip()
         movies = [movie.strip() for movie in content.split(',')]
+        
+        # Filter out empty strings, whitespace-only strings, and invalid entries
+        valid_movies = [
+            movie for movie in movies 
+            if movie and movie.strip() and len(movie.strip()) > 0 and not movie.strip().isdigit()
+        ]
+        
+        # Check if we have any valid titles after filtering
+        if not valid_movies:
+            return {
+                "success": False,
+                "error": "request_not_fulfilled",
+                "message": "Our expert movie selector couldn't find movies matching your request. This usually happens when the request is too vague or contains explicit content. Please try again with a more specific, non-explicit description — our movie expert needs a bit more context to find the perfect pick for you!"
+            }
 
         return {
-            "titles": movies[:num_titles],
+            "titles": valid_movies[:num_titles],
             "success": True
         }
 
@@ -651,7 +668,13 @@ def get_movie_suggestion():
             
         result = generate_movie_list(user_description, num_titles, streaming_service)
         
+        # Handle case where AI couldn't generate valid titles
         if not result["success"]:
+            if result.get("error") == "request_not_fulfilled":
+                return jsonify({
+                    'error': 'request_not_fulfilled',
+                    'message': result.get("message", "Our expert movie selector couldn't find movies matching your request.")
+                }), 400
             return jsonify({'error': 'Failed to generate movie suggestions'}), 500
             
         # Get the movies from the result
@@ -661,45 +684,84 @@ def get_movie_suggestion():
         # If we want multiple movies, return them all with complete info
         if num_titles > 1:
             movie_results = []
-            for movie_title in suggested_movies:
-                reviews, awards, ratings, poster, released, actors, director, genre, runtime, year = get_movie_data(movie_title)
+            
+            # Filter out invalid titles before making API calls
+            valid_titles = [title for title in suggested_movies if title and title.strip()]
+            
+            # Use ThreadPoolExecutor for parallel API calls
+            with ThreadPoolExecutor(max_workers=min(6, len(valid_titles))) as executor:
+                # Submit all movie data fetches in parallel
+                future_to_title = {executor.submit(get_movie_data, title): title for title in valid_titles}
                 
-                # Create a ratings dictionary for this movie
-                ratings_dict = {}
-                if isinstance(ratings, list):
-                    ratings_dict = {r.get("Source", "Unknown"): r.get("Value", "N/A") for r in ratings if isinstance(r, dict)}
-                
-                # Use placeholder for missing posters
-                if not poster or poster == "N/A":
-                    poster = "/api/placeholder/300/450"
-                
-                movie_results.append({
-                    'title': movie_title,
-                    'reviews': reviews or "No reviews available",
-                    'awards': awards or "No awards information available",
-                    'poster': poster,
-                    'ratings': {
-                        'imdb': ratings_dict.get('IMDb', 'N/A') if ratings else 'N/A',
-                        'rotten tomatoes': ratings_dict.get('Rotten Tomatoes', 'N/A') if ratings else 'N/A',
-                        'metacritic': ratings_dict.get('Metacritic', 'N/A') if ratings else 'N/A'
-                    },
-                    'released': released or "N/A",
-                    'actors': actors or "N/A",
-                    'director': director or "N/A",
-                    'genre': genre or "N/A",
-                    'runtime': runtime or "N/A",
-                    'year': year or "N/A",
-                    'trailer_url': f"https://www.youtube.com/results?search_query={movie_title} trailer"
-                })
+                # Collect results as they complete
+                for future in future_to_title:
+                    movie_title = future_to_title[future]
+                    try:
+                        reviews, awards, ratings, poster, released, actors, director, genre, runtime, year = future.result()
+                        
+                        # Skip if get_movie_data returned all None (movie not found)
+                        if all(v is None for v in [reviews, awards, ratings, poster, released, actors, director, genre, runtime, year]):
+                            continue
+                        
+                        # Create a ratings dictionary for this movie
+                        ratings_dict = {}
+                        if isinstance(ratings, list):
+                            ratings_dict = {r.get("Source", "Unknown"): r.get("Value", "N/A") for r in ratings if isinstance(r, dict)}
+                        
+                        # Use placeholder for missing posters
+                        if not poster or poster == "N/A":
+                            poster = "/api/placeholder/300/450"
+                        
+                        movie_results.append({
+                            'title': movie_title,
+                            'reviews': reviews or "No reviews available",
+                            'awards': awards or "No awards information available",
+                            'poster': poster,
+                            'ratings': {
+                                'imdb': ratings_dict.get('IMDb', 'N/A') if ratings else 'N/A',
+                                'rotten tomatoes': ratings_dict.get('Rotten Tomatoes', 'N/A') if ratings else 'N/A',
+                                'metacritic': ratings_dict.get('Metacritic', 'N/A') if ratings else 'N/A'
+                            },
+                            'released': released or "N/A",
+                            'actors': actors or "N/A",
+                            'director': director or "N/A",
+                            'genre': genre or "N/A",
+                            'runtime': runtime or "N/A",
+                            'year': year or "N/A",
+                            'trailer_url': f"https://www.youtube.com/results?search_query={movie_title} trailer"
+                        })
+                    except Exception as e:
+                        print(f"Error fetching data for {movie_title}: {e}")
+                        continue
+            
+            # Check if we have any valid movies after filtering
+            if not movie_results:
+                return jsonify({
+                    'error': 'request_not_fulfilled',
+                    'message': "Our expert movie selector couldn't find movies matching your request. This usually happens when the request is too vague or contains explicit content. Please try again with a more specific, non-explicit description — our movie expert needs a bit more context to find the perfect pick for you!"
+                }), 400
             
             return jsonify({
                 'success': True,
                 'movies': movie_results
             })
         else:
-            # Single movie case - keep original behavior but ensure consistent data structure
+            # Single movie case - validate title first
+            if not suggested_movies or not suggested_movies[0] or not suggested_movies[0].strip():
+                return jsonify({
+                    'error': 'request_not_fulfilled',
+                    'message': "Our expert movie selector couldn't find movies matching your request. This usually happens when the request is too vague or contains explicit content. Please try again with a more specific, non-explicit description — our movie expert needs a bit more context to find the perfect pick for you!"
+                }), 400
+            
             selected_movie = suggested_movies[0]
             reviews, awards, ratings, poster, released, actors, director, genre, runtime, year = get_movie_data(selected_movie)
+            
+            # Check if movie data fetch failed (all None)
+            if all(v is None for v in [reviews, awards, ratings, poster, released, actors, director, genre, runtime, year]):
+                return jsonify({
+                    'error': 'request_not_fulfilled',
+                    'message': "Our expert movie selector couldn't find movies matching your request. This usually happens when the request is too vague or contains explicit content. Please try again with a more specific, non-explicit description — our movie expert needs a bit more context to find the perfect pick for you!"
+                }), 400
             
             # Ensure ratings is a dictionary
             ratings_dict = {}
