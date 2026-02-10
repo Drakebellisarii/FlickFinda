@@ -434,34 +434,37 @@ def get_watched_movies():
 def index():
     print("Session data:", session)  # Debug print
     
-    # Get API keys from environment variables
-    youtube_api_key = os.environ.get('YOUTUBE_API_KEY')
-    omdb_api_key = os.environ.get('OMDB_API_KEY')
-    
-    if 'user_id' in session:
-        print(f"User ID in session: {session['user_id']}")
-        return render_template('index.html', 
-                             youtube_api_key=youtube_api_key,
-                             omdb_api_key=omdb_api_key)
-    elif 'is_guest' in session:
-        print("Guest session detected")
-        # Pass both API keys to the template
-        return render_template('index.html', 
-                             youtube_api_key=youtube_api_key,
-                             omdb_api_key=omdb_api_key)
+    if 'user_id' in session or 'is_guest' in session:
+        # Serve React SPA for authenticated users
+        return serve_react_app()
     else:
         print("No session data, showing login page")
         return render_template('login.html')
-    
+
+@app.route('/watchlist')
+def watchlist_page():
+    """Serve React SPA for watchlist page"""
+    if 'user_id' in session or 'is_guest' in session:
+        return serve_react_app()
+    return redirect('/login')
 
 @app.route('/ratings')
 def ratings_page():
-    return render_template('ratings.html')
+    """Serve React SPA for ratings page"""
+    if 'user_id' in session or 'is_guest' in session:
+        return serve_react_app()
+    return redirect('/login')
 
 @app.route('/login')
 def login_page():
     """Route to show the login page"""
     return render_template('login.html')
+
+def serve_react_app():
+    """Serve the React SPA index.html"""
+    from flask import send_from_directory
+    dist_path = os.path.join(app.static_folder, 'dist')
+    return send_from_directory(dist_path, 'index.html')
 
 @lru_cache(maxsize=128)
 def get_movie_data(movie_title):

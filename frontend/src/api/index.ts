@@ -1,5 +1,5 @@
 // API service layer for FlickFinda backend
-import type { Movie, WatchlistItem, RatingItem, User, MovieSuggestionRequest, ApiError } from '../types';
+import type { Movie, WatchlistItem, RatingItem, User, MovieSuggestionRequest } from '../types';
 
 const API_BASE_URL = '';  // Same origin
 
