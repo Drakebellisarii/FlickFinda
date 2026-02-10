@@ -114,6 +114,7 @@ class MovieRating(db.Model):
     poster_url = db.Column(db.String(500))
     review = db.Column(db.Text)
     rating = db.Column(db.Integer)
+    added_date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     # User relationship
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_rating_user_id'), nullable=False)
     
@@ -142,12 +143,16 @@ with app.app_context():
 @app.route('/api/ratings/update', methods=['POST'])
 def update_rating():
     try:
+        user_id = get_current_user_id()
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Authentication required'}), 401
+
         data = request.get_json()
         movie_id = data.get('id')
         review = data.get('review')
         rating = data.get('rating')
         
-        movie = MovieRating.query.get(movie_id)
+        movie = MovieRating.query.filter_by(id=movie_id, user_id=user_id).first()
         if not movie:
             return jsonify({'message': 'Movie not found', 'success': False}), 404
         
@@ -395,8 +400,7 @@ def add_to_ratings():
     except Exception as e:
         db.session.rollback()
         print(f"Error in add_to_ratings: {str(e)}")
-        # Return success anyway since the client seems to be proceeding
-        return jsonify({'success': True, 'message': 'Action processed'})
+        return jsonify({'success': False, 'message': f'Error adding to watched list: {str(e)}'}), 500
     
 
 @app.route('/api/watched', methods=['GET'])
@@ -457,10 +461,6 @@ def login_page():
     """Route to show the login page"""
     return render_template('login.html')
 
-# Helper function to get current user ID
-def get_current_user_id():
-    return session.get('user_id')
-
 def get_movie_data(movie_title):
     try:
         url = f"http://www.omdbapi.com/?t={movie_title}&plot=full&apikey={OMDB_API_KEY}"
@@ -505,7 +505,7 @@ def get_reviews_and_ratings():
     movie = request.args.get('movie')
     if movie:
         try:
-            url = f"http://www.omdbapi.com/?t={movie}&plot=full&apikey=4b9e10c0"
+            url = f"http://www.omdbapi.com/?t={movie}&plot=full&apikey={OMDB_API_KEY}"
             response = requests.get(url)
             data = response.json()
             
@@ -698,6 +698,10 @@ def get_movie_suggestion():
 @app.route('/api/ratings/delete', methods=['POST'])
 def delete_rating():
     try:
+        user_id = get_current_user_id()
+        if not user_id:
+            return jsonify({'success': False, 'message': 'Authentication required'}), 401
+
         data = request.get_json()
         movie_id = data.get('id')
         
@@ -706,11 +710,11 @@ def delete_rating():
             
         print(f"Attempting to delete movie with ID: {movie_id}")
         
-        # Find the movie by ID
-        movie = MovieRating.query.get(movie_id)
+        # Find the movie by ID and verify ownership
+        movie = MovieRating.query.filter_by(id=movie_id, user_id=user_id).first()
         
         if not movie:
-            print(f"Movie with ID {movie_id} not found")
+            print(f"Movie with ID {movie_id} not found for user {user_id}")
             return jsonify({'success': False, 'message': 'Movie not found'}), 404
         
         # Log the movie we're about to delete
