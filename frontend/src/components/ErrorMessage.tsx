@@ -35,10 +35,10 @@ export default function ErrorMessage({ error, message }: ErrorMessageProps) {
 
         {/* Error Content */}
         <div className="flex-1">
-          <h3 className="text-xl font-playfair font-bold text-royal-blue-900 mb-2">
+          <h3 className="text-xl font-playfair font-bold text-cinema-navy-900 mb-2">
             Oops! Something went wrong
           </h3>
-          <p className="text-gray-700 leading-relaxed">
+          <p className="text-apple-gray-700 leading-relaxed">
             {displayMessage}
           </p>
         </div>
