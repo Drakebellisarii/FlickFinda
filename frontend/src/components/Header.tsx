@@ -34,7 +34,12 @@ export default function Header() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className="sticky top-0 z-50 bg-[#020617] border-b-2 border-[#F59E0B] shadow-lg backdrop-blur-sm"
+      className="sticky top-0 z-50 shadow-lg"
+      style={{
+        background: 'linear-gradient(135deg, #1E3A8A, #3730A3)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -46,10 +51,10 @@ export default function Header() {
             >
               <div className="text-3xl">🎬</div>
               <div>
-                <h1 className="text-2xl font-['Playfair_Display'] font-bold text-[#F59E0B]">
+                <h1 className="text-2xl font-playfair font-bold text-white">
                   FlickFinda
                 </h1>
-                <p className="text-xs text-gray-400 -mt-1">Your Movie Companion</p>
+                <p className="text-xs text-gold -mt-1">Your Movie Companion</p>
               </div>
             </motion.div>
           </Link>
@@ -63,8 +68,8 @@ export default function Header() {
                   whileTap={{ scale: 0.95 }}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                     isActive(link.path)
-                      ? 'bg-[#F59E0B] text-[#020617]'
-                      : 'text-gray-300 hover:text-[#F59E0B] hover:bg-[#1E293B]'
+                      ? 'bg-gold text-royal-blue-900 shadow-gold-glow'
+                      : 'text-white hover:text-gold hover:bg-white/10'
                   }`}
                 >
                   <span className="mr-2">{link.icon}</span>
@@ -79,7 +84,7 @@ export default function Header() {
               whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="ml-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="ml-4 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoggingOut ? 'Logging out...' : '🚪 Logout'}
             </motion.button>
@@ -88,7 +93,7 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-[#F59E0B] p-2"
+            className="md:hidden text-white p-2 hover:text-gold transition-colors"
           >
             <svg
               className="w-6 h-6"
@@ -133,8 +138,8 @@ export default function Header() {
                   whileTap={{ scale: 0.95 }}
                   className={`block px-4 py-2 rounded-lg font-semibold transition-all ${
                     isActive(link.path)
-                      ? 'bg-[#F59E0B] text-[#020617]'
-                      : 'text-gray-300 hover:text-[#F59E0B] hover:bg-[#1E293B]'
+                      ? 'bg-gold text-royal-blue-900 shadow-gold-glow'
+                      : 'text-white hover:text-gold hover:bg-white/10'
                   }`}
                 >
                   <span className="mr-2">{link.icon}</span>
@@ -148,7 +153,7 @@ export default function Header() {
               whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="w-full text-left px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full text-left px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoggingOut ? 'Logging out...' : '🚪 Logout'}
             </motion.button>

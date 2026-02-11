@@ -14,6 +14,9 @@ const STREAMING_SERVICES = [
   'Disney+',
   'Prime Video',
   'HBO Max',
+  'Apple TV+',
+  'Paramount+',
+  'Peacock',
 ];
 
 const GENRES = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Random'];
@@ -99,14 +102,14 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#020617] via-[#0F172A] to-[#1E293B]">
+    <div className="min-h-screen bg-animated-gradient">
       <Header />
 
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 content-layer"
       >
         {/* Hero Section */}
         <motion.div
@@ -115,10 +118,10 @@ export default function HomePage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-['Playfair_Display'] font-bold text-[#F59E0B] mb-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-playfair font-bold text-gold mb-4 drop-shadow-lg">
             Discover Your Next Favorite Film
           </h1>
-          <p className="text-lg sm:text-xl text-gray-300">
+          <p className="text-lg sm:text-xl text-gray-800 font-medium">
             AI-powered movie suggestions tailored just for you
           </p>
         </motion.div>
@@ -128,12 +131,12 @@ export default function HomePage() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-[#1E293B] rounded-xl shadow-2xl p-6 md:p-8 mb-8"
+          className="glass-card rounded-xl shadow-card p-6 md:p-8 mb-8"
         >
           <div className="space-y-6">
             {/* Description Input */}
             <div>
-              <label className="block text-[#F59E0B] font-semibold mb-2 text-lg">
+              <label className="block text-royal-blue-900 font-semibold mb-2 text-lg">
                 What kind of movie are you looking for?
               </label>
               <input
@@ -142,7 +145,7 @@ export default function HomePage() {
                 onChange={(e) => setDescription(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="e.g., A thrilling sci-fi adventure with time travel..."
-                className="w-full bg-[#020617] text-white rounded-lg p-4 border-2 border-gray-600 focus:border-[#F59E0B] focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/50 transition-all"
+                className="w-full bg-white/80 text-gray-900 placeholder-gray-500 rounded-lg p-4 border-2 border-gray-300 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/50 transition-all shadow-sm"
               />
             </div>
 
@@ -150,13 +153,13 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Streaming Service */}
               <div>
-                <label className="block text-[#F59E0B] font-semibold mb-2">
+                <label className="block text-royal-blue-900 font-semibold mb-2">
                   Streaming Service
                 </label>
                 <select
                   value={streamingService}
                   onChange={(e) => setStreamingService(e.target.value)}
-                  className="w-full bg-[#020617] text-white rounded-lg p-3 border-2 border-gray-600 focus:border-[#F59E0B] focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/50 transition-all cursor-pointer"
+                  className="w-full bg-white/80 text-gray-900 rounded-lg p-3 border-2 border-gray-300 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/50 transition-all cursor-pointer shadow-sm"
                 >
                   {STREAMING_SERVICES.map((service) => (
                     <option key={service} value={service}>
@@ -168,13 +171,13 @@ export default function HomePage() {
 
               {/* Number of Titles */}
               <div>
-                <label className="block text-[#F59E0B] font-semibold mb-2">
+                <label className="block text-royal-blue-900 font-semibold mb-2">
                   Number of Suggestions
                 </label>
                 <select
                   value={numTitles}
                   onChange={(e) => setNumTitles(Number(e.target.value))}
-                  className="w-full bg-[#020617] text-white rounded-lg p-3 border-2 border-gray-600 focus:border-[#F59E0B] focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/50 transition-all cursor-pointer"
+                  className="w-full bg-white/80 text-gray-900 rounded-lg p-3 border-2 border-gray-300 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/50 transition-all cursor-pointer shadow-sm"
                 >
                   {[1, 2, 3, 4, 5, 6].map((num) => (
                     <option key={num} value={num}>
@@ -191,7 +194,7 @@ export default function HomePage() {
               whileTap={{ scale: 0.98 }}
               onClick={handleGetSuggestions}
               disabled={loading}
-              className="w-full bg-gradient-to-r from-[#F59E0B] to-[#FCD34D] hover:from-[#FCD34D] hover:to-[#F59E0B] text-[#020617] font-bold py-4 px-8 rounded-lg text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              className="w-full btn-blue-gradient font-bold py-4 px-8 rounded-lg text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -231,7 +234,7 @@ export default function HomePage() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mb-8"
         >
-          <h2 className="text-xl sm:text-2xl font-['Playfair_Display'] font-bold text-white mb-4 text-center">
+          <h2 className="text-xl sm:text-2xl font-playfair font-bold text-gray-800 mb-4 text-center">
             Or pick a random movie by genre
           </h2>
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
@@ -242,7 +245,7 @@ export default function HomePage() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleGenreClick(genre)}
                 disabled={loading}
-                className="bg-[#1E293B] hover:bg-[#F59E0B] text-white hover:text-[#020617] font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg border-2 border-[#F59E0B] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px]"
+                className="bg-white/80 backdrop-blur-sm hover:bg-gold text-royal-blue-900 hover:text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg border-2 border-royal-blue-300 hover:border-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px] shadow-md hover:shadow-gold-glow"
               >
                 {genre}
               </motion.button>
@@ -274,7 +277,7 @@ export default function HomePage() {
 
           {!loading && movies.length > 0 && (
             <>
-              <h2 className="text-3xl font-['Playfair_Display'] font-bold text-[#F59E0B] mb-6">
+              <h2 className="text-3xl font-playfair font-bold text-gold mb-6 drop-shadow-md">
                 Your Suggestions
               </h2>
               {movies.map((movie, index) => (
@@ -285,7 +288,7 @@ export default function HomePage() {
 
           {!loading && !error && movies.length === 0 && description && (
             <div className="text-center py-12">
-              <p className="text-gray-400 text-lg">
+              <p className="text-gray-700 text-lg">
                 No results found. Try a different description or genre.
               </p>
             </div>
