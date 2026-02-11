@@ -20,18 +20,18 @@ export interface Movie {
 
 export interface WatchlistItem {
   id: number;
-  movie_title: string;
-  poster_url: string;
+  title: string;
+  poster: string;
   added_date: string;
 }
 
 export interface RatingItem {
   id: number;
-  movie_title: string;
+  title: string;
   poster_url: string;
   review: string;
   rating: number;
-  added_date: string;
+  added_date?: string;
 }
 
 export interface User {

@@ -68,23 +68,24 @@ class ApiService {
   // Watchlist endpoints
   async getWatchlist(): Promise<WatchlistItem[]> {
     const response = await fetch(`${API_BASE_URL}/api/watchlist`);
-    return this.handleResponse(response);
+    const data = await this.handleResponse<{ success: boolean; watchlist: WatchlistItem[] }>(response);
+    return data.watchlist;
   }
 
   async addToWatchlist(movieTitle: string, posterUrl: string): Promise<{ success: boolean; message?: string }> {
     const response = await fetch(`${API_BASE_URL}/api/watchlist/add`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ movie_title: movieTitle, poster_url: posterUrl }),
+      body: JSON.stringify({ title: movieTitle, poster: posterUrl }),
     });
     return this.handleResponse(response);
   }
 
-  async removeFromWatchlist(movieTitle: string): Promise<{ success: boolean; message?: string }> {
+  async removeFromWatchlist(id: number): Promise<{ success: boolean; message?: string }> {
     const response = await fetch(`${API_BASE_URL}/api/watchlist/remove`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ movie_title: movieTitle }),
+      body: JSON.stringify({ id }),
     });
     return this.handleResponse(response);
   }
@@ -92,14 +93,15 @@ class ApiService {
   // Ratings/Watched endpoints
   async getWatchedMovies(): Promise<RatingItem[]> {
     const response = await fetch(`${API_BASE_URL}/api/watched`);
-    return this.handleResponse(response);
+    const data = await this.handleResponse<{ success: boolean; watched_movies: RatingItem[] }>(response);
+    return data.watched_movies;
   }
 
   async addToWatched(movieTitle: string, posterUrl: string, rating: number, review: string): Promise<{ success: boolean; message?: string }> {
     const response = await fetch(`${API_BASE_URL}/api/ratings/add`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ movie_title: movieTitle, poster_url: posterUrl, rating, review }),
+      body: JSON.stringify({ title: movieTitle, poster: posterUrl, rating, review }),
     });
     return this.handleResponse(response);
   }

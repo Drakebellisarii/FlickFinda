@@ -83,10 +83,10 @@ export default function MovieCard({ movie, onWatchlistAdd, onWatchedAdd }: Movie
           <div className="md:w-2/3 p-6 space-y-4">
             {/* Title and Year */}
             <div className="border-b border-[#F59E0B]/20 pb-4">
-              <h2 className="text-3xl md:text-4xl font-['Playfair_Display'] font-bold text-white mb-2">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-['Playfair_Display'] font-bold text-white mb-2">
                 {movie.title}
               </h2>
-              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-300">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-300">
                 <span className="text-[#F59E0B] font-semibold">{movie.year}</span>
                 <span>•</span>
                 <span>{movie.runtime}</span>
@@ -98,29 +98,29 @@ export default function MovieCard({ movie, onWatchlistAdd, onWatchedAdd }: Movie
             </div>
 
             {/* Ratings */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-[#020617] rounded-lg p-3 text-center">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
+              <div className="bg-[#020617] rounded-lg p-2 sm:p-3 text-center">
                 <div className="text-xs text-gray-400 mb-1">IMDb</div>
-                <div className="text-lg font-bold text-[#F59E0B]">
+                <div className="text-sm sm:text-lg font-bold text-[#F59E0B]">
                   {movie.ratings.imdb || 'N/A'}
                 </div>
               </div>
-              <div className="bg-[#020617] rounded-lg p-3 text-center">
-                <div className="text-xs text-gray-400 mb-1">Rotten Tomatoes</div>
-                <div className="text-lg font-bold text-[#F59E0B]">
+              <div className="bg-[#020617] rounded-lg p-2 sm:p-3 text-center">
+                <div className="text-xs text-gray-400 mb-1">RT</div>
+                <div className="text-sm sm:text-lg font-bold text-[#F59E0B]">
                   {movie.ratings['rotten tomatoes'] || 'N/A'}
                 </div>
               </div>
-              <div className="bg-[#020617] rounded-lg p-3 text-center">
-                <div className="text-xs text-gray-400 mb-1">Metacritic</div>
-                <div className="text-lg font-bold text-[#F59E0B]">
+              <div className="bg-[#020617] rounded-lg p-2 sm:p-3 text-center">
+                <div className="text-xs text-gray-400 mb-1">Meta</div>
+                <div className="text-sm sm:text-lg font-bold text-[#F59E0B]">
                   {movie.ratings.metacritic || 'N/A'}
                 </div>
               </div>
             </div>
 
             {/* Director and Actors */}
-            <div className="space-y-2">
+            <div className="space-y-2 text-sm sm:text-base">
               <div>
                 <span className="text-[#F59E0B] font-semibold">Director: </span>
                 <span className="text-gray-300">{movie.director}</span>
@@ -135,7 +135,7 @@ export default function MovieCard({ movie, onWatchlistAdd, onWatchedAdd }: Movie
             <div>
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="text-[#F59E0B] font-semibold mb-2 hover:text-[#FCD34D] transition-colors"
+                className="text-[#F59E0B] font-semibold mb-2 hover:text-[#FCD34D] transition-colors text-sm sm:text-base"
               >
                 {isExpanded ? '▼' : '▶'} Plot & Reviews
               </button>
@@ -173,13 +173,13 @@ export default function MovieCard({ movie, onWatchlistAdd, onWatchedAdd }: Movie
             )}
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap gap-3 pt-4">
+            <div className="flex flex-wrap gap-2 sm:gap-3 pt-4">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleAddToWatchlist}
                 disabled={isAddingToWatchlist}
-                className="flex-1 min-w-[150px] bg-[#F59E0B] hover:bg-[#FCD34D] text-[#020617] font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 min-w-[120px] bg-[#F59E0B] hover:bg-[#FCD34D] text-[#020617] font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px]"
               >
                 {isAddingToWatchlist ? 'Adding...' : '+ Watchlist'}
               </motion.button>
@@ -187,7 +187,7 @@ export default function MovieCard({ movie, onWatchlistAdd, onWatchedAdd }: Movie
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleMarkAsWatched}
-                className="flex-1 min-w-[150px] bg-[#020617] hover:bg-[#1E293B] text-[#F59E0B] font-semibold py-3 px-6 rounded-lg border-2 border-[#F59E0B] transition-colors"
+                className="flex-1 min-w-[120px] bg-[#020617] hover:bg-[#1E293B] text-[#F59E0B] font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg border-2 border-[#F59E0B] transition-colors text-sm sm:text-base min-h-[44px]"
               >
                 ✓ Mark as Watched
               </motion.button>
@@ -196,7 +196,7 @@ export default function MovieCard({ movie, onWatchlistAdd, onWatchedAdd }: Movie
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleWatchTrailer}
-                  className="flex-1 min-w-[150px] bg-gradient-to-r from-[#F59E0B] to-[#FCD34D] hover:from-[#FCD34D] hover:to-[#F59E0B] text-[#020617] font-semibold py-3 px-6 rounded-lg transition-all"
+                  className="flex-1 min-w-[120px] bg-gradient-to-r from-[#F59E0B] to-[#FCD34D] hover:from-[#FCD34D] hover:to-[#F59E0B] text-[#020617] font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all text-sm sm:text-base min-h-[44px]"
                 >
                   🎬 Watch Trailer
                 </motion.button>
