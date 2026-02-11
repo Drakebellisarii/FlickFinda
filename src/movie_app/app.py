@@ -28,12 +28,18 @@ YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(16))
 
-# Database setup
-basedir = os.path.abspath(os.path.dirname(__file__))
-db_path = os.path.join(basedir, 'instance', 'movies.db')
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+# Database setup — use Render's DATABASE_URL (PostgreSQL) if available, else SQLite for local dev
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    # Render provides postgres:// but SQLAlchemy requires postgresql://
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    db_path = os.path.join(basedir, 'instance', 'movies.db')
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 
