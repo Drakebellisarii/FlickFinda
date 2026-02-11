@@ -34,11 +34,12 @@ export default function Header() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className="sticky top-0 z-50 shadow-lg"
+      className="sticky top-0 z-50 shadow-apple-lg"
       style={{
-        background: 'linear-gradient(135deg, #1E3A8A, #3730A3)',
+        background: 'linear-gradient(135deg, #0D1B2A, #0A1929, #000814)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,8 +69,8 @@ export default function Header() {
                   whileTap={{ scale: 0.95 }}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                     isActive(link.path)
-                      ? 'bg-gold text-royal-blue-900 shadow-gold-glow'
-                      : 'text-white hover:text-gold hover:bg-white/10'
+                      ? 'bg-retro-orange text-white shadow-retro-glow'
+                      : 'text-white hover:text-retro-orange hover:bg-white/10'
                   }`}
                 >
                   <span className="mr-2">{link.icon}</span>
@@ -84,7 +85,7 @@ export default function Header() {
               whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="ml-4 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="ml-4 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed border border-red-500/50"
             >
               {isLoggingOut ? 'Logging out...' : '🚪 Logout'}
             </motion.button>
@@ -93,7 +94,7 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-white p-2 hover:text-gold transition-colors"
+            className="md:hidden text-white p-2 hover:text-retro-orange transition-colors"
           >
             <svg
               className="w-6 h-6"
@@ -138,8 +139,8 @@ export default function Header() {
                   whileTap={{ scale: 0.95 }}
                   className={`block px-4 py-2 rounded-lg font-semibold transition-all ${
                     isActive(link.path)
-                      ? 'bg-gold text-royal-blue-900 shadow-gold-glow'
-                      : 'text-white hover:text-gold hover:bg-white/10'
+                      ? 'bg-retro-orange text-white shadow-retro-glow'
+                      : 'text-white hover:text-retro-orange hover:bg-white/10'
                   }`}
                 >
                   <span className="mr-2">{link.icon}</span>
@@ -153,7 +154,7 @@ export default function Header() {
               whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="w-full text-left px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full text-left px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed border border-red-500/50"
             >
               {isLoggingOut ? 'Logging out...' : '🚪 Logout'}
             </motion.button>

@@ -83,7 +83,7 @@ export default function RatingsPage() {
           <span
             key={index}
             className={`text-lg ${
-              index < rating ? 'text-gold' : 'text-gray-400'
+              index < rating ? 'text-retro-orange' : 'text-apple-gray-400'
             }`}
           >
             ★
@@ -110,10 +110,10 @@ export default function RatingsPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-playfair font-bold text-gold mb-4 drop-shadow-lg">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-playfair font-bold text-gold mb-4 drop-shadow-2xl">
             My Ratings
           </h1>
-          <p className="text-lg sm:text-xl text-gray-800 font-medium">
+          <p className="text-lg sm:text-xl text-white font-medium">
             Movies you've watched and rated
           </p>
         </motion.div>
@@ -149,7 +149,7 @@ export default function RatingsPage() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              <p className="text-gray-800 text-lg font-medium">Loading your ratings...</p>
+              <p className="text-white text-lg font-medium">Loading your ratings...</p>
             </div>
           </div>
         )}
@@ -163,17 +163,17 @@ export default function RatingsPage() {
             className="text-center py-20"
           >
             <div className="text-8xl mb-6">⭐</div>
-            <h2 className="text-3xl font-playfair font-bold text-royal-blue-900 mb-4">
+            <h2 className="text-3xl font-playfair font-bold text-gold mb-4">
               No Ratings Yet
             </h2>
-            <p className="text-gray-700 text-lg mb-8">
+            <p className="text-white text-lg mb-8">
               Start watching and rating movies!
             </p>
             <motion.a
               href="/"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-block btn-blue-gradient font-bold py-3 px-8 rounded-lg transition-all shadow-lg"
+              className="inline-block btn-cinema-gradient font-bold py-3 px-8 rounded-lg transition-all shadow-apple-lg"
             >
               Discover Movies
             </motion.a>
@@ -195,7 +195,7 @@ export default function RatingsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 whileHover={{ y: -8, scale: 1.02 }}
-                className="glass-card rounded-lg overflow-hidden shadow-card hover:shadow-gold-glow transition-all"
+                className="glass-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all border border-gold/30"
               >
                 <div className="flex gap-3 sm:gap-4 p-3 sm:p-4">
                   {/* Movie Poster */}
@@ -203,7 +203,7 @@ export default function RatingsPage() {
                     <img
                       src={item.poster_url}
                       alt={item.title}
-                      className="w-full h-28 sm:h-36 md:h-48 object-cover rounded-lg border-2 border-gold/20"
+                      className="w-full h-28 sm:h-36 md:h-48 object-cover rounded-lg border-2 border-gold/30"
                       onError={(e) => {
                         e.currentTarget.src = 'https://via.placeholder.com/150x225?text=No+Poster';
                       }}
@@ -212,25 +212,25 @@ export default function RatingsPage() {
 
                   {/* Movie Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg md:text-xl font-playfair font-bold text-royal-blue-900 mb-2 line-clamp-2">
+                    <h3 className="text-base sm:text-lg md:text-xl font-playfair font-bold text-cinema-navy-950 mb-2 line-clamp-2">
                       {item.title}
                     </h3>
 
                     {/* Rating Stars */}
                     <div className="mb-2">{renderStars(item.rating)}</div>
-                    <p className="text-gold font-semibold text-sm mb-2">
+                    <p className="text-retro-orange font-semibold text-sm mb-2">
                       {item.rating}/10
                     </p>
 
                     {/* Review */}
                     {item.review && (
-                      <p className="text-gray-700 text-sm mb-2 line-clamp-3">
+                      <p className="text-apple-gray-700 text-sm mb-2 line-clamp-3">
                         "{item.review}"
                       </p>
                     )}
 
                     {item.added_date && (
-                      <p className="text-gray-600 text-xs mb-3">
+                      <p className="text-apple-gray-600 text-xs mb-3">
                         Watched {new Date(item.added_date).toLocaleDateString()}
                       </p>
                     )}
@@ -241,7 +241,7 @@ export default function RatingsPage() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleEditClick(item)}
-                        className="flex-1 min-w-[80px] btn-blue-gradient font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm transition-all min-h-[44px]"
+                        className="flex-1 min-w-[80px] btn-cinema-gradient font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm transition-all min-h-[44px]"
                       >
                         ✏️ Edit
                       </motion.button>
@@ -250,7 +250,7 @@ export default function RatingsPage() {
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleDelete(item.id)}
                         disabled={deletingId === item.id}
-                        className="flex-1 min-w-[80px] bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] shadow-lg"
+                        className="flex-1 min-w-[80px] bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] shadow-lg border border-red-500/50"
                       >
                         {deletingId === item.id ? (
                           <span className="flex items-center justify-center gap-1">
@@ -294,7 +294,7 @@ export default function RatingsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-center mt-8 text-gray-700 font-medium"
+            className="text-center mt-8 text-white font-medium"
           >
             {ratings.length} {ratings.length === 1 ? 'movie' : 'movies'} rated
           </motion.div>
@@ -306,23 +306,23 @@ export default function RatingsPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4"
           onClick={() => setEditingItem(null)}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="glass-card rounded-lg p-6 max-w-md w-full shadow-card"
+            className="glass-card rounded-xl p-6 max-w-md w-full shadow-apple-lg border border-gold/30"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-2xl font-playfair font-bold text-royal-blue-900 mb-4">
+            <h3 className="text-2xl font-playfair font-bold text-cinema-navy-950 mb-4">
               Edit Rating for {editingItem.title}
             </h3>
 
             <div className="space-y-4">
               {/* Rating Slider */}
               <div>
-                <label className="block text-royal-blue-900 font-semibold mb-2">
+                <label className="block text-cinema-navy-900 font-semibold mb-2">
                   Rating: {editRating}/10
                 </label>
                 <input
@@ -331,9 +331,9 @@ export default function RatingsPage() {
                   max="10"
                   value={editRating}
                   onChange={(e) => setEditRating(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gold"
+                  className="w-full h-2 bg-apple-gray-200 rounded-lg appearance-none cursor-pointer accent-retro-orange"
                 />
-                <div className="flex justify-between text-xs text-gray-600 mt-1">
+                <div className="flex justify-between text-xs text-apple-gray-600 mt-1">
                   <span>1</span>
                   <span>5</span>
                   <span>10</span>
@@ -343,14 +343,14 @@ export default function RatingsPage() {
 
               {/* Review Textarea */}
               <div>
-                <label className="block text-royal-blue-900 font-semibold mb-2">
+                <label className="block text-cinema-navy-900 font-semibold mb-2">
                   Review (Optional)
                 </label>
                 <textarea
                   value={editReview}
                   onChange={(e) => setEditReview(e.target.value)}
                   placeholder="Share your thoughts..."
-                  className="w-full bg-white/80 text-gray-900 placeholder-gray-500 rounded-lg p-3 min-h-[100px] border-2 border-gray-300 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/50"
+                  className="w-full bg-white/90 text-apple-gray-900 placeholder-apple-gray-500 rounded-lg p-3 min-h-[100px] border-2 border-apple-gray-300 focus:border-retro-orange focus:outline-none focus:ring-2 focus:ring-retro-orange/50"
                 />
               </div>
 
@@ -358,14 +358,14 @@ export default function RatingsPage() {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => setEditingItem(null)}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors"
+                  className="flex-1 bg-apple-gray-300 hover:bg-apple-gray-400 text-apple-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleEditSubmit}
                   disabled={isSubmitting}
-                  className="flex-1 btn-blue-gradient font-semibold py-2 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 btn-cinema-gradient font-semibold py-2 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Saving...' : 'Save Changes'}
                 </button>

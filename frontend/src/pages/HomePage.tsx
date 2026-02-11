@@ -118,10 +118,10 @@ export default function HomePage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-playfair font-bold text-gold mb-4 drop-shadow-lg">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-playfair font-bold text-gold mb-4 drop-shadow-2xl">
             Discover Your Next Favorite Film
           </h1>
-          <p className="text-lg sm:text-xl text-gray-800 font-medium">
+          <p className="text-lg sm:text-xl text-white font-medium">
             AI-powered movie suggestions tailored just for you
           </p>
         </motion.div>
@@ -131,12 +131,12 @@ export default function HomePage() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="glass-card rounded-xl shadow-card p-6 md:p-8 mb-8"
+          className="glass-card rounded-xl shadow-apple-lg p-6 md:p-8 mb-8 border border-gold/30"
         >
           <div className="space-y-6">
             {/* Description Input */}
             <div>
-              <label className="block text-royal-blue-900 font-semibold mb-2 text-lg">
+              <label className="block text-cinema-navy-950 font-semibold mb-2 text-lg">
                 What kind of movie are you looking for?
               </label>
               <input
@@ -145,7 +145,7 @@ export default function HomePage() {
                 onChange={(e) => setDescription(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="e.g., A thrilling sci-fi adventure with time travel..."
-                className="w-full bg-white/80 text-gray-900 placeholder-gray-500 rounded-lg p-4 border-2 border-gray-300 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/50 transition-all shadow-sm"
+                className="w-full bg-white/90 text-apple-gray-900 placeholder-apple-gray-500 rounded-lg p-4 border-2 border-apple-gray-300 focus:border-retro-orange focus:outline-none focus:ring-2 focus:ring-retro-orange/50 transition-all shadow-apple"
               />
             </div>
 
@@ -153,13 +153,13 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Streaming Service */}
               <div>
-                <label className="block text-royal-blue-900 font-semibold mb-2">
+                <label className="block text-cinema-navy-950 font-semibold mb-2">
                   Streaming Service
                 </label>
                 <select
                   value={streamingService}
                   onChange={(e) => setStreamingService(e.target.value)}
-                  className="w-full bg-white/80 text-gray-900 rounded-lg p-3 border-2 border-gray-300 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/50 transition-all cursor-pointer shadow-sm"
+                  className="w-full bg-white/90 text-apple-gray-900 rounded-lg p-3 border-2 border-apple-gray-300 focus:border-retro-orange focus:outline-none focus:ring-2 focus:ring-retro-orange/50 transition-all cursor-pointer shadow-apple"
                 >
                   {STREAMING_SERVICES.map((service) => (
                     <option key={service} value={service}>
@@ -171,13 +171,13 @@ export default function HomePage() {
 
               {/* Number of Titles */}
               <div>
-                <label className="block text-royal-blue-900 font-semibold mb-2">
+                <label className="block text-cinema-navy-950 font-semibold mb-2">
                   Number of Suggestions
                 </label>
                 <select
                   value={numTitles}
                   onChange={(e) => setNumTitles(Number(e.target.value))}
-                  className="w-full bg-white/80 text-gray-900 rounded-lg p-3 border-2 border-gray-300 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/50 transition-all cursor-pointer shadow-sm"
+                  className="w-full bg-white/90 text-apple-gray-900 rounded-lg p-3 border-2 border-apple-gray-300 focus:border-retro-orange focus:outline-none focus:ring-2 focus:ring-retro-orange/50 transition-all cursor-pointer shadow-apple"
                 >
                   {[1, 2, 3, 4, 5, 6].map((num) => (
                     <option key={num} value={num}>
@@ -194,7 +194,7 @@ export default function HomePage() {
               whileTap={{ scale: 0.98 }}
               onClick={handleGetSuggestions}
               disabled={loading}
-              className="w-full btn-blue-gradient font-bold py-4 px-8 rounded-lg text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              className="w-full btn-cinema-gradient font-bold py-4 px-8 rounded-lg text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-apple-lg"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -234,7 +234,7 @@ export default function HomePage() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mb-8"
         >
-          <h2 className="text-xl sm:text-2xl font-playfair font-bold text-gray-800 mb-4 text-center">
+          <h2 className="text-xl sm:text-2xl font-playfair font-bold text-white mb-4 text-center">
             Or pick a random movie by genre
           </h2>
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
@@ -245,7 +245,7 @@ export default function HomePage() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleGenreClick(genre)}
                 disabled={loading}
-                className="bg-white/80 backdrop-blur-sm hover:bg-gold text-royal-blue-900 hover:text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg border-2 border-royal-blue-300 hover:border-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px] shadow-md hover:shadow-gold-glow"
+                className="bg-white/90 backdrop-blur-sm hover:bg-retro-orange text-cinema-navy-900 hover:text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg border-2 border-cinema-navy-300 hover:border-retro-orange transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px] shadow-apple hover:shadow-retro-glow"
               >
                 {genre}
               </motion.button>
@@ -288,7 +288,7 @@ export default function HomePage() {
 
           {!loading && !error && movies.length === 0 && description && (
             <div className="text-center py-12">
-              <p className="text-gray-700 text-lg">
+              <p className="text-white text-lg">
                 No results found. Try a different description or genre.
               </p>
             </div>
