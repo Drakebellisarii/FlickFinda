@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, redirect, Response
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from openai import OpenAI
 import os
 import random
@@ -35,7 +35,7 @@ os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['PERMANENT_SESSION_LIFETIME'] = 60 * 60 * 24 * 31  # 31 days
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
