@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, redirect, Response
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from openai import OpenAI
 import os
 import random
@@ -26,15 +26,22 @@ OMDB_API_KEY = os.getenv('OMDB_API_KEY')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 
-app.secret_key = secrets.token_hex(16)
+app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(16))
 
-# Database setup
-basedir = os.path.abspath(os.path.dirname(__file__))
-db_path = os.path.join(basedir, 'instance', 'movies.db')
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+# Database setup — use Render's DATABASE_URL (PostgreSQL) if available, else SQLite for local dev
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    # Render provides postgres:// but SQLAlchemy requires postgresql://
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    db_path = os.path.join(basedir, 'instance', 'movies.db')
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -194,6 +201,7 @@ def register():
         db.session.commit()
         
         # Set up session
+        session.permanent = True
         session['user_id'] = new_user.id
         session['username'] = new_user.username
         
@@ -229,6 +237,7 @@ def login():
             return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
             
         # Set up session 
+        session.permanent = True
         print(f"Setting session for user_id: {user.id}")
         session['user_id'] = user.id
         session['username'] = user.username
@@ -883,6 +892,7 @@ def guest_login():
     """Create a guest session with limited functionality"""
     try:
         # Create a temporary guest session
+        session.permanent = True
         session['is_guest'] = True
         session['username'] = 'Guest'
         

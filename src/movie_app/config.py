@@ -3,10 +3,8 @@ import os
 from datetime import timedelta
 
 class Config:
-    # Generate a random secret key
-    SECRET_KEY = os.urandom(24)
-    # Or use a fixed secret key (for development only)
-    # SECRET_KEY = 'your-super-secret-key-here'  
+    # Use a stable secret key from environment (required for session persistence in production)
+    SECRET_KEY = os.environ.get('SECRET_KEY', os.urandom(24))
     
     # Database configuration
     SQLALCHEMY_DATABASE_URI = 'sqlite:///movies.db'
