@@ -36,10 +36,10 @@ export default function Header() {
       transition={{ duration: 0.5 }}
       className="sticky top-0 z-50 shadow-apple-lg"
       style={{
-        background: 'linear-gradient(135deg, #0D1B2A, #0A1929, #000814)',
+        background: 'linear-gradient(135deg, #1E3A8A 0%, #3730A3 100%)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+        borderBottom: '2px solid rgba(245, 158, 11, 0.3)',
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -69,8 +69,8 @@ export default function Header() {
                   whileTap={{ scale: 0.95 }}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                     isActive(link.path)
-                      ? 'bg-retro-orange text-white shadow-retro-glow'
-                      : 'text-white hover:text-retro-orange hover:bg-white/10'
+                      ? 'bg-gold text-cinema-navy-950 shadow-gold-glow'
+                      : 'text-white hover:text-gold hover:bg-white/10'
                   }`}
                 >
                   <span className="mr-2">{link.icon}</span>
@@ -94,7 +94,7 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-white p-2 hover:text-retro-orange transition-colors"
+            className="md:hidden text-white p-2 hover:text-gold transition-colors"
           >
             <svg
               className="w-6 h-6"
@@ -139,8 +139,8 @@ export default function Header() {
                   whileTap={{ scale: 0.95 }}
                   className={`block px-4 py-2 rounded-lg font-semibold transition-all ${
                     isActive(link.path)
-                      ? 'bg-retro-orange text-white shadow-retro-glow'
-                      : 'text-white hover:text-retro-orange hover:bg-white/10'
+                      ? 'bg-gold text-cinema-navy-950 shadow-gold-glow'
+                      : 'text-white hover:text-gold hover:bg-white/10'
                   }`}
                 >
                   <span className="mr-2">{link.icon}</span>

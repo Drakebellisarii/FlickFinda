@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
+import { CurtainTransition } from './components';
 import HomePage from './pages/HomePage';
 import WatchlistPage from './pages/WatchlistPage';
 import RatingsPage from './pages/RatingsPage';
@@ -9,8 +10,8 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-navy-bg via-dark-navy to-navy-bg flex items-center justify-center">
-        <div className="text-gold text-2xl font-playfair animate-pulse">
+      <div className="min-h-screen bg-cinema-gradient flex items-center justify-center">
+        <div className="text-cinema-navy text-2xl font-playfair animate-pulse">
           FlickFinda
         </div>
       </div>
@@ -25,7 +26,8 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-navy-bg via-dark-navy to-navy-bg">
+      <CurtainTransition />
+      <div className="min-h-screen bg-animated-gradient">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/watchlist" element={<WatchlistPage />} />

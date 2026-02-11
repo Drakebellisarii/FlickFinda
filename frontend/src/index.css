@@ -19,34 +19,47 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background: #0A1929;
+  background: linear-gradient(135deg, 
+    #FFFFFF 0%,
+    #F8FAFC 15%,
+    #E2E8F0 30%,
+    #CBD5E1 45%,
+    #94A3B8 60%,
+    #64748B 75%,
+    #0F172A 90%,
+    #0B1426 100%);
 }
 
 * {
   box-sizing: border-box;
 }
 
-/* Navy vintage cinema gradient background */
+/* Light cinema gradient background matching HTML templates */
 @layer utilities {
   .bg-cinema-gradient {
     background: linear-gradient(135deg, 
-      #000814 0%,
-      #0D1B2A 20%, 
-      #0A1929 40%, 
-      #0D1B2A 60%,
-      #000814 80%,
-      #000000 100%);
+      #FFFFFF 0%,
+      #F8FAFC 15%,
+      #E2E8F0 30%,
+      #CBD5E1 45%,
+      #94A3B8 60%,
+      #64748B 75%,
+      #0F172A 90%,
+      #0B1426 100%);
     position: relative;
   }
 
   .bg-animated-gradient {
     position: relative;
     background: linear-gradient(135deg, 
-      #000814 0%,
-      #0D1B2A 25%, 
-      #0A1929 50%, 
-      #0D1B2A 75%,
-      #000814 100%);
+      #FFFFFF 0%,
+      #F8FAFC 15%,
+      #E2E8F0 30%,
+      #CBD5E1 45%,
+      #94A3B8 60%,
+      #64748B 75%,
+      #0F172A 90%,
+      #0B1426 100%);
   }
 
   .bg-animated-gradient::before {
@@ -57,10 +70,10 @@ body {
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(circle at 20% 80%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.06) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(255, 107, 53, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 60% 60%, rgba(10, 25, 41, 0.08) 0%, transparent 50%);
+      radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 60% 60%, rgba(30, 58, 138, 0.06) 0%, transparent 50%);
     animation: backgroundFloat 25s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
@@ -74,9 +87,9 @@ body {
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(circle at 10% 90%, rgba(212, 175, 55, 0.04) 0%, transparent 40%),
-      radial-gradient(circle at 90% 10%, rgba(255, 140, 97, 0.03) 0%, transparent 40%),
-      radial-gradient(circle at 50% 50%, rgba(10, 25, 41, 0.05) 0%, transparent 60%);
+      radial-gradient(circle at 10% 90%, rgba(245, 158, 11, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.03) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(30, 58, 138, 0.05) 0%, transparent 60%);
     animation: backgroundFloat2 30s ease-in-out infinite reverse;
     pointer-events: none;
     z-index: 0;
@@ -140,14 +153,14 @@ body {
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
-  /* Navy blue gradient button with retro orange sweep */
+  /* Navy/Gold button matching HTML templates */
   .btn-cinema-gradient {
-    background: linear-gradient(135deg, #0D1B2A, #1565C0, #0A1929);
+    background: linear-gradient(135deg, #1E3A8A, #3730A3);
     color: white;
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    border: 1px solid rgba(245, 158, 11, 0.3);
   }
 
   .btn-cinema-gradient::before {
@@ -157,7 +170,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.4), transparent);
     transition: left 0.5s ease;
   }
 
@@ -166,18 +179,18 @@ body {
   }
 
   .btn-cinema-gradient:hover {
-    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
-    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+    border-color: rgba(245, 158, 11, 0.5);
   }
 
-  /* Retro orange accent button */
+  /* Gold accent button matching HTML templates */
   .btn-retro-orange {
-    background: linear-gradient(135deg, #FF6B35, #E6551F);
-    color: white;
+    background: linear-gradient(135deg, #F59E0B, #FBBF24);
+    color: #1E3A8A;
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    border: 1px solid rgba(30, 58, 138, 0.3);
   }
 
   .btn-retro-orange::before {
@@ -187,7 +200,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     transition: left 0.5s ease;
   }
 
@@ -196,7 +209,7 @@ body {
   }
 
   .btn-retro-orange:hover {
-    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.5);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
     transform: translateY(-1px);
   }
 
@@ -204,5 +217,59 @@ body {
   .content-layer {
     position: relative;
     z-index: 1;
+  }
+
+  /* Curtain transition animation from HTML templates */
+  .curtain-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .curtain {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    background-image:
+      linear-gradient(90deg,
+        rgba(0,0,0,0.3) 0%,
+        rgba(0,0,0,0) 10%,
+        rgba(0,0,0,0.3) 20%),
+      linear-gradient(180deg, #1E3A8A, #0F172A);
+    transition: transform 1s cubic-bezier(0.86, 0, 0.07, 1);
+  }
+
+  .curtain-left {
+    left: 0;
+    transform: translateX(-100%);
+    border-right: 4px solid #F59E0B;
+  }
+
+  .curtain-right {
+    right: 0;
+    transform: translateX(100%);
+    border-left: 4px solid #F59E0B;
+  }
+
+  .curtain::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0.1) 0px,
+        rgba(0,0,0,0.1) 1px,
+        transparent 1px,
+        transparent 10px
+      );
   }
 }

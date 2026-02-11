@@ -132,7 +132,7 @@ export default function LoadingSkeleton() {
                   ease: 'easeInOut',
                   delay: i * 0.1,
                 }}
-                className="flex-1 min-w-[150px] bg-royal-blue-500/50 h-12 rounded-lg"
+                className="flex-1 min-w-[150px] bg-cinema-navy/50 h-12 rounded-lg"
               />
             ))}
           </div>
