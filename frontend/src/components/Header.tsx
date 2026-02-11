@@ -69,7 +69,7 @@ export default function Header() {
                   whileTap={{ scale: 0.95 }}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                     isActive(link.path)
-                      ? 'bg-gold text-cinema-navy shadow-gold-glow'
+                      ? 'bg-gold text-cinema-navy-950 shadow-gold-glow'
                       : 'text-white hover:text-gold hover:bg-white/10'
                   }`}
                 >
@@ -139,7 +139,7 @@ export default function Header() {
                   whileTap={{ scale: 0.95 }}
                   className={`block px-4 py-2 rounded-lg font-semibold transition-all ${
                     isActive(link.path)
-                      ? 'bg-gold text-cinema-navy shadow-gold-glow'
+                      ? 'bg-gold text-cinema-navy-950 shadow-gold-glow'
                       : 'text-white hover:text-gold hover:bg-white/10'
                   }`}
                 >

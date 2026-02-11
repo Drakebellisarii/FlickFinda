@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+const CURTAIN_OPEN_DELAY = 100; // Delay before opening curtains for smooth page load effect
+
 export default function CurtainTransition() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -7,10 +9,10 @@ export default function CurtainTransition() {
     // Start with curtains closed
     setIsOpen(false);
     
-    // Open curtains after a brief delay
+    // Open curtains after a brief delay to allow page content to render
     const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 100);
+    }, CURTAIN_OPEN_DELAY);
 
     return () => clearTimeout(timer);
   }, []);
