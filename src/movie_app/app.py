@@ -16,7 +16,7 @@ from flask import session
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-app = Flask(__name__, static_folder='../../static', static_url_path='/static')
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 # Loading env vars
 load_dotenv()
@@ -940,4 +940,5 @@ def get_saved_movies():
         }), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
