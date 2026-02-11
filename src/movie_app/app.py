@@ -26,7 +26,7 @@ OMDB_API_KEY = os.getenv('OMDB_API_KEY')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 
-app.secret_key = secrets.token_hex(16)
+app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(16))
 
 # Database setup
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -35,6 +35,7 @@ os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = 60 * 60 * 24 * 31  # 31 days
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -194,6 +195,7 @@ def register():
         db.session.commit()
         
         # Set up session
+        session.permanent = True
         session['user_id'] = new_user.id
         session['username'] = new_user.username
         
@@ -229,6 +231,7 @@ def login():
             return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
             
         # Set up session 
+        session.permanent = True
         print(f"Setting session for user_id: {user.id}")
         session['user_id'] = user.id
         session['username'] = user.username
@@ -883,6 +886,7 @@ def guest_login():
     """Create a guest session with limited functionality"""
     try:
         # Create a temporary guest session
+        session.permanent = True
         session['is_guest'] = True
         session['username'] = 'Guest'
         
