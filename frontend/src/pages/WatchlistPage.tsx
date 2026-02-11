@@ -60,10 +60,10 @@ export default function WatchlistPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl md:text-6xl font-['Playfair_Display'] font-bold text-[#F59E0B] mb-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-['Playfair_Display'] font-bold text-[#F59E0B] mb-4">
             My Watchlist
           </h1>
-          <p className="text-xl text-gray-300">
+          <p className="text-lg sm:text-xl text-gray-300">
             Movies you want to watch later
           </p>
         </motion.div>
@@ -136,7 +136,7 @@ export default function WatchlistPage() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6"
           >
             {watchlist.map((item, index) => (
               <motion.div
@@ -161,11 +161,11 @@ export default function WatchlistPage() {
                 </div>
 
                 {/* Movie Info */}
-                <div className="p-4">
-                  <h3 className="text-xl font-['Playfair_Display'] font-bold text-white mb-2 line-clamp-2">
+                <div className="p-3 sm:p-4">
+                  <h3 className="text-base sm:text-lg md:text-xl font-['Playfair_Display'] font-bold text-white mb-2 line-clamp-2">
                     {item.title}
                   </h3>
-                  <p className="text-gray-400 text-sm mb-4">
+                  <p className="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4">
                     Added {new Date(item.added_date).toLocaleDateString()}
                   </p>
 
@@ -175,7 +175,7 @@ export default function WatchlistPage() {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleRemove(item.id)}
                     disabled={removingId === item.id}
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm min-h-[44px]"
                   >
                     {removingId === item.id ? (
                       <span className="flex items-center justify-center gap-2">

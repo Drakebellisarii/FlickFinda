@@ -115,10 +115,10 @@ export default function HomePage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl md:text-6xl font-['Playfair_Display'] font-bold text-[#F59E0B] mb-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-['Playfair_Display'] font-bold text-[#F59E0B] mb-4">
             Discover Your Next Favorite Film
           </h1>
-          <p className="text-xl text-gray-300">
+          <p className="text-lg sm:text-xl text-gray-300">
             AI-powered movie suggestions tailored just for you
           </p>
         </motion.div>
@@ -231,10 +231,10 @@ export default function HomePage() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mb-8"
         >
-          <h2 className="text-2xl font-['Playfair_Display'] font-bold text-white mb-4 text-center">
+          <h2 className="text-xl sm:text-2xl font-['Playfair_Display'] font-bold text-white mb-4 text-center">
             Or pick a random movie by genre
           </h2>
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
             {GENRES.map((genre) => (
               <motion.button
                 key={genre}
@@ -242,7 +242,7 @@ export default function HomePage() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleGenreClick(genre)}
                 disabled={loading}
-                className="bg-[#1E293B] hover:bg-[#F59E0B] text-white hover:text-[#020617] font-semibold py-3 px-6 rounded-lg border-2 border-[#F59E0B] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-[#1E293B] hover:bg-[#F59E0B] text-white hover:text-[#020617] font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg border-2 border-[#F59E0B] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px]"
               >
                 {genre}
               </motion.button>

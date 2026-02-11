@@ -110,10 +110,10 @@ export default function RatingsPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl md:text-6xl font-['Playfair_Display'] font-bold text-[#F59E0B] mb-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-['Playfair_Display'] font-bold text-[#F59E0B] mb-4">
             My Ratings
           </h1>
-          <p className="text-xl text-gray-300">
+          <p className="text-lg sm:text-xl text-gray-300">
             Movies you've watched and rated
           </p>
         </motion.div>
@@ -186,7 +186,7 @@ export default function RatingsPage() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
           >
             {ratings.map((item, index) => (
               <motion.div
@@ -197,13 +197,13 @@ export default function RatingsPage() {
                 whileHover={{ y: -8, scale: 1.02 }}
                 className="bg-[#1E293B] rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all"
               >
-                <div className="flex gap-4 p-4">
+                <div className="flex gap-3 sm:gap-4 p-3 sm:p-4">
                   {/* Movie Poster */}
-                  <div className="flex-shrink-0 w-24 sm:w-32">
+                  <div className="flex-shrink-0 w-20 sm:w-24 md:w-32">
                     <img
                       src={item.poster_url}
                       alt={item.title}
-                      className="w-full h-36 sm:h-48 object-cover rounded-lg"
+                      className="w-full h-28 sm:h-36 md:h-48 object-cover rounded-lg"
                       onError={(e) => {
                         e.currentTarget.src = 'https://via.placeholder.com/150x225?text=No+Poster';
                       }}
@@ -212,7 +212,7 @@ export default function RatingsPage() {
 
                   {/* Movie Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg sm:text-xl font-['Playfair_Display'] font-bold text-white mb-2 line-clamp-2">
+                    <h3 className="text-base sm:text-lg md:text-xl font-['Playfair_Display'] font-bold text-white mb-2 line-clamp-2">
                       {item.title}
                     </h3>
 
@@ -236,12 +236,12 @@ export default function RatingsPage() {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleEditClick(item)}
-                        className="flex-1 bg-[#F59E0B] hover:bg-[#FCD34D] text-[#020617] font-semibold py-2 px-3 rounded-lg text-sm transition-colors"
+                        className="flex-1 min-w-[80px] bg-[#F59E0B] hover:bg-[#FCD34D] text-[#020617] font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm transition-colors min-h-[44px]"
                       >
                         ✏️ Edit
                       </motion.button>
@@ -250,7 +250,7 @@ export default function RatingsPage() {
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleDelete(item.id)}
                         disabled={deletingId === item.id}
-                        className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 min-w-[80px] bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
                       >
                         {deletingId === item.id ? (
                           <span className="flex items-center justify-center gap-1">
@@ -316,7 +316,7 @@ export default function RatingsPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-2xl font-['Playfair_Display'] font-bold text-white mb-4">
-              Edit Rating for {editingItem.movie_title}
+              Edit Rating for {editingItem.title}
             </h3>
 
             <div className="space-y-4">
