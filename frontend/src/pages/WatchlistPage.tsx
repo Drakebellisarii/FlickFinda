@@ -29,12 +29,12 @@ export default function WatchlistPage() {
     }
   };
 
-  const handleRemove = async (movieTitle: string, id: number) => {
+  const handleRemove = async (id: number) => {
     setRemovingId(id);
     setError(null);
 
     try {
-      await apiService.removeFromWatchlist(movieTitle);
+      await apiService.removeFromWatchlist(id);
       setWatchlist((prev) => prev.filter((item) => item.id !== id));
     } catch (err: any) {
       setError(err.message || err.error || 'Failed to remove from watchlist');
@@ -150,8 +150,8 @@ export default function WatchlistPage() {
                 {/* Movie Poster */}
                 <div className="relative">
                   <img
-                    src={item.poster_url}
-                    alt={item.movie_title}
+                    src={item.poster}
+                    alt={item.title}
                     className="w-full h-[400px] object-cover"
                     onError={(e) => {
                       e.currentTarget.src = 'https://via.placeholder.com/300x450?text=No+Poster';
@@ -163,7 +163,7 @@ export default function WatchlistPage() {
                 {/* Movie Info */}
                 <div className="p-4">
                   <h3 className="text-xl font-['Playfair_Display'] font-bold text-white mb-2 line-clamp-2">
-                    {item.movie_title}
+                    {item.title}
                   </h3>
                   <p className="text-gray-400 text-sm mb-4">
                     Added {new Date(item.added_date).toLocaleDateString()}
@@ -173,7 +173,7 @@ export default function WatchlistPage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleRemove(item.movie_title, item.id)}
+                    onClick={() => handleRemove(item.id)}
                     disabled={removingId === item.id}
                     className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >

@@ -202,7 +202,7 @@ export default function RatingsPage() {
                   <div className="flex-shrink-0 w-24 sm:w-32">
                     <img
                       src={item.poster_url}
-                      alt={item.movie_title}
+                      alt={item.title}
                       className="w-full h-36 sm:h-48 object-cover rounded-lg"
                       onError={(e) => {
                         e.currentTarget.src = 'https://via.placeholder.com/150x225?text=No+Poster';
@@ -213,7 +213,7 @@ export default function RatingsPage() {
                   {/* Movie Info */}
                   <div className="flex-1 min-w-0">
                     <h3 className="text-lg sm:text-xl font-['Playfair_Display'] font-bold text-white mb-2 line-clamp-2">
-                      {item.movie_title}
+                      {item.title}
                     </h3>
 
                     {/* Rating Stars */}
@@ -229,9 +229,11 @@ export default function RatingsPage() {
                       </p>
                     )}
 
-                    <p className="text-gray-400 text-xs mb-3">
-                      Watched {new Date(item.added_date).toLocaleDateString()}
-                    </p>
+                    {item.added_date && (
+                      <p className="text-gray-400 text-xs mb-3">
+                        Watched {new Date(item.added_date).toLocaleDateString()}
+                      </p>
+                    )}
 
                     {/* Action Buttons */}
                     <div className="flex gap-2">

@@ -431,7 +431,8 @@ def get_watched_movies():
                 'title': m.movie_title,
                 'poster_url': m.poster_url,
                 'review': m.review,
-                'rating': m.rating
+                'rating': m.rating,
+                'added_date': m.added_date.isoformat() if m.added_date else None
             } for m in movies if m.poster_url and m.poster_url.strip() and m.poster_url != 'N/A']
         })
     except Exception as e:
@@ -473,6 +474,13 @@ def serve_react_app():
     from flask import send_from_directory
     dist_path = os.path.join(app.static_folder, 'dist')
     return send_from_directory(dist_path, 'index.html')
+
+@app.route('/assets/<path:filename>')
+def serve_assets(filename):
+    """Serve Vite-built assets (JS, CSS, etc.)"""
+    from flask import send_from_directory
+    assets_path = os.path.join(app.static_folder, 'dist', 'assets')
+    return send_from_directory(assets_path, filename)
 
 # Simple cache for OMDB API responses with TTL
 from time import time
@@ -580,9 +588,7 @@ def get_reviews_and_ratings():
             return jsonify({'error': str(e)})
     return jsonify({'error': 'No movie provided'})
 
-@app.route('/watchlist')
-def watchlist():
-    return render_template('watchlist.html')
+
 
 @app.route('/get_trailer', methods=['GET'])
 def get_trailer():
@@ -948,6 +954,15 @@ def get_saved_movies():
             'success': False,
             'message': f'Error fetching saved movies: {str(e)}'
         }), 500
+
+# Catch-all route for React Router (must be last)
+@app.route('/<path:path>')
+def catch_all(path):
+    """Catch-all route to serve React SPA for authenticated users"""
+    # Only serve SPA for authenticated users, otherwise redirect to login
+    if 'user_id' in session or 'is_guest' in session:
+        return serve_react_app()
+    return redirect('/login')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
