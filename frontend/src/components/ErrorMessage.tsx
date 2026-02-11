@@ -13,13 +13,13 @@ export default function ErrorMessage({ error, message }: ErrorMessageProps) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="bg-gradient-to-r from-amber-900/50 to-orange-900/50 border-2 border-[#F59E0B] rounded-lg p-6 shadow-lg max-w-2xl mx-auto"
+      className="glass-card rounded-lg p-6 shadow-card max-w-2xl mx-auto border-2 border-gold/30"
     >
       <div className="flex items-start gap-4">
         {/* Warning Icon */}
         <div className="flex-shrink-0">
           <svg
-            className="w-8 h-8 text-[#F59E0B]"
+            className="w-8 h-8 text-gold"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -35,10 +35,10 @@ export default function ErrorMessage({ error, message }: ErrorMessageProps) {
 
         {/* Error Content */}
         <div className="flex-1">
-          <h3 className="text-xl font-['Playfair_Display'] font-bold text-[#FCD34D] mb-2">
+          <h3 className="text-xl font-playfair font-bold text-royal-blue-900 mb-2">
             Oops! Something went wrong
           </h3>
-          <p className="text-amber-100 leading-relaxed">
+          <p className="text-gray-700 leading-relaxed">
             {displayMessage}
           </p>
         </div>
@@ -49,7 +49,7 @@ export default function ErrorMessage({ error, message }: ErrorMessageProps) {
         initial={{ width: 0 }}
         animate={{ width: '100%' }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="h-1 bg-gradient-to-r from-[#F59E0B] to-[#FCD34D] rounded-full mt-4"
+        className="h-1 bg-gradient-to-r from-gold to-gold-light rounded-full mt-4"
       />
     </motion.div>
   );
