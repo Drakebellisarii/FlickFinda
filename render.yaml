@@ -3,7 +3,7 @@ services:
     name: flickfinda
     env: python
     buildCommand: pip install -r requirements.txt && cd frontend && npm install && npm run build
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --chdir src/movie_app
+    startCommand: gunicorn src.movie_app.app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: OMDB_API_KEY
         sync: false
