@@ -22,3 +22,5 @@ urllib3==2.1.0
 # AI + env
 openai>=1.0.0
 python-dotenv>=1.0.0
+
+gunicorn==23.0.0
