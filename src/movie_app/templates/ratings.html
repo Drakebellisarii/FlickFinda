@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlickFinda - My Library</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* ===== DESIGN SYSTEM ===== */
+        :root {
+            --gold:        #E5B94E;
+            --dark-gold:   #b47a22;
+            --maroon:      #8B1E3F;
+            --dark-maroon: #5a142a;
+            --dark-bg:     rgb(26, 31, 43);
+            --card-bg:     rgb(26, 38, 50);
+            --text:        #E8E9F3;
+            --radius:      8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            min-height: 100vh;
+            padding: 2rem 1rem 3rem;
+            line-height: 1.6;
+            background-color: var(--dark-bg);
+            background-image:
+                linear-gradient(to bottom, rgba(26, 31, 43, 0.97), rgba(26, 31, 43, 0.97)),
+                repeating-linear-gradient(
+                    45deg,
+                    rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px,
+                    transparent 1px, transparent 3px
+                );
+        }
+
+        /* ===== OUTER FRAME ===== */
+        .page-frame {
+            max-width: 1200px;
+            margin: 0 auto;
+            border: 4px solid var(--gold);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6), 8px 8px 0 rgba(184,134,11,0.2);
+            overflow: hidden;
+            position: relative;
+            animation: frameIn 0.6s cubic-bezier(0.17, 0.67, 0.21, 1.2) both;
+        }
+
+        @keyframes frameIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0)    scale(1);    }
+        }
+
+        .page-frame::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--gold) 0px, var(--gold) 8px,
+                transparent 8px, transparent 16px
+            );
+            z-index: 2;
+        }
+
+        /* ===== MARQUEE HEADER ===== */
+        .page-header {
+            background: var(--maroon);
+            text-align: center;
+        }
+
+        .bulbs {
+            width: 100%;
+            height: 10px;
+            background-image: radial-gradient(circle, var(--gold) 30%, var(--dark-gold) 70%);
+            background-size: 20px 20px;
+            background-position: 0 center;
+            animation: bulbsFlash 2.5s infinite alternate;
+        }
+
+        @keyframes bulbsFlash {
+            0%, 100% { opacity: 0.6; }
+            50%       { opacity: 1;   }
+        }
+
+        .header-inner {
+            padding: 1.2rem 2rem 1.5rem;
+        }
+
+        .page-title {
+            color: var(--gold);
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0 var(--dark-maroon);
+            letter-spacing: 2px;
+            margin-bottom: 0.4rem;
+        }
+
+        .page-subtitle {
+            color: rgba(232,233,243,0.75);
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* ===== TICKET TEAR ===== */
+        .ticket-tear {
+            height: 12px;
+            background-color: var(--dark-bg);
+            background-image:
+                linear-gradient(90deg, transparent 0%, transparent 50%, var(--gold) 50%, var(--gold) 100%),
+                linear-gradient(90deg, var(--gold) 0%, var(--gold) 50%, transparent 50%, transparent 100%);
+            background-size: 16px 12px, 16px 12px;
+            background-position: 0 0, 8px 0;
+        }
+
+        /* ===== CONTENT BODY ===== */
+        .page-body {
+            background: var(--dark-bg);
+            padding: 2rem;
+        }
+
+        /* ===== NAV ROW ===== */
+        .nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px dashed rgba(180,122,34,0.5);
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--maroon);
+            color: var(--text);
+            border: 2px solid var(--dark-gold);
+            padding: 0.6rem 1.2rem;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.65rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 4px 4px 0 var(--dark-gold);
+            text-transform: uppercase;
+        }
+
+        .nav-btn:hover {
+            background: var(--gold);
+            color: var(--dark-maroon);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--dark-gold);
+        }
+
+        /* ===== MOVIE GRID ===== */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        /* ===== MOVIE CARD ===== */
+        .movie-card {
+            background: var(--card-bg);
+            border: 2px solid var(--dark-gold);
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 4px 4px 0 rgba(184,134,11,0.25);
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+
+        .movie-card:hover {
+            box-shadow: 6px 6px 0 rgba(229,185,78,0.35);
+            transform: translateY(-2px);
+        }
+
+        .movie-poster {
+            width: 200px;
+            height: 300px;
+            object-fit: cover;
+            border: 2px solid var(--dark-gold);
+            margin-bottom: 1rem;
+            background-color: rgba(0,0,0,0.2);
+        }
+
+        .movie-title {
+            color: var(--gold);
+            font-size: 0.75rem;
+            margin-bottom: 0.75rem;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+            line-height: 1.6;
+        }
+
+        /* ===== STAR RATINGS ===== */
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin: 1rem 0;
+        }
+
+        .star-rating .fa-star {
+            cursor: pointer;
+            font-size: 18px;
+            color: rgba(232,233,243,0.3);
+            transition: color 0.2s, transform 0.15s;
+        }
+
+        .star-rating .fa-star:hover {
+            transform: scale(1.2);
+        }
+
+        .star-rating .fa-star.fas {
+            color: var(--gold);
+        }
+
+        .rating-text {
+            color: var(--text);
+            text-align: center;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+        }
+
+        /* ===== REVIEW ===== */
+        .movie-review {
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.8rem;
+            color: var(--text);
+            margin: 0.75rem 0;
+            max-height: 80px;
+            overflow-y: auto;
+            padding: 0.6rem 0.75rem;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(180,122,34,0.3);
+            border-radius: 4px;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        /* ===== BUTTONS ===== */
+        .button-container {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: var(--maroon);
+            color: var(--text);
+            border: 2px solid var(--dark-gold);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            transition: all 0.3s;
+            box-shadow: 3px 3px 0 var(--dark-gold);
+            text-transform: uppercase;
+        }
+
+        .action-btn:hover {
+            background: var(--gold);
+            color: var(--dark-maroon);
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 var(--dark-gold);
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: rgba(0,0,0,0.5);
+            color: var(--text);
+            border: 1px solid rgba(180,122,34,0.4);
+            padding: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 50%;
+            width: 36px; height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .delete-btn:hover {
+            background: var(--maroon);
+            border-color: var(--gold);
+            color: var(--gold);
+            transform: scale(1.1);
+        }
+
+        .delete-btn i { font-size: 1rem; }
+
+        /* ===== EMPTY / ERROR STATES ===== */
+        .no-movies, .error-msg {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .no-movies p {
+            color: var(--gold);
+            font-size: 0.75rem;
+            line-height: 2.2;
+        }
+
+        .error-msg p {
+            color: #ff4136;
+            font-size: 0.75rem;
+        }
+
+        /* ===== TOAST MESSAGES ===== */
+        .message {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            padding: 0.75rem 1.25rem;
+            z-index: 10000;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            border: 2px solid var(--dark-gold);
+            box-shadow: 4px 4px 0 var(--dark-gold);
+            animation: slideInMsg 0.3s ease-out;
+        }
+
+        .message.success {
+            background: var(--maroon);
+            color: var(--gold);
+        }
+
+        .message.error {
+            background: #3d0a0a;
+            color: #ff4136;
+            border-color: #ff4136;
+            box-shadow: 4px 4px 0 #ff4136;
+        }
+
+        @keyframes slideInMsg {
+            from { transform: translateX(100%); opacity: 0; }
+            to   { transform: translateX(0);    opacity: 1; }
+        }
+
+        /* ===== REVIEW MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: var(--dark-bg);
+            background-image:
+                linear-gradient(to bottom, rgba(26,31,43,0.97), rgba(26,31,43,0.97)),
+                repeating-linear-gradient(45deg,
+                    rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px,
+                    transparent 1px, transparent 3px
+                );
+            border: 4px solid var(--gold);
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 480px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            animation: modalIn 0.4s cubic-bezier(0.17, 0.67, 0.21, 1.4);
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+
+        .modal-header {
+            background: var(--maroon);
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--dark-gold);
+        }
+
+        .modal-header h2 {
+            color: var(--gold);
+            font-size: 0.9rem;
+            text-shadow: 2px 2px 0 var(--dark-maroon);
+        }
+
+        .close {
+            color: var(--gold);
+            font-size: 1.4rem;
+            cursor: pointer;
+            width: 28px; height: 28px;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            line-height: 1;
+        }
+
+        .close:hover {
+            background: var(--dark-maroon);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-label {
+            display: block;
+            color: var(--gold);
+            font-size: 0.65rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+        }
+
+        #review-text {
+            width: 100%;
+            height: 100px;
+            padding: 0.6rem 0.75rem;
+            margin-bottom: 1.2rem;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.85rem;
+            background: rgba(0,0,0,0.35);
+            border: 2px solid var(--dark-gold);
+            color: var(--text);
+            resize: vertical;
+            border-radius: 4px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #review-text:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 8px rgba(229,185,78,0.3);
+        }
+
+        .modal-rating-label {
+            display: block;
+            color: var(--gold);
+            font-size: 0.65rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: var(--maroon);
+            border: 2px solid var(--dark-gold);
+            color: var(--text);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 4px 4px 0 var(--dark-gold);
+            position: relative;
+            overflow: hidden;
+            margin-top: 1.2rem;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+            transition: left 0.6s ease-in-out;
+        }
+
+        .submit-btn:hover {
+            background: var(--gold);
+            color: var(--dark-maroon);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--dark-gold);
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .movie-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            body        { padding: 0.5rem; }
+            .page-body  { padding: 1rem 0.75rem; }
+            .page-title { font-size: 1.2rem; }
+            .movie-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+            .movie-poster { width: 150px; height: 225px; }
+            .nav-btn    { font-size: 0.55rem; padding: 0.5rem 0.8rem; }
+            .star-rating .fa-star { font-size: 16px; }
+        }
+
+        @media (max-width: 420px) {
+            .page-title  { font-size: 0.95rem; letter-spacing: 1px; }
+            .movie-title { font-size: 0.65rem; }
+            .action-btn  { font-size: 0.55rem; }
+            .button-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-frame">
+        <!-- Marquee Header -->
+        <header class="page-header">
+            <div class="bulbs"></div>
+            <div class="header-inner">
+                <h1 class="page-title">My Library</h1>
+                <p class="page-subtitle">Your personal collection of watched films</p>
+            </div>
+            <div class="bulbs"></div>
+        </header>
+
+        <!-- Ticket Tear Divider -->
+        <div class="ticket-tear"></div>
+
+        <!-- Content -->
+        <main class="page-body">
+            <div class="nav-row">
+                <a href="javascript:void(0)" onclick="transitionToPage('/')" class="nav-btn">
+                    ← Back to Movies
+                </a>
+            </div>
+
+            <div id="watched-movies" class="movie-grid">
+                <!-- Populated by JS -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="review-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Review</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <label class="modal-label">Your Review</label>
+                <textarea id="review-text" placeholder="Write your thoughts about this film..."></textarea>
+
+                <label class="modal-rating-label">Your Rating</label>
+                <div class="star-rating" id="modal-star-rating">
+                    <i class="fa-star far" data-rating="1"></i>
+                    <i class="fa-star far" data-rating="2"></i>
+                    <i class="fa-star far" data-rating="3"></i>
+                    <i class="fa-star far" data-rating="4"></i>
+                    <i class="fa-star far" data-rating="5"></i>
+                    <i class="fa-star far" data-rating="6"></i>
+                    <i class="fa-star far" data-rating="7"></i>
+                    <i class="fa-star far" data-rating="8"></i>
+                    <i class="fa-star far" data-rating="9"></i>
+                    <i class="fa-star far" data-rating="10"></i>
+                </div>
+                <p class="rating-text">Rating: <span id="rating-display">0</span>/10</p>
+
+                <button class="submit-btn" onclick="submitReview()">Submit Review</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let currentMovieId = null;
+
+    function loadWatchedMovies() {
+        console.log('Loading watched movies...');
+        fetch('/api/watched')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Received data:', data);
+                const container = document.getElementById('watched-movies');
+                container.innerHTML = '';
+
+                if (!data.watched_movies || data.watched_movies.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-movies">
+                            <p>No movies in your library yet.<br><br>Go back and mark some films as watched!</p>
+                        </div>`;
+                    return;
+                }
+
+                data.watched_movies.forEach(movie => {
+                    const movieElement = document.createElement('div');
+                    movieElement.className = 'movie-card';
+
+                    let ratingDisplay = '';
+                    if (movie.rating) {
+                        ratingDisplay = `
+                            <div class="star-rating">
+                                ${Array(10).fill().map((_, i) =>
+                                    `<i class="fa-star ${i < movie.rating ? 'fas' : 'far'}"></i>`
+                                ).join('')}
+                            </div>
+                            <p class="rating-text">Rating: ${movie.rating}/10</p>`;
+                    }
+
+                    movieElement.innerHTML = `
+                        <button class="delete-btn" onclick="deleteRating(${movie.id})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <img class="movie-poster" src="${movie.poster_url}" alt="${movie.title}">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        ${ratingDisplay}
+                        ${movie.review ? `<p class="movie-review">${movie.review}</p>` : ''}
+                        <div class="button-container">
+                            <button class="action-btn" onclick="openReviewModal(${movie.id})">
+                                ${movie.review ? 'Edit Review' : 'Add Review'}
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(movieElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('watched-movies').innerHTML =
+                    '<div class="error-msg"><p>Error loading library. Please try again later.</p></div>';
+            });
+    }
+
+    function openReviewModal(movieId) {
+        currentMovieId = movieId;
+        const modal = document.getElementById('review-modal');
+        modal.style.display = 'flex';
+
+        document.getElementById('review-text').value = '';
+        const starRating = document.querySelector('#modal-star-rating');
+        starRating.setAttribute('data-current-rating', '0');
+        highlightStars(starRating, 0);
+        document.getElementById('rating-display').textContent = '0';
+    }
+
+    function submitReview() {
+        const review = document.getElementById('review-text').value;
+        const rating = document.querySelector('#modal-star-rating').getAttribute('data-current-rating');
+
+        if (!rating) {
+            showMessage('Please select a rating', 'error');
+            return;
+        }
+
+        fetch('/api/ratings/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: currentMovieId, review: review, rating: parseInt(rating) })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('review-modal').style.display = 'none';
+                document.getElementById('review-text').value = '';
+                const starRating = document.querySelector('#modal-star-rating');
+                starRating.setAttribute('data-current-rating', '0');
+                highlightStars(starRating, 0);
+                document.getElementById('rating-display').textContent = '0';
+                loadWatchedMovies();
+                showMessage('Review updated successfully!', 'success');
+            } else {
+                throw new Error(data.message || 'Failed to update rating');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Failed to update rating: ' + error.message, 'error');
+        });
+    }
+
+    document.querySelector('.close').onclick = function() {
+        document.getElementById('review-modal').style.display = 'none';
+    };
+
+    document.addEventListener('DOMContentLoaded', loadWatchedMovies);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const starContainers = document.querySelectorAll('.star-rating');
+
+        starContainers.forEach(container => {
+            const stars = container.querySelectorAll('.fa-star');
+
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function() {
+                    const rating = this.dataset.rating;
+                    highlightStars(container, rating);
+                    if (container.id === 'modal-star-rating') {
+                        document.getElementById('rating-display').textContent = rating;
+                    }
+                });
+
+                star.addEventListener('click', function() {
+                    const rating = this.dataset.rating;
+                    container.setAttribute('data-current-rating', rating);
+                    highlightStars(container, rating);
+                    if (container.id === 'modal-star-rating') {
+                        document.getElementById('rating-display').textContent = rating;
+                    }
+                });
+            });
+
+            container.addEventListener('mouseleave', function() {
+                const currentRating = container.getAttribute('data-current-rating') || 0;
+                highlightStars(container, currentRating);
+                if (container.id === 'modal-star-rating') {
+                    document.getElementById('rating-display').textContent = currentRating;
+                }
+            });
+        });
+    });
+
+    function highlightStars(container, rating) {
+        const stars = container.querySelectorAll('.fa-star');
+        stars.forEach(star => {
+            const starRating = star.dataset.rating;
+            star.classList.remove('fas', 'far');
+            star.classList.add(starRating <= rating ? 'fas' : 'far');
+        });
+    }
+
+    function showMessage(message, type) {
+        const messageEl = document.createElement('div');
+        messageEl.className = `message ${type}`;
+        messageEl.textContent = message;
+        document.body.appendChild(messageEl);
+        setTimeout(() => { messageEl.remove(); }, 3000);
+    }
+
+    function transitionToPage(href) {
+        window.location.href = href;
+    }
+
+    function deleteRating(movieId) {
+        if (confirm('Are you sure you want to remove this movie from your library?')) {
+            fetch('/api/ratings/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: movieId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadWatchedMovies();
+                    showMessage('Movie removed successfully!', 'success');
+                } else {
+                    throw new Error(data.message || 'Failed to remove movie');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Failed to remove movie: ' + error.message, 'error');
+            });
+        }
+    }
+    </script>
+</body>
+</html>

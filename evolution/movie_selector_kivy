@@ -1,0 +1,157 @@
+
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.dropdown import DropDown
+from kivy.uix.spinner import Spinner
+from kivy.uix.textinput import TextInput
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.popup import Popup
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
+from kivy.uix.scrollview import ScrollView
+
+class MovieApp(App):
+    def build(self):
+        self.title = "Movie Selector"
+        self.movie_data_service = movie_data_service
+        self.rating_service = rating_service
+        self.review_service = review_service
+        self.genre_var = "Random"
+        
+        layout = BoxLayout(orientation="vertical", padding=20)
+        
+        # Title Section
+        title_label = Label(text="Movie Selector", font_size=24, bold=True, size_hint_y=None, height=50)
+        layout.add_widget(title_label)
+
+        # Genre Selection Section
+        genre_layout = BoxLayout(orientation="horizontal", size_hint_y=None, height=50)
+        genre_label = Label(text="Genre:", size_hint_x=None, width=100)
+        
+        genres = ["Random", "Horror", "RomCom", "Documentary", "Comedy", "Christmas"]
+        self.genre_spinner = Spinner(text="Random", values=genres, size_hint_x=None, width=200)
+        genre_button = Button(text="Find Movie", size_hint_x=None, width=150, on_press=self.select_movie)
+
+        genre_layout.add_widget(genre_label)
+        genre_layout.add_widget(self.genre_spinner)
+        genre_layout.add_widget(genre_button)
+        
+        layout.add_widget(genre_layout)
+        
+        # Movie Display Section
+        movie_display_layout = BoxLayout(orientation="vertical", size_hint_y=None, height=150)
+        self.selected_movie_label = Label(text="No movie selected", font_size=18, size_hint_y=None, height=50)
+        movie_display_layout.add_widget(self.selected_movie_label)
+        
+        layout.add_widget(movie_display_layout)
+
+        # Ratings Section
+        rating_layout = BoxLayout(orientation="vertical", size_hint_y=None, height=150)
+        self.rating_labels = {}
+        rating_sources = ["Rotten Tomatoes", "IMDb", "Metacritic"]
+        for source in rating_sources:
+            rating_row = BoxLayout(orientation="horizontal", size_hint_y=None, height=30)
+            rating_label = Label(text=f"{source}: N/A", size_hint_x=None, width=200)
+            self.rating_labels[source] = rating_label
+            rating_row.add_widget(rating_label)
+            rating_layout.add_widget(rating_row)
+
+        layout.add_widget(rating_layout)
+
+        # Reviews Section
+        reviews_tabbed_panel = TabbedPanel(size_hint_y=None, height=300)
+
+        ai_tab = TabbedPanelItem(text="AI Review")
+        self.ai_review = TextInput(hint_text="AI Review will appear here", size_hint_y=None, height=150, multiline=True)
+        ai_tab.add_widget(self.ai_review)
+        
+        web_tab = TabbedPanelItem(text="Web Reviews")
+        self.web_review = TextInput(hint_text="Web Reviews will appear here", size_hint_y=None, height=150, multiline=True)
+        web_tab.add_widget(self.web_review)
+
+        reviews_tabbed_panel.add_widget(ai_tab)
+        reviews_tabbed_panel.add_widget(web_tab)
+        
+        layout.add_widget(reviews_tabbed_panel)
+
+        # Fetch Reviews Button
+        fetch_button = Button(text="Fetch Reviews & Ratings", size_hint_y=None, height=50, on_press=self.get_reviews_and_ratings)
+        layout.add_widget(fetch_button)
+
+        return layout
+
+    def select_movie(self, instance):
+        chosen_genre = self.genre_spinner.text
+        if chosen_genre == "Random":
+            selected_movie = self.movie_data_service.get_random_movie()
+        else:
+            selected_movie = self.movie_data_service.get_random_movie_from_genre(chosen_genre)
+            
+        self.selected_movie_label.text = selected_movie
+        self.clear_reviews()
+        
+        # Get ratings
+        ratings = self.rating_service.get_movie_ratings(selected_movie)
+        for source, rating in ratings.items():
+            self.rating_labels[source].text = f"{source}: {rating}"
+        
+    def clear_reviews(self):
+        """Clear all review displays"""
+        self.ai_review.text = ""
+        self.web_review.text = ""
+        for source in self.rating_labels.values():
+            source.text = "N/A"
+
+    def get_reviews_and_ratings(self, instance):
+        movie = self.selected_movie_label.text
+        if not movie or movie == "No movie selected":
+            self.show_popup("Select a Movie", "Please select a movie first!")
+            return
+        
+        self.clear_reviews()
+        
+        try:
+            # Fetch and display AI review
+            ai_review = self.review_service.get_ai_review(movie)
+            self.ai_review.text = ai_review
+            
+            # Fetch and display web reviews
+            web_reviews = self.review_service.get_web_reviews(movie)
+            self.web_review.text = web_reviews
+            
+        except Exception as e:
+            self.web_review.text = f"Error fetching data: {str(e)}"
+    
+    def show_popup(self, title, message):
+        popup = Popup(title=title, content=Label(text=message), size_hint=(0.5, 0.5))
+        popup.open()
+
+# Mock services for testing purposes
+class MockMovieDataService:
+    def get_random_movie(self):
+        return "Inception"
+
+    def get_random_movie_from_genre(self, genre):
+        return f"{genre} Movie"
+
+class MockRatingService:
+    def get_movie_ratings(self, movie):
+        return {"Rotten Tomatoes": "85%", "IMDb": "8.7/10", "Metacritic": "75"}
+
+class MockReviewService:
+    def get_ai_review(self, movie):
+        return f"AI Review: {movie} is a must-watch!"
+
+    def get_web_reviews(self, movie):
+        return f"Web Reviews: Everyone loves {movie}!"
+
+# Main block
+if __name__ == '__main__':
+    movie_data_service = MockMovieDataService()
+    rating_service = MockRatingService()
+    review_service = MockReviewService()
+
+    app = MovieApp()
+    app.run()
