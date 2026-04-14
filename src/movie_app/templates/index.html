@@ -301,6 +301,42 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ============================================================
+       QUICK NAV BAR
+    ============================================================ */
+    .quick-nav {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .quick-nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1 1 160px;
+        padding: 0.65rem 1rem;
+        background: rgba(0,0,0,0.3);
+        border: 2px solid var(--dark-gold);
+        color: var(--gold);
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.55rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
+        transition: all var(--trans);
+        box-shadow: 3px 3px 0 rgba(184,134,11,0.2);
+        justify-content: center;
+    }
+    .quick-nav-btn:hover {
+        background: var(--maroon);
+        border-color: var(--gold);
+        box-shadow: 5px 5px 0 rgba(184,134,11,0.35);
+        transform: translate(-2px,-2px);
+    }
+    .quick-nav-icon { font-size: 1rem; }
+
+    /* ============================================================
        SECTION DIVIDER
     ============================================================ */
     .section-divider {
@@ -526,7 +562,10 @@
         position: fixed; inset: 0;
         background: rgba(0,0,0,0.95);
         z-index: 10000;
+        align-items: center;
+        justify-content: center;
     }
+    .theater-modal.open { display: flex; }
 
     .theater-content {
         position: relative;
@@ -750,7 +789,26 @@
         .guest-modal-actions { flex-direction: column; }
         .guest-action-btn { flex: none; width: 100%; }
 
-        .close-theater { top: -42px; right: 0; }
+        /* ---- Mobile trailer fixes ---- */
+        .theater-content {
+            width: 100%;
+            margin: 0;
+            padding: 0 0 48px; /* room for close btn below */
+        }
+        /* Remove the 3D tilt — it breaks iframe rendering on iOS/Android */
+        .theater-screen {
+            transform: none;
+            border-radius: 0;
+        }
+        /* Hide the 3D edge piece */
+        .screen-bottom { display: none; }
+        /* Move close button below the video, centered */
+        .close-theater {
+            position: static;
+            display: flex;
+            margin: 12px auto 0;
+            width: 44px; height: 44px;
+        }
     }
 
     @media (max-width: 420px) {
@@ -870,6 +928,18 @@
             <button id="find-movie-btn">Find Movies with AI</button>
         </section>
 
+        <!-- Quick-access nav (shown only when logged in) -->
+        <div class="quick-nav" id="quick-nav" style="display:none">
+            <a href="/watchlist" class="quick-nav-btn">
+                <span class="quick-nav-icon">📋</span>
+                <span>My Watchlist</span>
+            </a>
+            <a href="/ratings" class="quick-nav-btn">
+                <span class="quick-nav-icon">⭐</span>
+                <span>My Ratings</span>
+            </a>
+        </div>
+
         <!-- Results grid (multiple movies) -->
         <section id="results-view">
             <div class="results-heading" id="results-heading">Suggested Films</div>
@@ -918,13 +988,86 @@ let ytPlayer       = null;
 let lastResults    = [];    // store multi-movie results for back navigation
 let currentMovieData = null;
 
-const GUEST_SEARCH_LIMIT = 3;
+const SEARCH_LIMIT = 10;   // applies to both guests and logged-in users
 
-function getGuestSearchCount() {
-    return parseInt(sessionStorage.getItem('guestSearchCount') || '0');
+/* ---- search count (shared key for guests & logged-in) ---- */
+function getSearchCount() {
+    return parseInt(sessionStorage.getItem('searchCount') || '0');
 }
-function incrementGuestSearchCount() {
-    sessionStorage.setItem('guestSearchCount', getGuestSearchCount() + 1);
+function incrementSearchCount() {
+    sessionStorage.setItem('searchCount', getSearchCount() + 1);
+}
+
+/* ---- results persistence via sessionStorage ---- */
+function saveViewState(view) {
+    try {
+        sessionStorage.setItem('ff_view', view);
+        if (view === 'results') {
+            sessionStorage.setItem('ff_results', JSON.stringify(lastResults));
+            sessionStorage.removeItem('ff_detail');
+        } else if (view === 'detail' && currentMovieData) {
+            sessionStorage.setItem('ff_detail', JSON.stringify(currentMovieData));
+            sessionStorage.setItem('ff_results', JSON.stringify(lastResults));
+        }
+    } catch(e) {}
+}
+
+function clearViewState() {
+    sessionStorage.removeItem('ff_view');
+    sessionStorage.removeItem('ff_results');
+    sessionStorage.removeItem('ff_detail');
+}
+
+function restoreViewState() {
+    try {
+        const view = sessionStorage.getItem('ff_view');
+        if (!view) return;
+
+        if (view === 'results') {
+            const saved = JSON.parse(sessionStorage.getItem('ff_results') || '[]');
+            if (saved.length > 0) {
+                lastResults = saved;
+                displayResultsGrid(saved, true); // true = restored (skip saveViewState re-write)
+            }
+        } else if (view === 'detail') {
+            const saved = JSON.parse(sessionStorage.getItem('ff_detail') || 'null');
+            const savedResults = JSON.parse(sessionStorage.getItem('ff_results') || '[]');
+            if (saved) {
+                lastResults = savedResults;
+                restoreDetailView(saved);
+            }
+        }
+    } catch(e) {}
+}
+
+function restoreDetailView(data) {
+    currentMovieData = data;
+    showDetailView(lastResults.length > 1);
+
+    document.getElementById('detail-title').textContent = data.title;
+    document.getElementById('detail-poster').src = data.poster || '/api/placeholder/300/450';
+    document.getElementById('detail-plot').textContent = data.reviews || data.plot || 'No plot available.';
+
+    if (data.awards && data.awards !== 'N/A' && data.awards !== 'No awards information available.') {
+        document.getElementById('detail-awards').textContent = data.awards;
+        document.getElementById('detail-awards').style.display = 'block';
+        document.getElementById('awards-label').style.display  = 'block';
+    }
+
+    const ratingsRow = document.getElementById('detail-ratings');
+    ratingsRow.innerHTML = '';
+    if (data.ratings) {
+        Object.entries(data.ratings)
+            .filter(([, v]) => v && v !== 'N/A')
+            .forEach(([source, val]) => {
+                const badge = document.createElement('div');
+                badge.className = 'rating-badge';
+                badge.innerHTML = `<strong>${source}</strong>${val}`;
+                ratingsRow.appendChild(badge);
+            });
+    }
+
+    wireDetailButtons(data.title);
 }
 
 /* ============================================================
@@ -948,21 +1091,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     data.user.username.charAt(0).toUpperCase();
                 document.getElementById('user-greeting').textContent =
                     `Hello, ${data.user.username}!`;
+                document.getElementById('quick-nav').style.display = 'flex';
             } else {
                 isGuest = true;
                 document.getElementById('guest-login-btn').style.display = 'block';
-                // Reflect any searches already used this session
-                const used = getGuestSearchCount();
-                const btn  = document.getElementById('find-movie-btn');
-                if (used >= GUEST_SEARCH_LIMIT) {
-                    btn.textContent = 'Search Limit Reached';
-                } else if (used > 0) {
-                    const remaining = GUEST_SEARCH_LIMIT - used;
-                    btn.textContent = `Find Movies with AI  (${remaining} search${remaining === 1 ? '' : 'es'} left)`;
-                }
             }
+            updateSearchBtnLabel();
+            restoreViewState();
         })
-        .catch(() => {});
+        .catch(() => {
+            updateSearchBtnLabel();
+            restoreViewState();
+        });
 
     document.getElementById('logout-btn')?.addEventListener('click', e => {
         e.preventDefault();
@@ -1088,6 +1228,22 @@ function showDetailView(fromResults) {
 }
 
 /* ============================================================
+   SEARCH BUTTON LABEL
+============================================================ */
+function updateSearchBtnLabel() {
+    const btn = document.getElementById('find-movie-btn');
+    if (!btn) return;
+    const remaining = SEARCH_LIMIT - getSearchCount();
+    if (remaining <= 0) {
+        btn.textContent = 'Search Limit Reached';
+    } else if (remaining <= SEARCH_LIMIT) {
+        btn.textContent = `Find Movies with AI  (${remaining} left)`;
+    } else {
+        btn.textContent = 'Find Movies with AI';
+    }
+}
+
+/* ============================================================
    AI SEARCH
 ============================================================ */
 async function getMovieFromAI() {
@@ -1096,20 +1252,23 @@ async function getMovieFromAI() {
 
     if (!desc) { showToast('Please describe the kind of film you want!'); return; }
 
-    // Guest search limit
-    if (isGuest) {
-        const count = getGuestSearchCount();
-        if (count >= GUEST_SEARCH_LIMIT) {
+    // Search limit — applies to everyone
+    const count = getSearchCount();
+    if (count >= SEARCH_LIMIT) {
+        if (isGuest) {
             showGuestOverlay('searchLimit');
-            return;
+        } else {
+            showToast('You have reached the 10-search limit for this session.');
         }
+        return;
     }
 
     const btn = document.getElementById('find-movie-btn');
     btn.disabled = true;
     btn.innerHTML = '<span class="btn-spinner"></span>Finding films…';
 
-    // Hide both views while loading
+    // Clear previous results from both DOM and storage before new search
+    clearViewState();
     document.getElementById('results-view').style.display = 'none';
     document.getElementById('detail-view').style.display  = 'none';
 
@@ -1124,14 +1283,14 @@ async function getMovieFromAI() {
         if (data.error) throw new Error(data.error);
 
         if (data.movies && data.movies.length > 0) {
-            if (isGuest) incrementGuestSearchCount();
+            incrementSearchCount();
             if (data.movies.length === 1) {
                 await showSingleMovieDetail(data.movies[0].title, data.movies[0].poster, false);
             } else {
                 displayResultsGrid(data.movies);
             }
         } else if (data.title) {
-            if (isGuest) incrementGuestSearchCount();
+            incrementSearchCount();
             await showSingleMovieDetail(data.title, data.poster, false);
         } else {
             throw new Error('No results returned');
@@ -1141,21 +1300,14 @@ async function getMovieFromAI() {
         showToast('Error: ' + err.message);
     } finally {
         btn.disabled = false;
-        if (isGuest) {
-            const remaining = GUEST_SEARCH_LIMIT - getGuestSearchCount();
-            btn.textContent = remaining > 0
-                ? `Find Movies with AI  (${remaining} search${remaining === 1 ? '' : 'es'} left)`
-                : 'Search Limit Reached';
-        } else {
-            btn.textContent = 'Find Movies with AI';
-        }
+        updateSearchBtnLabel();
     }
 }
 
 /* ============================================================
    RESULTS GRID
 ============================================================ */
-function displayResultsGrid(movies) {
+function displayResultsGrid(movies, isRestore = false) {
     lastResults = movies;
     const grid = document.getElementById('movie-grid');
     grid.innerHTML = '';
@@ -1182,6 +1334,7 @@ function displayResultsGrid(movies) {
     });
 
     showResultsView();
+    if (!isRestore) saveViewState('results');
 }
 
 /* ============================================================
@@ -1233,6 +1386,9 @@ async function showSingleMovieDetail(title, posterFallback, fromResults) {
                 });
         }
 
+        // Persist so navigating away and back restores this view
+        saveViewState('detail');
+
     } catch (err) {
         document.getElementById('detail-plot').textContent = 'Could not load movie details.';
         console.error(err);
@@ -1247,7 +1403,8 @@ function wireDetailButtons(title) {
     const wlBtn = document.getElementById('detail-watchlist-btn');
     wlBtn.onclick = () => {
         if (isGuest) { showGuestOverlay('watchlist'); return; }
-        addToWatchlist(title);
+        const poster = document.getElementById('detail-poster').src;
+        addToWatchlist(title, poster);
     };
 
     // Watched
@@ -1273,12 +1430,12 @@ function wireDetailButtons(title) {
 /* ============================================================
    WATCHLIST / WATCHED
 ============================================================ */
-async function addToWatchlist(title) {
+async function addToWatchlist(title, poster) {
     try {
         const res = await fetch('/api/watchlist/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title })
+            body: JSON.stringify({ title, poster: poster || null })
         });
         if (res.ok) { showSuccessAnimation(); showToast('Added to watchlist!'); }
         else { const d = await res.json(); showToast(d.message || 'Already in watchlist'); }
@@ -1320,7 +1477,7 @@ function onYouTubeIframeAPIReady() {
             },
             onError: () => {
                 showToast('Could not load trailer');
-                document.getElementById('theater-modal').style.display = 'none';
+                document.getElementById('theater-modal').classList.remove('open');
             }
         }
     });
@@ -1330,7 +1487,7 @@ async function fetchTrailer(movieTitle) {
     const theater = document.getElementById('theater-modal');
     const overlay = theater.querySelector('.loading-overlay');
     overlay.classList.add('active');
-    theater.style.display = 'block';
+    theater.classList.add('open');
 
     try {
         const res = await fetch(`/get_trailer?movie=${encodeURIComponent(movieTitle)}`);
@@ -1343,7 +1500,7 @@ async function fetchTrailer(movieTitle) {
         if (ytPlayer && ytPlayer.loadVideoById) {
             ytPlayer.loadVideoById({ videoId, startSeconds: 0 });
         } else {
-            // Player not yet ready — retry once
+            // Player not yet ready — retry once after brief delay
             setTimeout(() => {
                 if (ytPlayer && ytPlayer.loadVideoById) {
                     ytPlayer.loadVideoById({ videoId, startSeconds: 0 });
@@ -1353,7 +1510,7 @@ async function fetchTrailer(movieTitle) {
     } catch (err) {
         console.error(err);
         showToast('Trailer unavailable: ' + err.message);
-        theater.style.display = 'none';
+        theater.classList.remove('open');
         overlay.classList.remove('active');
     }
 }
@@ -1362,13 +1519,13 @@ async function fetchTrailer(movieTitle) {
 document.querySelector('.close-theater').addEventListener('click', () => {
     const theater = document.getElementById('theater-modal');
     if (ytPlayer) { try { ytPlayer.stopVideo(); } catch {} }
-    theater.style.display = 'none';
+    theater.classList.remove('open');
     theater.querySelector('.loading-overlay').classList.remove('active');
 });
 
 document.addEventListener('keydown', e => {
     const theater = document.getElementById('theater-modal');
-    if (e.code === 'Space' && theater.style.display === 'block') {
+    if (e.code === 'Space' && theater.classList.contains('open')) {
         e.preventDefault();
         if (ytPlayer && ytPlayer.getPlayerState) {
             const s = ytPlayer.getPlayerState();
@@ -1377,7 +1534,7 @@ document.addEventListener('keydown', e => {
         }
     }
     if (e.key === 'Escape') {
-        document.getElementById('theater-modal').style.display = 'none';
+        document.getElementById('theater-modal').classList.remove('open');
         document.getElementById('guestOverlay').classList.remove('active');
     }
 });

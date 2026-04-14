@@ -189,13 +189,16 @@ def update_rating():
     try:
         data = request.get_json()
         movie_id = data.get('id')
-        review = data.get('review')
+        review = data.get('review') or ''
         rating = data.get('rating')
-        
+
+        if len(review) > 500:
+            return jsonify({'message': 'Review must be 500 characters or fewer', 'success': False}), 400
+
         movie = MovieRating.query.get(movie_id)
         if not movie:
             return jsonify({'message': 'Movie not found', 'success': False}), 404
-        
+
         movie.review = review
         movie.rating = rating
         db.session.commit()
@@ -724,21 +727,30 @@ def generate_movie_list(description, num_titles=5):
                 {
                     "role": "system",
                     "content": (
-                        "You are a film expert with broad knowledge of movies across all genres, "
-                        "eras, and countries. Recommend diverse, specific titles — avoid defaulting "
-                        "to the most obvious or popular choices unless they are the best fit."
+                        "You are a world-class film curator and critic with deep knowledge spanning all genres, "
+                        "eras, directors, and cinematographies worldwide. Your role is to recommend movies that "
+                        "precisely match what a viewer is looking for — considering mood, tone, theme, pacing, "
+                        "visual style, narrative structure, and emotional resonance, not just surface genre labels.\n\n"
+                        "Guidelines:\n"
+                        "- Interpret vague or emotional descriptions creatively (e.g. 'something cozy' or 'a film that makes you think').\n"
+                        "- Balance mainstream and lesser-known titles — include acclaimed indie films, foreign-language films, "
+                        "and under-the-radar gems alongside well-known picks when they genuinely fit.\n"
+                        "- Span different decades and countries of origin where appropriate.\n"
+                        "- Never pad with generic blockbusters unless they are the best match.\n"
+                        "- If the user mentions a specific decade, director, actor, or style, weight those heavily.\n"
+                        "- Each suggestion must be a real, verifiable film title."
                     )
                 },
                 {
                     "role": "user",
                     "content": (
-                        f"Suggest exactly {num_titles} movie titles that match this description: {description}. "
-                        f"Include a mix of well-known and lesser-known films from different decades and countries where appropriate. "
-                        f"Return only the titles separated by commas, with no numbers, bullet points, or extra details."
+                        f"Suggest exactly {num_titles} movie titles that best match this description: {description}\n\n"
+                        f"Return only the movie titles separated by commas, with no numbering, bullet points, "
+                        f"explanations, or any other text. Just the titles."
                     )
                 }
             ],
-            temperature=0.8,  # Higher = more varied results
+            temperature=0.8,
             n=1
         )
 
@@ -749,15 +761,16 @@ def generate_movie_list(description, num_titles=5):
         if len(movies) < num_titles:
             extra_needed = num_titles - len(movies)
             retry = client.chat.completions.create(
-                model="gpt-5.4-mini",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "user", "content": (
                         f"Give me {extra_needed} more movies matching: {description}. "
                         f"Exclude these already suggested: {', '.join(movies)}. "
-                        f"Titles only, comma-separated."
+                        f"Titles only, comma-separated, no extra text."
                     )}
                 ],
-                temperature=0.9
+                temperature=0.9,
+                max_tokens=150
             )
             extra = [m.strip() for m in retry.choices[0].message.content.strip().split(',') if m.strip()]
             movies.extend(extra)
@@ -775,9 +788,9 @@ def generate_movie_list(description, num_titles=5):
         }
 
 # Add this route for the placeholder image
-#@app.route('/api/placeholder/<width>/<height>')
+@app.route('/api/placeholder/<width>/<height>')
 def placeholder(width, height):
-    return redirect(f"https://via.placeholder.com/{width}x{height}")
+    return redirect(f"https://placehold.co/{width}x{height}/1a2632/b47a22?text=No+Poster")
 
 @app.route('/get_movie_suggestion', methods=['POST'])
 def get_movie_suggestion():

@@ -553,7 +553,10 @@
             </div>
             <div class="modal-body">
                 <label class="modal-label">Your Review</label>
-                <textarea id="review-text" placeholder="Write your thoughts about this film..."></textarea>
+                <textarea id="review-text" placeholder="Write your thoughts about this film..." maxlength="500"></textarea>
+                <div style="text-align:right; margin-top:-0.9rem; margin-bottom:0.8rem;">
+                    <span id="review-char-count" style="font-family:'Courier Prime',monospace; font-size:0.75rem; color:rgba(229,185,78,0.55);">0 / 500</span>
+                </div>
 
                 <label class="modal-rating-label">Your Rating</label>
                 <div class="star-rating" id="modal-star-rating">
@@ -634,12 +637,27 @@
             });
     }
 
+    const REVIEW_MAX = 500;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const ta = document.getElementById('review-text');
+        const counter = document.getElementById('review-char-count');
+        ta.addEventListener('input', () => {
+            const len = ta.value.length;
+            counter.textContent = `${len} / ${REVIEW_MAX}`;
+            counter.style.color = len >= REVIEW_MAX ? '#e05a5a' : 'rgba(229,185,78,0.55)';
+        });
+    });
+
     function openReviewModal(movieId) {
         currentMovieId = movieId;
         const modal = document.getElementById('review-modal');
         modal.style.display = 'flex';
 
-        document.getElementById('review-text').value = '';
+        const ta = document.getElementById('review-text');
+        ta.value = '';
+        document.getElementById('review-char-count').textContent = `0 / ${REVIEW_MAX}`;
+        document.getElementById('review-char-count').style.color = 'rgba(229,185,78,0.55)';
         const starRating = document.querySelector('#modal-star-rating');
         starRating.setAttribute('data-current-rating', '0');
         highlightStars(starRating, 0);
@@ -649,6 +667,11 @@
     function submitReview() {
         const review = document.getElementById('review-text').value;
         const rating = document.querySelector('#modal-star-rating').getAttribute('data-current-rating');
+
+        if (review.length > REVIEW_MAX) {
+            showMessage(`Review must be ${REVIEW_MAX} characters or fewer`, 'error');
+            return;
+        }
 
         if (!rating) {
             showMessage('Please select a rating', 'error');
