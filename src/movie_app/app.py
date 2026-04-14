@@ -45,9 +45,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-with app.app_context():
-    db.create_all()
-
 # Define all your classes (ReviewService, RatingService, MovieDataService, etc.)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -148,6 +145,10 @@ class WatchlistItem(db.Model):
     __table_args__ = (
         db.UniqueConstraint('user_id', 'movie_title', name='uq_user_movie_watchlist'),
     )
+
+# Create tables after all models are defined
+with app.app_context():
+    db.create_all()
 
 #@app.route('/api/ratings/add', methods=['POST'])
 #def add_to_ratings():
