@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date as date_type
 import os
 import random
 import requests
@@ -418,9 +418,9 @@ def login():
     
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
-    # Clear session
     session.pop('user_id', None)
     session.pop('username', None)
+    session.pop('is_guest', None)
     return jsonify({'success': True, 'message': 'Logout successful'}), 200
 
 @app.route('/api/auth/check', methods=['GET'])
@@ -596,6 +596,28 @@ def ratings_page():
 # Helper function to get current user ID
 def get_current_user_id():
     return session.get('user_id')
+
+USER_DAILY_LIMIT = 8
+
+def _reset_search_count_if_new_day():
+    today = str(date_type.today())
+    if session.get('search_date') != today:
+        session['search_date'] = today
+        session['search_count'] = 0
+
+def get_user_searches_remaining():
+    _reset_search_count_if_new_day()
+    return max(0, USER_DAILY_LIMIT - session.get('search_count', 0))
+
+def increment_user_search():
+    _reset_search_count_if_new_day()
+    session['search_count'] = session.get('search_count', 0) + 1
+
+@app.route('/api/search/remaining', methods=['GET'])
+def search_remaining():
+    if not get_current_user_id():
+        return jsonify({'remaining': None}), 200
+    return jsonify({'remaining': get_user_searches_remaining()}), 200
 
 def get_movie_data(movie_title):
     cache_key = movie_title.lower().strip()
@@ -795,22 +817,32 @@ def placeholder(width, height):
 @app.route('/get_movie_suggestion', methods=['POST'])
 def get_movie_suggestion():
     try:
+        # Enforce daily limit for logged-in users server-side
+        user_id = get_current_user_id()
+        if user_id:
+            if get_user_searches_remaining() <= 0:
+                return jsonify({
+                    'error': 'Daily search limit reached. You have used all 8 searches for today.',
+                    'limit_reached': True,
+                    'remaining': 0
+                }), 429
+
         data = request.get_json()
         user_description = data.get("description", "")
         num_titles = int(data.get("num_titles", 1))  # Default to 1 if not specified
-        
+
         # Validate input
         if not user_description:
             return jsonify({'error': 'No description provided'}), 400
-            
+
         # Limit to reasonable range
         if num_titles < 1:
             num_titles = 1
         elif num_titles > 6:  # Match your dropdown max
             num_titles = 6
-            
+
         print(f"Generating {num_titles} movie suggestions for: {user_description}")
-            
+
         result = generate_movie_list(user_description, num_titles)
         
         if not result["success"]:
@@ -848,21 +880,33 @@ def get_movie_suggestion():
                     title = futures[future]
                     ordered[title] = future.result()
             movie_results = [ordered[t] for t in suggested_movies if ordered[t] is not None]
-            
+
+            if user_id:
+                increment_user_search()
+                remaining = get_user_searches_remaining()
+            else:
+                remaining = None
+
             return jsonify({
                 'success': True,
-                'movies': movie_results
+                'movies': movie_results,
+                'remaining': remaining
             })
         else:
-            # Single movie case - keep original behavior but ensure consistent data structure
+            # Single movie case
             selected_movie = suggested_movies[0]
             reviews, awards, ratings, poster = get_movie_data(selected_movie)
-            
-            # Ensure ratings is a dictionary
+
             ratings_dict = {}
             if isinstance(ratings, list):
                 ratings_dict = {r.get("Source", "Unknown"): r.get("Value", "N/A") for r in ratings if isinstance(r, dict)}
-            
+
+            if user_id:
+                increment_user_search()
+                remaining = get_user_searches_remaining()
+            else:
+                remaining = None
+
             response_data = {
                 'title': selected_movie,
                 'reviews': reviews or "Sorry no reviews Available",
@@ -872,10 +916,11 @@ def get_movie_suggestion():
                     'metacritic': ratings_dict.get('Metacritic', 'N/A') if ratings else 'N/A'
                 },
                 'awards': awards or "Could not find any award information",
-                'poster': poster or "https://example.com/popcorn-movie.jpg/300x450",
-                'trailer_url': f"https://www.youtube.com/results?search_query={selected_movie} trailer"
+                'poster': poster or "/api/placeholder/300/450",
+                'trailer_url': f"https://www.youtube.com/results?search_query={selected_movie} trailer",
+                'remaining': remaining
             }
-            
+
             return jsonify(response_data)
             
     except Exception as e:

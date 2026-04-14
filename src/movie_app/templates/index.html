@@ -965,15 +965,19 @@ let ytPlayer       = null;
 let lastResults    = [];    // store multi-movie results for back navigation
 let currentMovieData = null;
 
-const SEARCH_LIMIT = 10;   // applies to both guests and logged-in users
+const GUEST_SEARCH_LIMIT = 3;
+const USER_SEARCH_LIMIT  = 8;
 
-/* ---- search count (shared key for guests & logged-in) ---- */
-function getSearchCount() {
-    return parseInt(sessionStorage.getItem('searchCount') || '0');
+/* ---- guest search count (sessionStorage only) ---- */
+function getGuestSearchCount() {
+    return parseInt(sessionStorage.getItem('guestSearchCount') || '0');
 }
-function incrementSearchCount() {
-    sessionStorage.setItem('searchCount', getSearchCount() + 1);
+function incrementGuestSearchCount() {
+    sessionStorage.setItem('guestSearchCount', getGuestSearchCount() + 1);
 }
+
+/* ---- logged-in user remaining (set from server) ---- */
+let userSearchesRemaining = USER_SEARCH_LIMIT;
 
 /* ---- results persistence via sessionStorage ---- */
 function saveViewState(view) {
@@ -1069,6 +1073,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('user-greeting').textContent =
                     `Hello, ${data.user.username}!`;
                 document.getElementById('quick-nav').style.display = 'flex';
+                // Fetch today's remaining searches from server
+                fetch('/api/search/remaining')
+                    .then(r => r.json())
+                    .then(d => {
+                        if (d.remaining !== null) userSearchesRemaining = d.remaining;
+                        updateSearchBtnLabel();
+                        restoreViewState();
+                    })
+                    .catch(() => { updateSearchBtnLabel(); restoreViewState(); });
+                return; // handled inside fetch chain above
             } else {
                 isGuest = true;
                 document.getElementById('guest-login-btn').style.display = 'block';
@@ -1210,13 +1224,19 @@ function showDetailView(fromResults) {
 function updateSearchBtnLabel() {
     const btn = document.getElementById('find-movie-btn');
     if (!btn) return;
-    const remaining = SEARCH_LIMIT - getSearchCount();
-    if (remaining <= 0) {
-        btn.textContent = 'Search Limit Reached';
-    } else if (remaining <= SEARCH_LIMIT) {
-        btn.textContent = `Find Movies with AI  (${remaining} left)`;
+    if (isGuest) {
+        const remaining = GUEST_SEARCH_LIMIT - getGuestSearchCount();
+        if (remaining <= 0) {
+            btn.textContent = 'Search Limit Reached';
+        } else {
+            btn.textContent = `Find Movies with AI  (${remaining} left)`;
+        }
     } else {
-        btn.textContent = 'Find Movies with AI';
+        if (userSearchesRemaining <= 0) {
+            btn.textContent = 'Daily Limit Reached';
+        } else {
+            btn.textContent = `Find Movies with AI  (${userSearchesRemaining} left today)`;
+        }
     }
 }
 
@@ -1229,15 +1249,17 @@ async function getMovieFromAI() {
 
     if (!desc) { showToast('Please describe the kind of film you want!'); return; }
 
-    // Search limit — applies to everyone
-    const count = getSearchCount();
-    if (count >= SEARCH_LIMIT) {
-        if (isGuest) {
+    // Enforce limits before hitting the server
+    if (isGuest) {
+        if (getGuestSearchCount() >= GUEST_SEARCH_LIMIT) {
             showGuestOverlay('searchLimit');
-        } else {
-            showToast('You have reached the 10-search limit for this session.');
+            return;
         }
-        return;
+    } else {
+        if (userSearchesRemaining <= 0) {
+            showToast('You have used all 8 searches for today. Come back tomorrow!');
+            return;
+        }
     }
 
     const btn = document.getElementById('find-movie-btn');
@@ -1256,18 +1278,26 @@ async function getMovieFromAI() {
             body: JSON.stringify({ description: desc, num_titles: num })
         });
         const data = await res.json();
+        if (res.status === 429) {
+            userSearchesRemaining = 0;
+            updateSearchBtnLabel();
+            showToast('You have used all 8 searches for today. Come back tomorrow!');
+            return;
+        }
         if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
         if (data.error) throw new Error(data.error);
 
         if (data.movies && data.movies.length > 0) {
-            incrementSearchCount();
+            if (isGuest) { incrementGuestSearchCount(); }
+            else if (data.remaining !== undefined && data.remaining !== null) { userSearchesRemaining = data.remaining; }
             if (data.movies.length === 1) {
                 await showSingleMovieDetail(data.movies[0].title, data.movies[0].poster, false);
             } else {
                 displayResultsGrid(data.movies);
             }
         } else if (data.title) {
-            incrementSearchCount();
+            if (isGuest) { incrementGuestSearchCount(); }
+            else if (data.remaining !== undefined && data.remaining !== null) { userSearchesRemaining = data.remaining; }
             await showSingleMovieDetail(data.title, data.poster, false);
         } else {
             throw new Error('No results returned');
