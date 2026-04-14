@@ -334,7 +334,6 @@
         box-shadow: 5px 5px 0 rgba(184,134,11,0.35);
         transform: translate(-2px,-2px);
     }
-    .quick-nav-icon { font-size: 1rem; }
 
     /* ============================================================
        SECTION DIVIDER
@@ -344,21 +343,6 @@
         background: linear-gradient(90deg, transparent, rgba(180,122,34,0.5), transparent);
         margin: 1.5rem 0;
     }
-
-    /* ============================================================
-       RESULTS HEADING
-    ============================================================ */
-    .results-heading {
-        color: var(--gold); font-size: 0.8rem;
-        text-align: center; text-transform: uppercase;
-        text-shadow: 2px 2px 0 var(--dark-maroon);
-        padding: 0.7rem 2rem;
-        border-top: 1px dashed rgba(180,122,34,0.4);
-        border-bottom: 1px dashed rgba(180,122,34,0.4);
-        margin-bottom: 1.5rem;
-        display: flex; align-items: center; justify-content: center; gap: 0.75rem;
-    }
-    .results-heading::before, .results-heading::after { content: "★"; opacity: 0.7; }
 
     /* ============================================================
        MOVIE RESULTS GRID  (multi-movie)
@@ -930,19 +914,12 @@
 
         <!-- Quick-access nav (shown only when logged in) -->
         <div class="quick-nav" id="quick-nav" style="display:none">
-            <a href="/watchlist" class="quick-nav-btn">
-                <span class="quick-nav-icon">📋</span>
-                <span>My Watchlist</span>
-            </a>
-            <a href="/ratings" class="quick-nav-btn">
-                <span class="quick-nav-icon">⭐</span>
-                <span>My Ratings</span>
-            </a>
+            <a href="/watchlist" class="quick-nav-btn">My Watchlist</a>
+            <a href="/ratings" class="quick-nav-btn">My Ratings</a>
         </div>
 
         <!-- Results grid (multiple movies) -->
         <section id="results-view">
-            <div class="results-heading" id="results-heading">Suggested Films</div>
             <div class="movie-grid" id="movie-grid"></div>
         </section>
 
@@ -965,7 +942,7 @@
                     <div class="detail-actions">
                         <button class="btn" id="detail-watchlist-btn">+ Watchlist</button>
                         <button class="btn" id="detail-watched-btn">Mark Watched</button>
-                        <button class="btn" id="detail-trailer-btn">▶ Trailer</button>
+                        <button class="btn" id="detail-trailer-btn">Trailer</button>
                         <button class="btn" id="detail-library-btn">My Library</button>
                     </div>
                 </div>
