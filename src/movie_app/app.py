@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 import os
 import random
-import requests 
+import requests
 import openai
 from openai import OpenAI
 import traceback
@@ -15,6 +15,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 from flask import session
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 app = Flask(__name__)
@@ -328,6 +329,9 @@ movie_data_service = MovieDataService()
 review_service = ReviewService(OMDB_API_KEY)
 rating_service = RatingService(OMDB_API_KEY)
 
+# Simple in-memory OMDB response cache (title -> result tuple)
+_omdb_cache: dict = {}
+
 # Make sure OpenAI client is initialized with the API key
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -591,23 +595,28 @@ def get_current_user_id():
     return session.get('user_id')
 
 def get_movie_data(movie_title):
+    cache_key = movie_title.lower().strip()
+    if cache_key in _omdb_cache:
+        return _omdb_cache[cache_key]
     try:
         url = f"http://www.omdbapi.com/?t={movie_title}&plot=full&apikey={OMDB_API_KEY}"
-        response = requests.get(url, timeout=10) 
-        response.raise_for_status() 
+        response = requests.get(url, timeout=8)
+        response.raise_for_status()
         data = response.json()
         if data.get("Response") == "True":
-            return (
+            result = (
                 data.get("Plot", "No plot available."),
                 data.get("Awards", "No awards available."),
                 data.get("Ratings", {}),
                 data.get("Poster", "No poster available.")
             )
         else:
-            return None, None, None, None
+            result = (None, None, None, None)
     except requests.RequestException as e:
         print(f"Error fetching movie data: {e}")
-        return None, None, None, None
+        result = (None, None, None, None)
+    _omdb_cache[cache_key] = result
+    return result
 
 @app.route('/select_movie', methods=['GET'])
 def select_movie():
@@ -800,16 +809,13 @@ def get_movie_suggestion():
         
         # If we want multiple movies, return them all with complete info
         if num_titles > 1:
-            movie_results = []
-            for movie_title in suggested_movies:
+            # Fetch all OMDB data concurrently
+            def fetch_one(movie_title):
                 reviews, awards, ratings, poster = get_movie_data(movie_title)
-                
-                # Create a ratings dictionary for this movie
                 ratings_dict = {}
                 if isinstance(ratings, list):
                     ratings_dict = {r.get("Source", "Unknown"): r.get("Value", "N/A") for r in ratings if isinstance(r, dict)}
-                
-                movie_results.append({
+                return {
                     'title': movie_title,
                     'reviews': reviews or "No reviews available",
                     'awards': awards or "No awards information available",
@@ -820,7 +826,15 @@ def get_movie_suggestion():
                         'metacritic': ratings_dict.get('Metacritic', 'N/A') if ratings else 'N/A'
                     },
                     'trailer_url': f"https://www.youtube.com/results?search_query={movie_title} trailer"
-                })
+                }
+
+            with ThreadPoolExecutor(max_workers=6) as executor:
+                futures = {executor.submit(fetch_one, t): t for t in suggested_movies}
+                ordered = {t: None for t in suggested_movies}
+                for future in as_completed(futures):
+                    title = futures[future]
+                    ordered[title] = future.result()
+            movie_results = [ordered[t] for t in suggested_movies if ordered[t] is not None]
             
             return jsonify({
                 'success': True,
