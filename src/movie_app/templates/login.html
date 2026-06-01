@@ -298,6 +298,124 @@
             opacity: 1;
         }
 
+        /* ── Broke Modal ── */
+        #broke-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        #broke-modal {
+            background: var(--blue);
+            border: 4px solid var(--gold);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 560px;
+            box-shadow: 0 0 40px rgba(229,185,78,0.25);
+            animation: popIn 0.45s cubic-bezier(0.17, 0.67, 0.21, 1.4);
+            overflow: hidden;
+        }
+
+        #broke-modal .modal-header {
+            background: var(--red);
+            padding: 1.4rem 1.25rem 1rem;
+            text-align: center;
+        }
+
+        #broke-modal .modal-header .modal-icon {
+            font-size: 2.8rem;
+            display: block;
+            margin-bottom: 0.6rem;
+            animation: wobble 1.8s infinite;
+        }
+
+        @keyframes wobble {
+            0%,100% { transform: rotate(-6deg); }
+            50%      { transform: rotate(6deg);  }
+        }
+
+        #broke-modal .modal-header h3 {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--gold);
+            font-size: clamp(0.7rem, 3.5vw, 1.05rem);
+            margin: 0;
+            text-shadow: 2px 2px 0 var(--dark-red);
+            line-height: 1.6;
+        }
+
+        #broke-modal .modal-body {
+            padding: 1.6rem 1.75rem 1.4rem;
+            text-align: center;
+        }
+
+        #broke-modal .modal-body p {
+            font-family: 'Courier Prime', monospace;
+            color: var(--text);
+            font-size: clamp(0.85rem, 2.8vw, 1.05rem);
+            line-height: 1.75;
+            margin: 0 0 1rem;
+        }
+
+        #broke-modal .modal-body p strong {
+            color: var(--gold);
+        }
+
+        #broke-modal .modal-body .good-news {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--gold);
+            font-size: clamp(0.5rem, 2.2vw, 0.68rem);
+            line-height: 1.9;
+            background: rgba(229,185,78,0.07);
+            border: 1px dashed var(--dark-gold);
+            border-radius: 6px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.4rem;
+        }
+
+        #broke-modal .btn-broke-guest {
+            width: 100%;
+            padding: 1rem 1rem;
+            background: var(--red);
+            border: 2px solid var(--gold);
+            border-radius: 4px;
+            color: var(--gold);
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(0.6rem, 2.8vw, 0.82rem);
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 var(--dark-gold);
+            transition: all 0.25s;
+            -webkit-appearance: none;
+            margin-bottom: 0.85rem;
+        }
+
+        #broke-modal .btn-broke-guest:hover {
+            background: var(--gold);
+            color: var(--dark-red);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--dark-gold);
+        }
+
+        #broke-modal .btn-dismiss {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.78rem;
+            opacity: 0.55;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: opacity 0.2s;
+        }
+
+        #broke-modal .btn-dismiss:hover { opacity: 0.9; }
+
         /* Ticket tear divider */
         .ticket-tear {
             height: 10px;
@@ -310,6 +428,41 @@
     </style>
 </head>
 <body>
+
+<!-- BROKE MODAL -->
+<div id="broke-overlay">
+    <div id="broke-modal">
+        <div class="modal-header">
+            <span class="modal-icon">💸</span>
+            <h3>Important Announcement</h3>
+        </div>
+        <div class="ticket-tear"></div>
+        <div class="modal-body">
+            <p>
+                Due to <strong>severe financial constraints</strong>
+                (aka I am completely broke), I can no longer afford
+                to keep the database running.
+            </p>
+            <p>
+                This means <strong>login, registration, watchlists,
+                and ratings</strong> are currently unavailable.
+                I apologize for the inconvenience, my wallet
+                does not.
+            </p>
+            <div class="good-news">
+                THE GOOD NEWS: you can still browse as a guest and
+                see all the APIs doing their thing movie
+                suggestions, trailers, ratings &amp; more all
+                still work!
+            </div>
+            <button class="btn-broke-guest" id="broke-guest-btn">
+                🎬 &nbsp; Continue as Guest
+            </button>
+            <br>
+
+        </div>
+    </div>
+</div>
 
 <div id="auth-screen">
 
@@ -406,6 +559,20 @@
 
 <script>
 (function () {
+    // Broke modal
+    function dismissBrokeModal() {
+        document.getElementById('broke-overlay').style.display = 'none';
+    }
+
+    document.getElementById('broke-guest-btn').addEventListener('click', function () {
+        fetch('/api/auth/guest', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) { if (d.success) window.location.href = '/'; })
+            .catch(function () { window.location.href = '/'; });
+    });
+
+    document.getElementById('broke-dismiss-btn').addEventListener('click', dismissBrokeModal);
+
     const loginContainer    = document.getElementById('login-container');
     const registerContainer = document.getElementById('register-container');
 
