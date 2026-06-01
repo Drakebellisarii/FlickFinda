@@ -28,13 +28,15 @@ OMDB_API_KEY = os.getenv('OMDB_API_KEY')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 
-app.secret_key = secrets.token_hex(16)
+app.secret_key = os.getenv('SECRET_KEY', secrets.token_hex(16))
 
-# Database setup - always use SQLite
+# Database setup - use DATABASE_URL env var, fall back to local SQLite
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(basedir, 'instance', 'movies.db')
 os.makedirs(os.path.dirname(db_path), exist_ok=True)
-db_url = f'sqlite:///{db_path}'
+db_url = os.getenv('DATABASE_URL', f'sqlite:///{db_path}')
+# Render/Supabase supply postgres:// but SQLAlchemy requires postgresql://
+db_url = db_url.replace('postgres://', 'postgresql://', 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -121,6 +123,7 @@ class MovieRating(db.Model):
     poster_url = db.Column(db.String(500))
     review = db.Column(db.Text)
     rating = db.Column(db.Integer)
+    added_date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     # User relationship
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_rating_user_id'), nullable=False)
     

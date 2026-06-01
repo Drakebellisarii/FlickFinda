@@ -11,6 +11,7 @@ blinker==1.7.0
 Flask-SQLAlchemy==3.1.1
 SQLAlchemy==2.0.37
 Flask-Migrate==4.0.7
+psycopg2-binary==2.9.10
 
 # HTTP / APIs
 requests==2.31.0
