@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify, request, redirect
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import OperationalError
 from datetime import datetime, timezone, date as date_type
 import os
 import random
@@ -40,6 +41,9 @@ db_url = db_url.replace('postgres://', 'postgresql://', 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Don't let an unresponsive database hang startup or requests
+if db_url.startswith('postgresql'):
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'connect_args': {'connect_timeout': 5}}
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -147,8 +151,13 @@ class WatchlistItem(db.Model):
     )
 
 # Create tables after all models are defined
+# A database outage shouldn't stop the server from booting - features that
+# don't need the database keep working and tables are retried on next restart
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+    except OperationalError as e:
+        print(f"WARNING: database unavailable at startup, continuing without it: {e}")
 
 #@app.route('/api/ratings/add', methods=['POST'])
 #def add_to_ratings():
@@ -374,6 +383,10 @@ def register():
             }
         }), 201
         
+    except OperationalError as e:
+        db.session.rollback()
+        print(f"Registration error: {str(e)}")
+        return jsonify({'success': False, 'message': 'Accounts are temporarily unavailable. You can still continue as a guest.'}), 503
     except Exception as e:
         db.session.rollback()
         print(f"Registration error: {str(e)}")
@@ -410,6 +423,9 @@ def login():
                 'username': user.username
             }
         }), 200
+    except OperationalError as e:
+        print(f"Login error: {str(e)}")
+        return jsonify({'success': False, 'message': 'Accounts are temporarily unavailable. You can still continue as a guest.'}), 503
     except Exception as e:
         print(f"Login error: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
